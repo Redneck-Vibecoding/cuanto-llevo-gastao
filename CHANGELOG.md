@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.3.0...v1.4.0) (2026-09-30)
+
+
+### Features
+
+* add release and deploy GitHub Actions workflow ([37a5acd](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/37a5acd60a3b57b8959e309ccfe7f59b27c9eb0f))
+
 # [1.3.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.2.0...v1.3.0) (2026-09-30)
 
 
