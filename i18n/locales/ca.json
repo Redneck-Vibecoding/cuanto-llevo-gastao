@@ -37,25 +37,11 @@
       "title": "Idioma",
       "description": "Selecciona l'idioma de l'aplicació."
     },
-    "integrations": {
-      "title": "Integracions",
-      "description": "Configureu serveis externs per automatitzar tasques."
-    },
-    "api_keys": {
-      "title": "Google Maps",
-      "description": "Clau API necessària per a l'autocompletat i geolocalització de supermercats i establiments.",
-      "label": "Clau API de Google Maps",
-      "placeholder": "Enganxa la teva clau API aquí",
-      "help": "Com aconseguir-la?"
-    },
-    "reminders": {
-      "title": "Recordatoris",
-      "description": "Configura un recordatori mensual per revisar les despeses i el pressupost.",
-      "day": "Dia",
-      "time": "Hora",
-      "recurring": "Mensualment",
-      "add_to_calendar": "Afegir a Google Calendar",
-      "download_ics": "Descarregar ICS"
+    "budget": {
+      "title": "Pressupost",
+      "description": "Configura el teu pressupost mensual.",
+      "label": "Pressupost mensual",
+      "help": "Aquest import s'utilitzarà per calcular els percentatges de despesa a la portada."
     },
     "backup": {
       "title": "Còpies de seguretat",

@@ -24,7 +24,6 @@
     "generate-icons": "npx pwa-asset-generator public/icon.svg public/ --opaque false --icon-only --favicon --mstile --type png"
   },
   "dependencies": {
-    "@googlemaps/js-api-loader": "^2.0.2",
     "@internationalized/date": "^3.10.1",
     "@nuxt/ui": "^4.2.1",
     "@nuxtjs/color-mode": "^3.5.2",

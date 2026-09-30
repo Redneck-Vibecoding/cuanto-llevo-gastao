@@ -1,11 +1,8 @@
 import type { ExpenseRecord } from '~/stores/expenses'
-import type { CalendarConfig } from '~/stores/settings'
 
 interface SettingsSnapshot {
   monthlyBudget?: number
-  googleMapsApiKey?: string
   openAiApiKey?: string
-  reminder?: CalendarConfig
   locale?: string
   [key: string]: unknown
 }

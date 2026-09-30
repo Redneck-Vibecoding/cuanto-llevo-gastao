@@ -5,11 +5,7 @@ const toast = useToast()
 
 const formState = reactive({
   monthlyBudget: (settingsStore.monthlyBudget || 400) as number | string,
-  googleMapsApiKey: settingsStore.googleMapsApiKey || '',
-  openAiApiKey: settingsStore.openAiApiKey || '',
-  reminderDay: settingsStore.reminder?.day || 1,
-  reminderTime: settingsStore.reminder?.time || '09:00',
-  reminderRecurring: settingsStore.reminder?.isRecurring ?? true
+  openAiApiKey: settingsStore.openAiApiKey || ''
 })
 
 const parseCurrency = (input: string | number) => {
@@ -25,13 +21,7 @@ const saveSettings = async () => {
   await settingsStore.updateMonthlyBudget(normalizedBudget)
 
   settingsStore.$patch({
-    googleMapsApiKey: formState.googleMapsApiKey,
-    openAiApiKey: formState.openAiApiKey,
-    reminder: {
-      day: formState.reminderDay,
-      time: formState.reminderTime,
-      isRecurring: formState.reminderRecurring
-    }
+    openAiApiKey: formState.openAiApiKey
   })
 
   toast.add({ title: t('common.success'), color: 'success' })
@@ -40,24 +30,12 @@ const saveSettings = async () => {
 const hasChanges = computed(() => {
   const current = {
     monthlyBudget: parseCurrency(formState.monthlyBudget),
-    googleMapsApiKey: formState.googleMapsApiKey,
-    openAiApiKey: formState.openAiApiKey,
-    reminder: {
-      day: formState.reminderDay,
-      time: formState.reminderTime,
-      isRecurring: formState.reminderRecurring
-    }
+    openAiApiKey: formState.openAiApiKey
   }
 
   const saved = {
     monthlyBudget: settingsStore.monthlyBudget || 400,
-    googleMapsApiKey: settingsStore.googleMapsApiKey || '',
-    openAiApiKey: settingsStore.openAiApiKey || '',
-    reminder: {
-      day: settingsStore.reminder?.day || 1,
-      time: settingsStore.reminder?.time || '09:00',
-      isRecurring: settingsStore.reminder?.isRecurring ?? true
-    }
+    openAiApiKey: settingsStore.openAiApiKey || ''
   }
 
   return JSON.stringify(current) !== JSON.stringify(saved)
@@ -76,11 +54,7 @@ onBeforeRouteLeave((to, from, next) => {
 // Refresh Logic when import happens
 const onBackupImported = () => {
   formState.monthlyBudget = settingsStore.monthlyBudget || 400
-  formState.googleMapsApiKey = settingsStore.googleMapsApiKey || ''
   formState.openAiApiKey = settingsStore.openAiApiKey || ''
-  formState.reminderDay = settingsStore.reminder?.day || 1
-  formState.reminderTime = settingsStore.reminder?.time || '09:00'
-  formState.reminderRecurring = settingsStore.reminder?.isRecurring ?? true
 }
 </script>
 
@@ -105,14 +79,14 @@ const onBackupImported = () => {
           <UIcon name="i-heroicons-banknotes" class="w-6 h-6" />
         </span>
         <div>
-          <h2 class="text-base font-bold text-gray-900 dark:text-white">Presupuesto Mensual</h2>
+          <h2 class="text-base font-bold text-gray-900 dark:text-white">{{ $t('settings.budget.title') }}</h2>
           <p class="text-xs text-gray-500 dark:text-gray-400">
-            Define tu objetivo o límite de gasto mensual para compras de supermercado
+            {{ $t('settings.budget.description') }}
           </p>
         </div>
       </div>
 
-      <UFormField label="Límite mensual (€)" name="monthlyBudget">
+      <UFormField :label="$t('settings.budget.label')" name="monthlyBudget">
         <UInput
           v-model="formState.monthlyBudget"
           type="text"
@@ -122,23 +96,32 @@ const onBackupImported = () => {
           class="w-full text-lg font-bold"
         />
         <template #help>
-          Este importe se utiliza en el inicio para calcular el porcentaje gastado y avisarte si te excedes.
+          {{ $t('settings.budget.help') }}
         </template>
       </UFormField>
     </div>
 
-    <!-- Integrations (OpenAI API key & Google Maps) -->
-    <SettingsIntegrations
-      v-model:google-maps-api-key="formState.googleMapsApiKey"
-      v-model:open-ai-api-key="formState.openAiApiKey"
-    />
+    <!-- OpenAI API Key -->
+    <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="size-10 rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 flex items-center justify-center">
+          <UIcon name="i-heroicons-sparkles" class="w-6 h-6" />
+        </span>
+        <div>
+          <h2 class="text-base font-bold text-gray-900 dark:text-white">{{ $t('settings.openai.label') }}</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            {{ $t('settings.openai.description') }}
+          </p>
+        </div>
+      </div>
 
-    <!-- Reminders -->
-    <SettingsReminders
-      v-model:reminder-day="formState.reminderDay"
-      v-model:reminder-time="formState.reminderTime"
-      v-model:reminder-recurring="formState.reminderRecurring"
-    />
+      <UFormField :label="$t('settings.openai.label')" name="openAiApiKey">
+        <UInput v-model="formState.openAiApiKey" type="password" icon="i-heroicons-sparkles" placeholder="sk-..." />
+        <template #help>
+          <p class="text-emerald-600 dark:text-emerald-400">{{ $t('settings.openai.privacy') }}</p>
+        </template>
+      </UFormField>
+    </div>
 
     <!-- Backup -->
     <SettingsBackup @imported="onBackupImported" />

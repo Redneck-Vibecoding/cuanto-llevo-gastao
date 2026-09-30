@@ -93,9 +93,7 @@ watch(() => exportState.selectedYear, (newYear) => {
 
 const buildSettingsPayload = () => ({
     monthlyBudget: settingsStore.monthlyBudget,
-    googleMapsApiKey: settingsStore.googleMapsApiKey,
     openAiApiKey: settingsStore.openAiApiKey,
-    reminder: settingsStore.reminder,
     locale: locale.value
 })
 

@@ -37,25 +37,11 @@
       "title": "Idioma",
       "description": "Selecciona el idioma de la aplicación."
     },
-    "integrations": {
-      "title": "Integraciones",
-      "description": "Configura servicios externos para automatizar tareas."
-    },
-    "api_keys": {
-      "title": "Google Maps",
-      "description": "Clave API necesaria para el autocompletado y geolocalización de supermercados y establecimientos.",
-      "label": "Clave API de Google Maps",
-      "placeholder": "Pega tu clave API aquí",
-      "help": "¿Cómo conseguirla?"
-    },
-    "reminders": {
-      "title": "Recordatorios",
-      "description": "Configura un recordatorio mensual para revisar los gastos y el presupuesto.",
-      "day": "Día",
-      "time": "Hora",
-      "recurring": "Mensualmente",
-      "add_to_calendar": "Añadir a Google Calendar",
-      "download_ics": "Descargar ICS"
+    "budget": {
+      "title": "Presupuesto",
+      "description": "Configura tu presupuesto mensual.",
+      "label": "Presupuesto mensual",
+      "help": "Este importe se utilizará para calcular los porcentajes de gasto en la portada."
     },
     "backup": {
       "title": "Copias de seguridad",

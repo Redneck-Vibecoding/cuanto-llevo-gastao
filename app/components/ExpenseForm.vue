@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
 import type { FormSubmitEvent } from '#ui/types'
 import type { ExpenseRecord, ExpenseItem } from '~/stores/expenses'
-import type { ExpenseLocationSuggestion } from '~/composables/useExpenseLocation'
 import { utcToLocalInput, localInputToUtc } from '~/utils/datetime'
 import {
   compressImageToDataUrl, processDocumentFile, fileToDataUrl, isImageFile,
@@ -31,7 +30,6 @@ const toast = useToast()
 const expenseStore = useExpenseStore()
 const settingsStore = useSettingsStore()
 const { t } = useI18n()
-const { detectCurrentLocation, getLocationSuggestions, selectLocationSuggestion } = useExpenseLocation()
 
 const isEditing = computed(() => Boolean(props.initialData))
 const isLoading = ref(false)
@@ -51,93 +49,10 @@ const state = reactive({
   ticketType: undefined as string | undefined,
   ticketSize: undefined as number | undefined,
   category: 'alimentacion' as ExpenseCategory | undefined,
-  locationLabel: '',
-  location: undefined as ExpenseRecord['location'],
   items: [] as ExpenseItem[]
 })
 
-const locationSuggestions = ref<ExpenseLocationSuggestion[]>([])
-const locationSuggestionsElement = ref<HTMLElement | null>(null)
-const isLocationInputFocused = ref(false)
-const isLocationSearchLoading = ref(false)
-const hasLocationSearchError = ref(false)
-let locationSearchTimer: ReturnType<typeof setTimeout> | undefined
-let locationSearchId = 0
-const isDetectingLocation = ref(false)
 
-const setLocation = (location: ExpenseRecord['location']) => {
-  state.location = location
-  state.locationLabel = location?.label || ''
-}
-
-watch(() => state.locationLabel, (label) => {
-  clearTimeout(locationSearchTimer)
-  const searchId = ++locationSearchId
-  isLocationSearchLoading.value = false
-  hasLocationSearchError.value = false
-  if (!label.trim()) {
-    state.location = undefined
-    locationSuggestions.value = []
-    return
-  }
-  if (state.location?.label !== label) {
-    state.location = { label: label.trim() }
-  }
-  const query = label.trim()
-  if (query.length < 2 || !isLocationInputFocused.value) {
-    locationSuggestions.value = []
-    return
-  }
-  locationSearchTimer = setTimeout(async () => {
-    isLocationSearchLoading.value = true
-    hasLocationSearchError.value = false
-    try {
-      const suggestions = await getLocationSuggestions(query)
-      if (searchId === locationSearchId) {
-        locationSuggestions.value = suggestions
-        await nextTick()
-        locationSuggestionsElement.value?.scrollIntoView({ block: 'nearest' })
-      }
-    } catch {
-      if (searchId === locationSearchId) {
-        locationSuggestions.value = []
-        hasLocationSearchError.value = true
-      }
-    } finally {
-      if (searchId === locationSearchId) isLocationSearchLoading.value = false
-    }
-  }, 250)
-})
-
-onUnmounted(() => clearTimeout(locationSearchTimer))
-
-const selectLocation = async (suggestion: ExpenseLocationSuggestion) => {
-  locationSuggestions.value = []
-  isLocationInputFocused.value = false
-  try {
-    setLocation(await selectLocationSuggestion(suggestion))
-  } catch {
-    setLocation({ label: suggestion.mainText })
-  }
-}
-
-const closeLocationSuggestions = () => {
-  setTimeout(() => { isLocationInputFocused.value = false }, 150)
-}
-
-const autoDetectLocation = async () => {
-  if (isDetectingLocation.value) return
-  isDetectingLocation.value = true
-  try {
-    setLocation(await detectCurrentLocation())
-    toast.add({ title: t('components.expense_form.alerts.location_detected'), color: 'success' })
-  } catch (error) {
-    console.error('Location detection failed', error)
-    toast.add({ title: t('components.expense_form.alerts.location_error'), color: 'error' })
-  } finally {
-    isDetectingLocation.value = false
-  }
-}
 
 const categoryItems = computed(() => SUPERMARKET_CATEGORIES.map(value => ({
   value: value as ExpenseCategory,
@@ -349,10 +264,6 @@ async function extractFromTicket() {
       state.dateTime = `${parsed.date}T${currentTime}`
       filled.push(t('components.expense_form.date'))
     }
-    if (parsed.location && !state.locationLabel.trim()) {
-      setLocation({ label: parsed.location })
-      filled.push(t('components.expense_form.location'))
-    }
 
     // Populate detected items
     if (parsed.items && parsed.items.length > 0) {
@@ -415,7 +326,6 @@ const resetState = () => {
     state.ticketSize = props.initialData.ticketSize
     state.category = resolveExpenseCategory(props.initialData)
     state.items = props.initialData.items ? JSON.parse(JSON.stringify(props.initialData.items)) : []
-    setLocation(props.initialData.location)
   } else {
     state.description = ''
     state.dateTime = formatLocalNow()
@@ -428,7 +338,6 @@ const resetState = () => {
     state.ticketSize = undefined
     state.category = 'alimentacion'
     state.items = []
-    setLocation(undefined)
   }
 }
 
@@ -447,7 +356,6 @@ async function onSubmit(event: FormSubmitEvent<any>) {
       amount: event.data.amount,
       category: event.data.category,
       items: state.items.length > 0 ? state.items : undefined,
-      ...(state.location ? { location: state.location } : {}),
       ...(state.ticket || state.ticketId
         ? {
             ticket: state.ticket,
@@ -726,48 +634,6 @@ const submitLabel = computed(() => isEditing.value
         </div>
       </div>
     </div>
-
-    <!-- Location -->
-    <UFormField :label="$t('components.expense_form.location')" name="location">
-      <div class="flex flex-col sm:flex-row gap-3">
-        <div class="w-full">
-          <UInput
-            v-model="state.locationLabel" icon="i-heroicons-map-pin" autocomplete="off"
-            :placeholder="$t('components.expense_form.location_placeholder')" class="w-full"
-            @focus="isLocationInputFocused = true" @blur="closeLocationSuggestions" />
-          <p v-if="isLocationSearchLoading" class="mt-2 text-xs text-gray-500">
-            {{ $t('components.expense_form.location_searching') }}
-          </p>
-          <p v-else-if="hasLocationSearchError" class="mt-2 text-xs text-error-500">
-            {{ $t('components.expense_form.location_autocomplete_error') }}
-          </p>
-          <div
-            v-if="isLocationInputFocused && locationSuggestions.length"
-            ref="locationSuggestionsElement"
-            class="mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900"
-            role="listbox">
-            <button
-              v-for="suggestion in locationSuggestions" :key="suggestion.placeId" type="button"
-              class="flex w-full items-start gap-3 border-b border-gray-100 px-3 py-3 text-left last:border-0 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none dark:border-gray-800 dark:hover:bg-gray-800 dark:focus:bg-gray-800"
-              role="option" @mousedown.prevent @click="selectLocation(suggestion)">
-              <UIcon name="i-heroicons-map-pin" class="mt-0.5 size-5 shrink-0 text-gray-500" />
-              <span class="min-w-0">
-                <span class="block truncate text-sm font-medium text-gray-900 dark:text-white">{{ suggestion.mainText }}</span>
-                <span v-if="suggestion.secondaryText" class="block truncate text-xs text-gray-500 dark:text-gray-400">
-                  {{ suggestion.secondaryText }}
-                </span>
-              </span>
-            </button>
-            <div class="px-3 py-2 text-right text-xs text-gray-500">Google Maps</div>
-          </div>
-        </div>
-        <UButton
-          type="button" icon="i-heroicons-map" color="neutral" variant="outline"
-          :loading="isDetectingLocation" @click="autoDetectLocation">
-          {{ $t('components.expense_form.detect_location') }}
-        </UButton>
-      </div>
-    </UFormField>
 
     <!-- Modals -->
     <TicketCropperModal
