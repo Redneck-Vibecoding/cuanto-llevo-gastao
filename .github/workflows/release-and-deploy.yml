@@ -47,13 +47,15 @@ jobs:
         id: sr
         uses: cycjimmy/semantic-release-action@v4
         with:
-          semantic_version: 23
+          extra_plugins: |
+            @semantic-release/git
+            @semantic-release/changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build_and_deploy:
     needs: release
-    if: needs.release.outputs.released == 'true'
+    if: always() && needs.release.result != 'cancelled' && (needs.release.outputs.released == 'true' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     environment: github-pages
     # Serialize actual Pages deployments without cancelling an in-flight one.
@@ -72,10 +74,10 @@ jobs:
 
       - name: Build (Nuxt generate)
         run: |
-          export NUXT_PUBLIC_APP_VERSION="${{ needs.release.outputs.version }}"
+          export NUXT_PUBLIC_APP_VERSION="${{ needs.release.outputs.version || '1.0.0' }}"
           npm run generate
         env:
-          NUXT_APP_BASE_URL: ${{ vars.NUXT_APP_BASE_URL }}
+          NUXT_APP_BASE_URL: ${{ vars.NUXT_APP_BASE_URL || '/dietator/' }}
           NITRO_PRESET: github-pages
           NUXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ vars.NUXT_PUBLIC_GOOGLE_CLIENT_ID }}
 
