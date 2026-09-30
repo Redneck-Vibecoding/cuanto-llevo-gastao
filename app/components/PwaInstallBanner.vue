@@ -3,7 +3,7 @@ const { $pwa } = useNuxtApp()
 const { t } = useI18n()
 const isPwa = ref(true) // Default to true to avoid flash
 const isDismissed = ref(true)
-const installBannerPreferenceKey = 'dietator-install-banner-dismissed'
+const installBannerPreferenceKey = 'cuanto-llevo-gastao-install-banner-dismissed'
 
 onMounted(async () => {
   // Check dismissal state

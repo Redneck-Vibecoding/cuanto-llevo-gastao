@@ -14,35 +14,35 @@
 }
 
 @theme static {
-    --color-dietator-50: #fffee7;
-    --color-dietator-100: #fffcc3;
-    --color-dietator-200: #fff888;
-    --color-dietator-300: #ffef44;
-    --color-dietator-400: #f5dc00;
-    --color-dietator-500: #f5dc00;
-    --color-dietator-600: #cba800;
-    --color-dietator-700: #a27d05;
-    --color-dietator-800: #86640d;
-    --color-dietator-900: #725211;
-    --color-dietator-950: #432d03;
+    --color-brand-50: #fffee7;
+    --color-brand-100: #fffcc3;
+    --color-brand-200: #fff888;
+    --color-brand-300: #ffef44;
+    --color-brand-400: #f5dc00;
+    --color-brand-500: #f5dc00;
+    --color-brand-600: #cba800;
+    --color-brand-700: #a27d05;
+    --color-brand-800: #86640d;
+    --color-brand-900: #725211;
+    --color-brand-950: #432d03;
 }
 
 @layer theme {
     :root {
-        --ui-color-primary-400: var(--color-dietator-500);
-        --ui-color-primary-500: var(--color-dietator-600);
-        --ui-color-primary-600: var(--color-dietator-700);
-        --site-logo-gradient-start: var(--color-dietator-400);
-        --site-logo-gradient-end: var(--color-dietator-600);
+        --ui-color-primary-400: var(--color-brand-500);
+        --ui-color-primary-500: var(--color-brand-600);
+        --ui-color-primary-600: var(--color-brand-700);
+        --site-logo-gradient-start: var(--color-brand-400);
+        --site-logo-gradient-end: var(--color-brand-600);
         --site-logo-foreground: var(--ui-color-neutral-900);
     }
 
     .dark {
-        --ui-color-primary-400: var(--color-dietator-400);
-        --ui-color-primary-500: var(--color-dietator-500);
-        --ui-color-primary-600: var(--color-dietator-600);
-        --site-logo-gradient-start: var(--color-dietator-500);
-        --site-logo-gradient-end: var(--color-dietator-700);
+        --ui-color-primary-400: var(--color-brand-400);
+        --ui-color-primary-500: var(--color-brand-500);
+        --ui-color-primary-600: var(--color-brand-600);
+        --site-logo-gradient-start: var(--color-brand-500);
+        --site-logo-gradient-end: var(--color-brand-700);
         --site-logo-foreground: var(--ui-color-neutral-50);
     }
 }

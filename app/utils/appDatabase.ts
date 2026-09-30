@@ -54,7 +54,7 @@ export interface AppDatabaseUsageStats {
     legacyLocalStorageKeys: string[]
 }
 
-export const APP_DB_NAME = 'dietator'
+export const APP_DB_NAME = 'cuanto-llevo-gastao'
 export const APP_DB_VERSION = 2
 
 export const APP_STORE_NAMES = {

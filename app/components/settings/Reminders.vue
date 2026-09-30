@@ -23,7 +23,7 @@ const exportCalendar = (type: 'google' | 'ics') => {
         window.open(url, '_blank')
     } else {
         const blob = generateIcsFile(config)
-        saveAs(blob, 'recordatori-dietator.ics')
+        saveAs(blob, 'recordatori-cuanto-llevo-gastao.ics')
     }
 }
 </script>

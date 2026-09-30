@@ -59,7 +59,7 @@ export const generateStatsPdf = async (options: PdfGeneratorOptions): Promise<Bl
     // Title
     doc.setFontSize(24)
     doc.setFont('helvetica', 'bold')
-    doc.text('Dietator', 20, 18)
+    doc.text('Cuánto llevo gastao', 20, 18)
 
     doc.setFontSize(14)
     doc.setFont('helvetica', 'normal')
@@ -155,7 +155,7 @@ export const generateStatsPdf = async (options: PdfGeneratorOptions): Promise<Bl
 
     const footerY = 275
     doc.text(`Preus: Mitja ${priceHalf} | Completa ${priceFull}`, 105, footerY, { align: 'center' })
-    doc.text(`Generat automàticament per Dietator el ${new Date().toLocaleDateString('ca-ES')}`, 105, footerY + 5, { align: 'center' })
+    doc.text(`Generat automàticament per Cuánto llevo gastao el ${new Date().toLocaleDateString('ca-ES')}`, 105, footerY + 5, { align: 'center' })
 
     return doc.output('blob')
 }
@@ -218,7 +218,7 @@ export const generateWrappedPdf = async (stats: WrappedStats): Promise<Blob> => 
 
     doc.setFontSize(14)
     doc.setTextColor('#94A3B8')
-    doc.text('EL TEU ANY A DIETATOR', 105, 40, { align: 'center' })
+    doc.text('EL TEU ANY A CUÁNTO LLEVO GASTAO', 105, 40, { align: 'center' })
 
     let y = 60
 
@@ -435,7 +435,7 @@ export const generateWrappedPdf = async (stats: WrappedStats): Promise<Blob> => 
     // -- FOOTER --
     doc.setFontSize(8)
     doc.setTextColor('#4B5563') // gray-600
-    doc.text(`Generat per Dietator - ${new Date().toLocaleDateString('ca-ES')}`, 105, 285, { align: 'center' })
+    doc.text(`Generat per Cuánto llevo gastao - ${new Date().toLocaleDateString('ca-ES')}`, 105, 285, { align: 'center' })
 
     return doc.output('blob')
 }

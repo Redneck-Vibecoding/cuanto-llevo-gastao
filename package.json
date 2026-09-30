@@ -2,6 +2,14 @@
   "name": "cuanto-llevo-gastao",
   "type": "module",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/issues"
+  },
+  "homepage": "https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao#readme",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxi dev --host 0.0.0.0",

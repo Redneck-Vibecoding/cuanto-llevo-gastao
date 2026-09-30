@@ -220,7 +220,7 @@
       "legacy_cleared": "Copia antigua eliminada",
       "storage_strategy": {
         "storage_limit_title": "Persistencia en IndexedDB",
-        "storage_limit_description": "Dietator guarda servicios, gastos, configuración, cachés y tickets en una única base de datos IndexedDB.",
+        "storage_limit_description": "Cuánto llevo gastao guarda compras, gastos, configuración, cachés y tickets en una única base de datos IndexedDB.",
         "active": "Activo",
         "active_title": "Datos locales en IndexedDB",
         "active_description": "Los tickets viven en una tabla separada dentro de la misma base de datos para no reescribir archivos grandes cada vez que cambia un gasto. Las copias de seguridad los hidratan al exportar datos.",
@@ -240,7 +240,7 @@
     "title": "Inicio",
     "welcome": {
       "title": "Bienvenido a",
-      "description": "Gestiona tus servicios y dietas de manera completamente local. Dietator no guarda datos en ningún servidor y funciona completamente sin conexión a internet."
+      "description": "Gestiona tus compras y gastos de supermercado de manera completamente local. Cuánto llevo gastao no guarda datos en ningún servidor y funciona completamente sin conexión a internet."
     },
     "alerts": {
       "price_missing": {
@@ -309,7 +309,7 @@
     "title": "Política de Privacidad",
     "local_first": {
       "title": "1. Ausencia de Servidores (Local-First)",
-      "p1": "Dietator está diseñado con una filosofía <strong>Local-First</strong>. Esto significa que no disponemos de servidores centrales, bases de datos en la nube ni ningún sistema para recopilar, almacenar o procesar sus datos.",
+      "p1": "Cuánto llevo gastao está diseñado con una filosofía <strong>Local-First</strong>. Esto significa que no disponemos de servidores centrales, bases de datos en la nube ni ningún sistema para recopilar, almacenar o procesar sus datos.",
       "p2": "La totalidad de la información que introduce en la aplicación se almacena <strong>exclusivamente en su dispositivo</strong> (ordenador, tableta o móvil) utilizando las tecnologías del navegador (IndexedDB)."
     },
     "responsibility": {
@@ -323,41 +323,41 @@
     "stored_data": {
       "title": "3. Datos Almacenados",
       "p1": "La aplicación guarda localmente la siguiente información necesaria para su funcionamiento:",
-      "li1": "Datos de perfil (nombre, apellidos, DNI y precios de dietas).",
-      "li2": "Registro de servicios y desplazamientos realizados.",
-      "li3": "Preferencias de configuración (tema, recordatorios).",
-      "li4": "Tokens de acceso a Google Calendar (si se ha conectado explícitamente).",
-      "li5": "Clave API de Google Maps (si se ha configurado)."
+      "li1": "Datos de configuración y preferencias.",
+      "li2": "Registro de compras, desgloses y tickets escaneados.",
+      "li3": "Preferencias de configuración (tema, presupuesto).",
+      "li4": "Tokens de acceso o claves configuradas por el usuario (si aplica).",
+      "li5": "Claves opcionales (OpenAI Vision API)."
     },
     "third_party": {
       "title": "4. Servicios de Terceros",
-      "p1": "Aunque Dietator no tiene servidores propios, la aplicación puede conectarse directamente desde su navegador a servicios de terceros si activa estas funcionalidades:",
+      "p1": "Aunque Cuánto llevo gastao no tiene servidores propios, la aplicación puede conectarse directamente desde su navegador a servicios de terceros si activa estas funcionalidades:",
       "google_calendar": {
         "title": "Google Calendar API",
-        "description": "Se utiliza únicamente para leer sus calendarios y eventos para facilitar la creación de registros. La conexión se realiza directamente entre su navegador y Google. Nosotros no tenemos acceso a estos datos."
+        "description": "Se utiliza únicamente si conecta su calendario para leer eventos. La conexión se realiza directamente entre su navegador y Google."
       },
       "google_maps": {
         "title": "Google Maps API",
-        "description": "Si configura su clave API, se utilizará para calcular distancias de rutas. Estas peticiones están sujetas a la política de privacidad de Google."
+        "description": "Si configura su clave API, se utilizará para calcular distancias o ubicaciones."
       }
     },
     "deletion": {
       "title": "5. Eliminación de Datos",
-      "p1": "Tiene el control absoluto sobre sus datos. Puede eliminar toda la información almacenada por Dietator en cualquier momento simplemente:",
+      "p1": "Tiene el control absoluto sobre sus datos. Puede eliminar toda la información almacenada por Cuánto llevo gastao en cualquier momento simplemente:",
       "li1": "Utilizando la opción \"Borrar todos los datos\" en el apartado de mantenimiento de la Configuración.",
       "li2": "O bien, limpiando los datos de sitios web (cookies y almacenamiento local) desde las opciones de su navegador."
     },
     "contact": {
       "title": "6. Contacto",
-      "p1": "Si tiene dudas sobre esta política o el funcionamiento técnico de la aplicación, puede abrir una incidencia o discusión en el repositorio oficial de <a href=\"https://github.com/jvmonjo/dietator\" target=\"_blank\" class=\"text-primary-500 hover:underline\">GitHub</a>."
+      "p1": "Si tiene dudas sobre esta política o el funcionamiento técnico de la aplicación, puede abrir una incidencia o discusión en el repositorio oficial de <a href=\"https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao\" target=\"_blank\" class=\"text-primary-500 hover:underline\">GitHub</a>."
     }
   },
   "terms": {
     "title": "Condiciones Generales del Servicio",
     "nature": {
       "title": "1. Naturaleza del Servicio",
-      "p1": "<strong>Dietator</strong> es un proyecto de software libre y de código abierto (<a href=\"https://github.com/jvmonjo/dietator\" target=\"_blank\" class=\"text-primary-500 hover:underline\">GitHub</a>) desarrollado y distribuido de manera totalmente gratuita y sin ánimo de lucro.",
-      "p2": "El objetivo de este software es proporcionar una herramienta de utilidad para la gestión personal de dietas y servicios, pero no constituye un servicio profesional ni comercial."
+      "p1": "<strong>Cuánto llevo gastao</strong> es un proyecto de software libre y de código abierto (<a href=\"https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao\" target=\"_blank\" class=\"text-primary-500 hover:underline\">GitHub</a>) desarrollado y distribuido de manera totalmente gratuita y sin ánimo de lucro.",
+      "p2": "El objetivo de este software es proporcionar una herramienta de utilidad para el control inteligente de compras y gastos de supermercado, pero no constituye un servicio profesional ni comercial."
     },
     "beta": {
       "title": "2. Estado de desarrollo (Beta)",
@@ -367,11 +367,11 @@
       "title": "3. Exención de Garantías y Responsabilidad",
       "p1": "El software se ofrece \"TAL CUAL\" (<strong>\"AS IS\"</strong>), sin ningún tipo de garantía, expresa o implícita, incluyendo, pero sin limitarse a, garantías de comerciabilidad, idoneidad para un propósito particular o no infracción.",
       "p2": "En ningún caso los autores o titulares de los derechos de autor serán responsables de ninguna reclamación, daño u otra responsabilidad, ya sea en una acción contractual, agravio o de otro modo, que surja de, fuera de o en conexión con el software o el uso u otras relaciones con el software.",
-      "warning": "<strong>Importante:</strong> El usuario es el único responsable de la veracidad de los datos introducidos y de realizar copias de seguridad periódicas. Dietator no guarda ningún dato en sus servidores y no se hace responsable de la pérdida de datos almacenados localmente en el dispositivo del usuario."
+      "warning": "<strong>Importante:</strong> El usuario es el único responsable de la veracidad de los datos introducidos y de realizar copias de seguridad periódicas. Cuánto llevo gastao no guarda ningún dato en sus servidores y no se hace responsable de la pérdida de datos almacenados localmente en el dispositivo del usuario."
     },
     "privacy": {
       "title": "4. Privacidad y Datos",
-      "p1": "Dietator funciona bajo una filosofía <strong>Local-First</strong>. Todos los datos que introduzca (servicios, precios, datos personales) se guardan exclusivamente en su navegador (IndexedDB).",
+      "p1": "Cuánto llevo gastao funciona bajo una filosofía <strong>Local-First</strong>. Todos los datos que introduzca (compras, tickets, presupuesto, datos personales) se guardan exclusivamente en su navegador (IndexedDB).",
       "p2": "No se envía ninguna información a servidores de terceros, con la excepción de:",
       "li1": "El uso de la API de Google Calendar si decide conectar su cuenta (la comunicación es directa entre su navegador y Google).",
       "li2": "El uso de la API de Google Maps, si configura su clave, para calcular distancias."
@@ -658,7 +658,7 @@
     },
     "topics": {
       "about": {
-        "title": "Sobre Dietator",
+        "title": "Sobre Cuánto llevo gastao",
         "description": "Filosofía local, privacidad y cómo funcionan tus datos."
       },
       "pwa": {
@@ -692,7 +692,7 @@
   },
   "wrapped": {
     "title": "Tu {year}",
-    "subtitle": "Resumen del año en Dietator",
+    "subtitle": "Resumen del año en Cuánto llevo gastao",
     "stats": {
       "income": "Total dietas",
       "hours": "Horas",

@@ -61,7 +61,7 @@ describe('generateWordReport', () => {
 
     expect(result).toBeTruthy()
     const zip = await JSZip.loadAsync(await result!.blob.arrayBuffer())
-    const jsonFile = Object.keys(zip.files).find(name => name.includes('dades-mensuals-dietator'))
+    const jsonFile = Object.keys(zip.files).find(name => name.includes('dades-mensuals-cuanto-llevo-gastao'))
     expect(jsonFile).toBeTruthy()
 
     const payload = JSON.parse(await zip.file(jsonFile!)!.async('string'))

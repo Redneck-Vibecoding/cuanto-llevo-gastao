@@ -8,7 +8,7 @@ export default <Config>{
     theme: {
         extend: {
             colors: {
-                dietator: {
+                brand: {
                     50: '#fffee7',
                     100: '#fffcc3',
                     200: '#fff888',

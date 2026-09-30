@@ -53,7 +53,7 @@ definePageMeta({
               </div>
             </li>
             <li>
-              <strong>Configura la clau a Dietator:</strong>
+              <strong>Configura la clau a Cuánto llevo gastao:</strong>
               <div class="ml-5 mt-1">
                 Torna a aquesta aplicació, ves a <NuxtLink to="/settings" class="text-primary-500 hover:underline">Configuració</NuxtLink> i enganxa la clau al camp "Google Maps API Key".
               </div>

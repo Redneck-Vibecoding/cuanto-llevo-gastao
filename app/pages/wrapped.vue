@@ -88,7 +88,7 @@ const handlePdf = async () => {
             ...stats.value,
             comparisons: comparisons.value
         })
-        const filename = `dietator-wrapped-${selectedYear.value}.pdf`
+        const filename = `cuanto-llevo-gastao-wrapped-${selectedYear.value}.pdf`
 
         const file = new File([blob], filename, { type: 'application/pdf' })
 

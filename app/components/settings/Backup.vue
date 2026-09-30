@@ -132,7 +132,7 @@ const buildSettingsPayload = (includeTemplates: boolean) => ({
 
 const buildBackupFilename = (type: 'config' | 'data', timestamp: string) => {
     if (type === 'config') {
-        return `config-${timestamp}-dietator.json`
+        return `config-${timestamp}-cuanto-llevo-gastao.json`
     }
 
     // Data export
@@ -145,7 +145,7 @@ const buildBackupFilename = (type: 'config' | 'data', timestamp: string) => {
         prefix += '-'
     }
 
-    return `${prefix}dades-dietator-${timestamp}.json`
+    return `${prefix}dades-cuanto-llevo-gastao-${timestamp}.json`
 }
 
 const exportBackup = async (type: 'config' | 'data', method: 'download' | 'share' = 'download') => {

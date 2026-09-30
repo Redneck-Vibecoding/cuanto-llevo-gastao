@@ -16,7 +16,7 @@ definePageMeta({
         <div class="border-b border-gray-200 dark:border-gray-800 pb-6">
             <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Integració amb Google Calendar</h1>
             <p class="text-gray-500 dark:text-gray-400 mt-2">
-                Vincula el teu compte de Google per visualitzar i utilitzar els teus esdeveniments a Dietator.
+                Vincula el teu compte de Google per visualitzar i utilitzar els teus esdeveniments a Cuánto llevo gastao.
             </p>
         </div>
 
@@ -24,7 +24,7 @@ definePageMeta({
             <UCard>
                 <div class="space-y-4 text-sm text-gray-600 dark:text-gray-300">
                     <p>
-                        Dietator utilitza l'API oficial de Google Calendar per sincronitzar els teus esdeveniments de
+                        Cuánto llevo gastao utilitza l'API oficial de Google Calendar per sincronitzar els teus esdeveniments de
                         manera segura.
                         Això et permet:
                     </p>
@@ -60,7 +60,7 @@ icon="i-heroicons-information-circle" color="warning" variant="subtle"
                             Fes clic al botó. S'obrirà una finestra emergent de Google.
                         </li>
                         <li>
-                            Inicia sessió amb el teu compte de Google i accepta els permisos perquè Dietator pugui
+                            Inicia sessió amb el teu compte de Google i accepta els permisos perquè Cuánto llevo gastao pugui
                             <strong>llegir</strong> els teus calendaris.
                             <br>
                             <span class="text-xs text-gray-500">Només demanem permís de lectura
@@ -87,7 +87,7 @@ icon="i-heroicons-information-circle" color="warning" variant="subtle"
                         <li>La connexió es fa directament entre el teu navegador i Google.</li>
                         <li>Les dades dels teus esdeveniments es guarden <strong>només al teu dispositiu</strong>
                             (IndexedDB).</li>
-                        <li>Dietator no envia les teves dades a cap servidor extern (excepte a Google per obtenir els
+                        <li>Cuánto llevo gastao no envia les teves dades a cap servidor extern (excepte a Google per obtenir els
                             esdeveniments).</li>
                     </ul>
                 </div>

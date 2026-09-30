@@ -1,7 +1,7 @@
 export default defineAppConfig({
     ui: {
         colors: {
-            primary: 'dietator',
+            primary: 'brand',
             neutral: 'slate',
         }
     }

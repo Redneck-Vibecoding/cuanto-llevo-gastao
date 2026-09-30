@@ -1,6 +1,6 @@
 import type { CalendarConfig } from '~/stores/settings'
 
-const EVENT_TITLE = 'Dietator: Generar documents'
+const EVENT_TITLE = 'Cuánto llevo gastao: Resum mensual'
 
 function getNextDate(day: number, time: string): Date {
     const [hours, minutes] = time.split(':').map(Number)
@@ -29,7 +29,7 @@ export function generateGoogleCalendarUrl(config: CalendarConfig): string {
     // End date is 30 mins later
     const endDate = new Date(startDate.getTime() + 30 * 60000)
 
-    const description = 'Accedeix a Dietator per generar i enviar els documents de dietes i desplaçaments del mes.'
+    const description = 'Accedeix a Cuánto llevo gastao per revisar les compres i despeses del mes.'
 
     const params = new URLSearchParams({
         action: 'TEMPLATE',
@@ -50,12 +50,12 @@ export function generateIcsFile(config: CalendarConfig): Blob {
     const endDate = new Date(startDate.getTime() + 30 * 60000)
     const now = new Date()
 
-    const description = 'Accedeix a Dietator per generar i enviar els documents de dietes i desplaçaments del mes.'
+    const description = 'Accedeix a Cuánto llevo gastao per revisar les compres i despeses del mes.'
 
     const lines = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
-        'PRODID:-//Dietator//App//CA',
+        'PRODID:-//CuantoLlevoGastao//App//CA',
         'CALSCALE:GREGORIAN',
         'BEGIN:VEVENT',
         `DTSTAMP:${formatDateToICS(now)}`,

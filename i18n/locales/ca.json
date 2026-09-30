@@ -220,7 +220,7 @@
       "legacy_cleared": "Còpia antiga eliminada",
       "storage_strategy": {
         "storage_limit_title": "Persistència a IndexedDB",
-        "storage_limit_description": "Dietator desa serveis, despeses, configuració, memòries cau i tiquets en una única base de dades IndexedDB.",
+        "storage_limit_description": "Cuánto llevo gastao desa compres, despeses, configuració, memòries cau i tiquets en una única base de dades IndexedDB.",
         "active": "Actiu",
         "active_title": "Dades locals a IndexedDB",
         "active_description": "Els tiquets viuen en una taula separada dins la mateixa base de dades per no reescriure fitxers grans cada vegada que canvia una despesa. Les còpies de seguretat els hidraten quan exportes dades.",
@@ -239,7 +239,7 @@
   "home": {
     "welcome": {
       "title": "Benvingut a",
-      "description": "Gestiona els teus serveis i dietes de manera completament local. Dietator no guarda dades a cap servidor i funciona completament sense connexió a internet."
+      "description": "Gestiona les teues compres i despeses de supermercat de manera completament local. Cuánto llevo gastao no guarda dades a cap servidor i funciona completament sense connexió a internet."
     },
     "alerts": {
       "price_missing": {
@@ -307,7 +307,7 @@
     "title": "Política de Privacitat",
     "local_first": {
       "title": "1. Absència de Servidors (Local-First)",
-      "p1": "Dietator està dissenyat amb una filosofia <strong>Local-First</strong>. Això significa que no disposem de servidors centrals, bases de dades al núvol ni cap sistema per recopilar, emmagatzemar o processar les vostres dades.",
+      "p1": "Cuánto llevo gastao està dissenyat amb una filosofia <strong>Local-First</strong>. Això significa que no disposem de servidors centrals, bases de dades al núvol ni cap sistema per recopilar, emmagatzemar o processar les vostres dades.",
       "p2": "La totalitat de la informació que introduïu a l'aplicació s'emmagatzema <strong>exclusivament al vostre dispositiu</strong> (ordinador, tauleta o mòbil) utilitzant les tecnologies del navegador (IndexedDB)."
     },
     "responsibility": {
@@ -321,41 +321,41 @@
     "stored_data": {
       "title": "3. Dades Emmagatzemades",
       "p1": "L'aplicació guarda localment la següent informació necessària per al seu funcionament:",
-      "li1": "Dades de perfil (nom, cognoms, DNI i preus de dietes).",
-      "li2": "Registre de serveis i desplaçaments realitzats.",
-      "li3": "Preferències de configuració (tema, recordatoris).",
-      "li4": "Tokens d'accés a Google Calendar (si s'ha connectat explícitament).",
-      "li5": "Clau API de Google Maps (si s'ha configurat)."
+      "li1": "Dades de configuració i preferències.",
+      "li2": "Registre de compres, desglossaments i tiquets escanejats.",
+      "li3": "Preferències de configuració (tema, pressupost).",
+      "li4": "Tokens d'accés o claus configurades per l'usuari (si s'escau).",
+      "li5": "Claus opcionals (OpenAI Vision API)."
     },
     "third_party": {
       "title": "4. Serveis de Tercers",
-      "p1": "Tot i que Dietator no té servidors propis, l'aplicació pot connectar-se directament des del vostre navegador a serveis de tercers si activeu aquestes funcionalitats:",
+      "p1": "Tot i que Cuánto llevo gastao no té servidors propis, l'aplicació pot connectar-se directament des del vostre navegador a serveis de tercers si activeu aquestes funcionalitats:",
       "google_calendar": {
         "title": "Google Calendar API",
-        "description": "S'utilitza únicament per llegir els vostres calendaris i esdeveniments per facilitar la creació de registres. La connexió es fa directament entre el vostre navegador i Google. Nosaltres no tenim accés a aquestes dades."
+        "description": "S'utilitza únicament si connecteu el vostre calendari per llegir esdeveniments. La connexió es fa directament entre el vostre navegador i Google."
       },
       "google_maps": {
         "title": "Google Maps API",
-        "description": "Si configureu la vostra clau API, s'utilitzarà per calcular distàncies de rutes. Aquestes peticions estan subjectes a la política de privacitat de Google."
+        "description": "Si configureu la vostra clau API, s'utilitzarà per calcular distàncies o ubicacions."
       }
     },
     "deletion": {
       "title": "5. Eliminació de Dades",
-      "p1": "Teniu el control absolut sobre les vostres dades. Podeu eliminar tota la informació emmagatzemada per Dietator en qualsevol moment simplement:",
+      "p1": "Teniu el control absolut sobre les vostres dades. Podeu eliminar tota la informació emmagatzemada per Cuánto llevo gastao en qualsevol moment simplement:",
       "li1": "Utilitzant l'opció \"Esborrar totes les dades\" a l'apartat de manteniment de la Configuració.",
       "li2": "O bé, netejant les dades de llocs web (cookies i emmagatzematge local) des de les opcions del vostre navegador."
     },
     "contact": {
       "title": "6. Contacte",
-      "p1": "Si teniu dubtes sobre aquesta política o el funcionament tècnic de l'aplicació, podeu obrir una incidència o discussió al repositori oficial de <a href=\"https://github.com/jvmonjo/dietator\" target=\"_blank\" class=\"text-primary-500 hover:underline\">GitHub</a>."
+      "p1": "Si teniu dubtes sobre aquesta política o el funcionament tècnic de l'aplicació, podeu obrir una incidència o discussió al repositori oficial de <a href=\"https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao\" target=\"_blank\" class=\"text-primary-500 hover:underline\">GitHub</a>."
     }
   },
   "terms": {
     "title": "Condicions Generals del Servei",
     "nature": {
       "title": "1. Naturalesa del Servei",
-      "p1": "<strong>Dietator</strong> és un projecte de programari lliure i de codi obert (<a href=\"https://github.com/jvmonjo/dietator\" target=\"_blank\" class=\"text-primary-500 hover:underline\">GitHub</a>) desenvolupat i distribuït de manera totalment gratuïta i sense cap ànim de lucre.",
-      "p2": "L'objectiu d'aquest programari és proporcionar una eina d'utilitat per a la gestió personal de dietes i serveis, però no constitueix un servei professional ni comercial."
+      "p1": "<strong>Cuánto llevo gastao</strong> és un projecte de programari lliure i de codi obert (<a href=\"https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao\" target=\"_blank\" class=\"text-primary-500 hover:underline\">GitHub</a>) desenvolupat i distribuït de manera totalment gratuïta i sense cap ànim de lucre.",
+      "p2": "L'objectiu d'aquest programari és proporcionar una eina d'utilitat per al control intel·ligent de compres i despeses de supermercat, però no constitueix un servei professional ni comercial."
     },
     "beta": {
       "title": "2. Estat de desenvolupament (Beta)",
@@ -365,11 +365,11 @@
       "title": "3. Exempció de Garanties i Responsabilitat",
       "p1": "El programari s'ofereix \"TAL QUAL\" (<strong>\"AS IS\"</strong>), sense cap mena de garantia, expressa o implícita, incloent-hi, però sense limitar-se a, garanties de mercantilitat, idoneïtat per a un propòsit particular o no infracció.",
       "p2": "En cap cas els autors o titulars dels drets d'autor seran responsables de cap reclamació, dany o altra responsabilitat, ja sigui en una acció contractual, greuge o d'una altra manera, que sorgeixi de, fora de o en connexió amb el programari o l'ús o altres relacions amb el programari.",
-      "warning": "<strong>Important:</strong> L'usuari és l'únic responsable de la veracitat de les dades introduïdes i de realitzar còpies de seguretat periòdiques. Dietator no guarda cap dada als seus servidors i no es fa responsable de la pèrdua de dades emmagatzemades localment al dispositiu de l'usuari."
+      "warning": "<strong>Important:</strong> L'usuari és l'únic responsable de la veracitat de les dades introduïdes i de realitzar còpies de seguretat periòdiques. Cuánto llevo gastao no guarda cap dada als seus servidors i no es fa responsable de la pèrdua de dades emmagatzemades localment al dispositiu de l'usuari."
     },
     "privacy": {
       "title": "4. Privacitat i Dades",
-      "p1": "Dietator funciona sota una filosofia <strong>Local-First</strong>. Totes les dades que introduïu (serveis, preus, dades personals) es guarden exclusivament al vostre navegador (IndexedDB).",
+      "p1": "Cuánto llevo gastao funciona sota una filosofia <strong>Local-First</strong>. Totes les dades que introduïu (compres, tiquets, pressupost, dades personals) es guarden exclusivament al vostre navegador (IndexedDB).",
       "p2": "No s'envia cap informació a servidors de tercers, amb l'excepció de:",
       "li1": "L'ús de l'API de Google Calendar si decidiu connectar-hi el vostre compte (la comunicació és directa entre el vostre navegador i Google).",
       "li2": "L'ús de l'API de Google Maps, si configureu la vostra clau, per calcular distàncies."
@@ -656,7 +656,7 @@
     },
     "topics": {
       "about": {
-        "title": "Sobre Dietator",
+        "title": "Sobre Cuánto llevo gastao",
         "description": "Filosofia local, privadesa i com funcionen les teues dades."
       },
       "pwa": {
@@ -690,7 +690,7 @@
   },
   "wrapped": {
     "title": "El teu {year}",
-    "subtitle": "Resum de l'any a Dietator",
+    "subtitle": "Resum de l'any a Cuánto llevo gastao",
     "stats": {
       "income": "Total dietes",
       "hours": "Hores",

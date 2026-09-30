@@ -138,7 +138,7 @@ export async function buildExpensesArchive(
 
   const blob = await zip.generateAsync({ type: 'blob' })
   const filenameDateRange = options.filenameDateRange || filenameDateRangeFromExpenses(ordered)
-  const filename = `dietator-despeses-${filenameDateRange}.zip`
+  const filename = `cuanto-llevo-gastao-despeses-${filenameDateRange}.zip`
   return { blob, filename }
 }
 

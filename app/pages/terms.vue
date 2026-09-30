@@ -71,6 +71,6 @@ class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-sm border-l-4
 const { t } = useI18n()
 
 useHead({
-    title: computed(() => `${t('terms.title')} - Dietator`)
+    title: computed(() => `${t('terms.title')} - Cuánto llevo gastao`)
 })
 </script>

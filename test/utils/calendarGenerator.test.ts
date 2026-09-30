@@ -27,7 +27,7 @@ describe('calendarGenerator', () => {
 
       expect(parsed.origin + parsed.pathname).toBe('https://calendar.google.com/calendar/render')
       expect(parsed.searchParams.get('action')).toBe('TEMPLATE')
-      expect(parsed.searchParams.get('text')).toBe('Dietator: Generar documents')
+      expect(parsed.searchParams.get('text')).toBe('Cuánto llevo gastao: Resum mensual')
       expect(parsed.searchParams.get('dates')).toMatch(/^\d{8}T\d{6}Z\/\d{8}T\d{6}Z$/)
     })
 
@@ -57,7 +57,7 @@ describe('calendarGenerator', () => {
       const text = await readBlob(blob)
       expect(text).toContain('BEGIN:VCALENDAR')
       expect(text).toContain('BEGIN:VEVENT')
-      expect(text).toContain('SUMMARY:Dietator: Generar documents')
+      expect(text).toContain('SUMMARY:Cuánto llevo gastao: Resum mensual')
       expect(text).toContain('RRULE:FREQ=MONTHLY')
       expect(text).toContain('END:VEVENT')
       expect(text).toContain('END:VCALENDAR')

@@ -75,7 +75,7 @@ export const generateWordReport = async (options: GenerateWordReportOptions) => 
   const { monthlyContext, serviceDocuments } = buildContexts(contextOptions)
 
   if (monthly && monthlyContext) {
-    tasks.push(renderDocumentFromTemplate(monthly, monthlyContext, `${options.month.value}-dietator-mensual.docx`))
+    tasks.push(renderDocumentFromTemplate(monthly, monthlyContext, `${options.month.value}-cuanto-llevo-gastao-mensual.docx`))
   }
 
   if (service && serviceDocuments.length > 0) {
@@ -83,7 +83,7 @@ export const generateWordReport = async (options: GenerateWordReportOptions) => 
       // Extract date from reference SERV-YYYY-MM-DD-XX
       const dateMatch = doc.reference.match(/SERV-(\d{4}-\d{2}-\d{2})/)
       const datePrefix = dateMatch ? dateMatch[1] : options.month.value
-      tasks.push(renderDocumentFromTemplate(service, doc.context, `${datePrefix}-servei-dietator-${doc.reference}.docx`))
+      tasks.push(renderDocumentFromTemplate(service, doc.context, `${datePrefix}-servei-cuanto-llevo-gastao-${doc.reference}.docx`))
     })
   }
 
@@ -97,7 +97,7 @@ export const generateWordReport = async (options: GenerateWordReportOptions) => 
       settings: options.settings,
       records: sortedRecords
     })
-    files.push({ filename: `${options.month.value}-estadistiques-dietator.pdf`, blob: pdfBlob })
+    files.push({ filename: `${options.month.value}-estadistiques-cuanto-llevo-gastao.pdf`, blob: pdfBlob })
   } catch (e) {
     console.error('Error generating PDF', e)
   }
@@ -117,7 +117,7 @@ export const generateWordReport = async (options: GenerateWordReportOptions) => 
     const jsonString = JSON.stringify(jsonPayload, null, 2)
     const jsonBlob = new Blob([jsonString], { type: 'application/json' })
     const today = new Date().toISOString().split('T')[0]
-    files.push({ filename: `${options.month.value}-dades-mensuals-dietator-${today}.json`, blob: jsonBlob })
+    files.push({ filename: `${options.month.value}-dades-mensuals-cuanto-llevo-gastao-${today}.json`, blob: jsonBlob })
   } catch (e) {
     console.error('Error generating JSON', e)
   }
@@ -131,7 +131,7 @@ export const generateWordReport = async (options: GenerateWordReportOptions) => 
     archive.file(file.filename, file.blob)
   })
   const zipBlob = await archive.generateAsync({ type: 'blob' })
-  const zipFilename = `${options.month.value}-documents-dietator.zip`
+  const zipFilename = `${options.month.value}-documents-cuanto-llevo-gastao.zip`
   return { blob: zipBlob, filename: zipFilename }
 }
 
