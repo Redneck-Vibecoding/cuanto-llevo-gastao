@@ -159,6 +159,11 @@ const openEditExpense = (expense: ExpenseRecord) => {
   isFormModalOpen.value = true
 }
 
+const handleExpenseSaved = () => {
+  isFormModalOpen.value = false
+  editingExpense.value = null
+}
+
 const openBudgetModal = () => {
   tempBudget.value = currentBudget.value
   isBudgetModalOpen.value = true
@@ -552,14 +557,12 @@ const monthName = computed(() => {
     </div>
 
     <!-- FORM MODAL -->
-    <UModal v-model:open="isFormModalOpen" :title="editingExpense ? 'Editar compra' : 'Nueva compra'">
-      <template #body>
-        <ExpenseForm
-          :initial-data="editingExpense"
-          @saved="isFormModalOpen = false"
-        />
-      </template>
-    </UModal>
+    <ExpenseModal
+      v-model:open="isFormModalOpen"
+      :expense="editingExpense"
+      @saved="handleExpenseSaved"
+      @close="editingExpense = null"
+    />
 
     <!-- BUDGET MODAL -->
     <UModal v-model:open="isBudgetModalOpen" :title="$t('dashboard.set_budget_title')">

@@ -7,9 +7,7 @@ import {
 
 const { t } = useI18n()
 const toast = useToast()
-const serviceStore = useServiceStore()
 const expenseStore = useExpenseStore()
-const distancesStore = useDistancesStore()
 
 const maintenanceState = reactive({
     selectedYear: undefined as number | undefined,
@@ -37,10 +35,6 @@ const formatBytes = (bytes: number) => {
 
 const availableYears = computed(() => {
     const years = new Set<number>()
-    serviceStore.records.forEach(r => {
-        const d = new Date(r.startTime)
-        if (!Number.isNaN(d.getTime())) years.add(d.getFullYear())
-    })
     expenseStore.expenses.forEach(r => {
         const d = new Date(r.timestamp)
         if (!Number.isNaN(d.getTime())) years.add(d.getFullYear())
@@ -51,12 +45,6 @@ const availableYears = computed(() => {
 const availableMonthsForYear = computed(() => {
     if (!maintenanceState.selectedYear) return []
     const months = new Set<number>()
-    serviceStore.records.forEach(r => {
-        const d = new Date(r.startTime)
-        if (!Number.isNaN(d.getTime()) && d.getFullYear() === maintenanceState.selectedYear) {
-            months.add(d.getMonth() + 1)
-        }
-    })
     expenseStore.expenses.forEach(r => {
         const d = new Date(r.timestamp)
         if (!Number.isNaN(d.getTime()) && d.getFullYear() === maintenanceState.selectedYear) {
@@ -94,10 +82,8 @@ const confirmDelete = () => {
     confirmModal.description = description
     confirmModal.action = async () => {
         if (month) {
-            await serviceStore.deleteRecordsByMonth(year, month)
             await expenseStore.deleteExpensesByMonth(year, month)
         } else {
-            await serviceStore.deleteRecordsByYear(year)
             await expenseStore.deleteExpensesByYear(year)
         }
         await refreshStats()
@@ -145,9 +131,7 @@ watch(ticketStatsSignature, () => {
 }, { immediate: true })
 
 watch(() => [
-    serviceStore.records.length,
-    expenseStore.expenses.length,
-    distancesStore.getCacheStats().items
+    expenseStore.expenses.length
 ], () => {
     void refreshDatabaseStats()
 })
@@ -184,19 +168,6 @@ const confirmRemoveTicketsForSelection = () => {
         toast.add({ title: t('settings.maintenance.tickets_removed'), color: 'success' })
     }
     confirmModal.confirmLabel = t('settings.maintenance.remove_tickets')
-    confirmModal.confirmColor = 'error'
-    confirmModal.isOpen = true
-}
-
-const confirmClearCache = () => {
-    confirmModal.title = t('settings.maintenance.confirm_clear_cache_title')
-    confirmModal.description = t('settings.maintenance.confirm_clear_cache_description')
-    confirmModal.action = async () => {
-        await distancesStore.clearCache()
-        await refreshDatabaseStats()
-        toast.add({ title: t('settings.maintenance.cache_cleared'), color: 'success' })
-    }
-    confirmModal.confirmLabel = t('settings.maintenance.clear_cache')
     confirmModal.confirmColor = 'error'
     confirmModal.isOpen = true
 }
@@ -252,29 +223,27 @@ const handleConfirm = async () => {
                     <div class="text-right">
                         <p class="text-lg font-bold text-primary-600 dark:text-primary-400">{{
                             formatBytes(databaseStats.totalBytes) }}</p>
-                        <p class="text-xs text-gray-500">{{ $t('settings.maintenance.total_services', {
-                            count: serviceStore.records.length
-                            }) }} · {{ $t('settings.maintenance.total_expenses', {
-                                count: expenseStore.expenses.length
-                            }) }}</p>
+                        <p class="text-xs text-gray-500">{{ $t('settings.maintenance.total_expenses', {
+                            count: expenseStore.expenses.length
+                        }) }}</p>
                     </div>
                 </div>
 
                 <div
                     v-if="databaseStats.legacyLocalStorageBytes > 0"
-                    class="p-4 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 flex items-center justify-between gap-4">
+                    class="p-4 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-between gap-4">
                     <div>
-                        <p class="text-sm font-medium text-amber-900 dark:text-amber-100">{{
+                        <p class="text-sm font-medium text-emerald-900 dark:text-emerald-100">{{
                             $t('settings.maintenance.legacy_title') }}
                         </p>
-                        <p class="text-xs text-amber-700 dark:text-amber-200 mt-1">{{
+                        <p class="text-xs text-emerald-700 dark:text-emerald-200 mt-1">{{
                             $t('settings.maintenance.legacy_description') }}</p>
                     </div>
                     <div class="flex items-center gap-4">
                         <div class="text-right">
-                            <p class="text-lg font-bold text-amber-700 dark:text-amber-200">{{
+                            <p class="text-lg font-bold text-emerald-700 dark:text-emerald-200">{{
                                 formatBytes(databaseStats.legacyLocalStorageBytes) }}</p>
-                            <p class="text-xs text-amber-700 dark:text-amber-200">{{
+                            <p class="text-xs text-emerald-700 dark:text-emerald-200">{{
                                 $t('settings.maintenance.legacy_keys', {
                                     count: databaseStats.legacyLocalStorageKeys.length
                                 }) }}</p>
@@ -283,34 +252,6 @@ const handleConfirm = async () => {
                             color="warning" variant="ghost" icon="i-heroicons-trash" size="xs"
                             @click="confirmClearLegacyLocalStorage">
                             {{ $t('settings.maintenance.clear_legacy') }}
-                        </UButton>
-                    </div>
-                </div>
-
-                <div
-                    class="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/40 flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{
-                            $t('settings.maintenance.cache_title') }}
-                        </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{
-                            $t('settings.maintenance.cache_description')
-                            }}
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="text-right">
-                            <p class="text-lg font-bold text-primary-600 dark:text-primary-400">{{
-                                formatBytes(distancesStore.getCacheStats().size) }}</p>
-                            <p class="text-xs text-gray-500">{{ $t('settings.maintenance.routes_count', {
-                                count:
-                                    distancesStore.getCacheStats().items
-                                }) }}</p>
-                        </div>
-                        <UButton
-color="error" variant="ghost" icon="i-heroicons-trash" size="xs"
-                            @click="confirmClearCache">
-                            {{ $t('settings.maintenance.clear_cache') }}
                         </UButton>
                     </div>
                 </div>
@@ -341,13 +282,13 @@ color="error" variant="ghost" icon="i-heroicons-trash" size="xs"
 
 
                 <div
-                    class="p-4 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 space-y-4">
+                    class="p-4 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 space-y-4">
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <p class="text-sm font-medium text-amber-900 dark:text-amber-100">{{
+                            <p class="text-sm font-medium text-emerald-900 dark:text-emerald-100">{{
                                 $t('settings.maintenance.storage_strategy.storage_limit_title')
                                 }}</p>
-                            <p class="text-xs text-amber-700 dark:text-amber-200 mt-1">{{
+                            <p class="text-xs text-emerald-700 dark:text-emerald-200 mt-1">{{
                                 $t('settings.maintenance.storage_strategy.storage_limit_description')
                                 }}</p>
                         </div>
@@ -355,7 +296,7 @@ color="error" variant="ghost" icon="i-heroicons-trash" size="xs"
                     </div>
 
                     <div
-                        class="p-3 rounded-lg border border-amber-200/70 dark:border-amber-800/70 bg-white/70 dark:bg-gray-900/40">
+                        class="p-3 rounded-lg border border-emerald-200/70 dark:border-emerald-800/70 bg-white/70 dark:bg-gray-900/40">
                         <div class="flex items-center gap-2">
                             <p class="text-sm font-semibold text-gray-900 dark:text-white">
                                 {{ $t('settings.maintenance.storage_strategy.active_title') }}

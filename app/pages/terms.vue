@@ -35,7 +35,7 @@
                         {{ $t('terms.disclaimer.p2') }}
                     </p>
                     <div
-class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-sm border-l-4 border-yellow-500 text-yellow-800 dark:text-yellow-200"
+class="mt-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg text-sm border-l-4 border-emerald-500 text-emerald-800 dark:text-emerald-200"
                         v-html="$t('terms.disclaimer.warning')" />
                 </section>
 

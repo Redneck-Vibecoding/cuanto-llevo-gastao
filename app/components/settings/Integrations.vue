@@ -1,37 +1,6 @@
 <script setup lang="ts">
 const googleMapsApiKey = defineModel<string>('googleMapsApiKey')
 const openAiApiKey = defineModel<string>('openAiApiKey')
-const googleCalendarId = defineModel<string>('googleCalendarId')
-
-const emit = defineEmits<{
-    (e: 'save'): void
-}>()
-
-const { t } = useI18n()
-const externalCalendarStore = useExternalCalendarStore()
-const config = useRuntimeConfig()
-
-const isConnected = computed(() => externalCalendarStore.lastSync !== null || externalCalendarStore.calendars.length > 0)
-const googleButtonLabel = computed(() => isConnected.value ? t('settings.calendar.sync') : t('settings.calendar.connect'))
-
-const calendarOptions = computed(() => {
-    return externalCalendarStore.calendars.map(c => ({ label: c.summary, value: c.id }))
-})
-
-const saveAndSyncCalendar = async () => {
-    emit('save')
-    // Trigger a re-sync with the new calendar ID using the existing Google token (no extra prompts if still valid)
-    await externalCalendarStore.syncEvents('events')
-}
-
-const handleCancelOrDisconnect = () => {
-    console.log('Handle cancel/disconnect clicked. isLoading:', externalCalendarStore.isLoading)
-    if (externalCalendarStore.isLoading) {
-        externalCalendarStore.cancelSync()
-    } else {
-        externalCalendarStore.disconnect()
-    }
-}
 </script>
 
 <template>
@@ -68,78 +37,9 @@ to="/help/maps"
                 <UInput v-model="openAiApiKey" type="password" icon="i-heroicons-sparkles" placeholder="sk-..." />
                 <template #help>
                     <p>{{ $t('settings.openai.description') }}</p>
-                    <p class="mt-1 text-amber-600 dark:text-amber-400">{{ $t('settings.openai.privacy') }}</p>
+                    <p class="mt-1 text-emerald-600 dark:text-emerald-400">{{ $t('settings.openai.privacy') }}</p>
                 </template>
             </UFormField>
-
-            <div class="relative py-4">
-                <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                    <div class="w-full border-t border-gray-300 dark:border-gray-700" />
-                </div>
-                <div class="relative flex justify-center">
-                    <span class="bg-white dark:bg-gray-900 px-2 text-sm text-gray-500">{{ $t('settings.calendar.title')
-                    }}</span>
-                </div>
-            </div>
-
-            <div id="google-calendar-section" class="scroll-mt-32">
-                <UFormField label="Google Calendar" name="googleCalendar">
-                    <div class="flex flex-col gap-2">
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                            {{ $t('settings.calendar.description') }}
-                            <NuxtLink
-to="/help/google-calendar"
-                                class="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400 font-medium inline-flex items-center gap-1 ml-1">
-                                <UIcon name="i-heroicons-question-mark-circle" class="w-4 h-4" /> {{
-                                    $t('settings.calendar.help') }}
-                            </NuxtLink>
-                        </p>
-                        <div class="flex flex-col gap-3">
-                            <div class="flex items-center gap-3">
-                                <UButton
-:loading="externalCalendarStore.isLoading"
-                                    :disabled="!config.public.googleClientId" icon="i-logos-google-icon" color="neutral"
-                                    variant="soft" @click="externalCalendarStore.syncEvents('events')">
-                                    {{ googleButtonLabel }}
-                                </UButton>
-                                <UBadge
-v-if="isConnected" color="success"
-                                    variant="subtle">
-                                    {{ $t('settings.calendar.connected') }}
-                                </UBadge>
-                                <UButton
-                                    v-if="externalCalendarStore.isLoading || isConnected"
-                                    icon="i-heroicons-trash" color="error" variant="ghost" size="xs"
-                                    @click="handleCancelOrDisconnect">
-                                    {{ externalCalendarStore.isLoading ? $t('common.cancel') : $t('common.disconnect')
-                                    }}
-                                </UButton>
-                            </div>
-                            <p v-if="!config.public.googleClientId" class="text-xs text-red-500 dark:text-red-400">
-                                {{ $t('settings.calendar.client_id_missing') }}
-                            </p>
-
-                            <div v-if="isConnected">
-                                <UButton
-v-if="externalCalendarStore.calendars.length === 0"
-                                    icon="i-heroicons-list-bullet" color="neutral" variant="ghost" size="xs"
-                                    :loading="externalCalendarStore.isLoading"
-                                    @click="externalCalendarStore.syncEvents('calendars')">
-                                    {{ $t('settings.calendar.change_calendar') }}
-                                </UButton>
-
-                                <UFormField
-v-else :label="$t('settings.calendar.select_calendar')"
-                                    name="calendarSelector">
-                                    <USelect
-v-model="googleCalendarId" :items="calendarOptions"
-                                        placeholder="Selecciona..." style="width: 100%" @change="saveAndSyncCalendar" />
-                                </UFormField>
-                            </div>
-                        </div>
-                    </div>
-                </UFormField>
-            </div>
         </div>
     </UCard>
 </template>

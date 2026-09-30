@@ -13,18 +13,23 @@
     }
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   Corporate brand color palette (green / emerald)
+   Derived from the app logo gradients: #10B981 → #059669 → #047857
+   To change the brand colour in the future, update only these tokens.
+   ───────────────────────────────────────────────────────────────────────────── */
 @theme static {
-    --color-brand-50: #fffee7;
-    --color-brand-100: #fffcc3;
-    --color-brand-200: #fff888;
-    --color-brand-300: #ffef44;
-    --color-brand-400: #f5dc00;
-    --color-brand-500: #f5dc00;
-    --color-brand-600: #cba800;
-    --color-brand-700: #a27d05;
-    --color-brand-800: #86640d;
-    --color-brand-900: #725211;
-    --color-brand-950: #432d03;
+    --color-brand-50:  #ecfdf5;
+    --color-brand-100: #d1fae5;
+    --color-brand-200: #a7f3d0;
+    --color-brand-300: #6ee7b7;
+    --color-brand-400: #34d399;
+    --color-brand-500: #10b981;
+    --color-brand-600: #059669;
+    --color-brand-700: #047857;
+    --color-brand-800: #065f46;
+    --color-brand-900: #064e3b;
+    --color-brand-950: #022c22;
 }
 
 @layer theme {
@@ -32,17 +37,17 @@
         --ui-color-primary-400: var(--color-brand-500);
         --ui-color-primary-500: var(--color-brand-600);
         --ui-color-primary-600: var(--color-brand-700);
-        --site-logo-gradient-start: var(--color-brand-400);
-        --site-logo-gradient-end: var(--color-brand-600);
-        --site-logo-foreground: var(--ui-color-neutral-900);
+        --site-logo-gradient-start: var(--color-brand-500);
+        --site-logo-gradient-end: var(--color-brand-700);
+        --site-logo-foreground: var(--ui-color-neutral-50);
     }
 
     .dark {
         --ui-color-primary-400: var(--color-brand-400);
         --ui-color-primary-500: var(--color-brand-500);
         --ui-color-primary-600: var(--color-brand-600);
-        --site-logo-gradient-start: var(--color-brand-500);
-        --site-logo-gradient-end: var(--color-brand-700);
+        --site-logo-gradient-start: var(--color-brand-400);
+        --site-logo-gradient-end: var(--color-brand-600);
         --site-logo-foreground: var(--ui-color-neutral-50);
     }
 }
