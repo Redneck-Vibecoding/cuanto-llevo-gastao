@@ -2,9 +2,9 @@ name: Release and Deploy
 
 on:
   push:
-    branches: [master]
+    branches: [master, cuanto-llevo-gastao]
   pull_request:
-    branches: [master]
+    branches: [master, cuanto-llevo-gastao]
   workflow_dispatch:
 
 permissions:
@@ -75,9 +75,14 @@ jobs:
       - name: Build (Nuxt generate)
         run: |
           export NUXT_PUBLIC_APP_VERSION="${{ needs.release.outputs.version || '1.0.0' }}"
+          if [ -n "${{ vars.NUXT_APP_BASE_URL }}" ]; then
+            export NUXT_APP_BASE_URL="${{ vars.NUXT_APP_BASE_URL }}"
+          else
+            export NUXT_APP_BASE_URL="/${{ github.event.repository.name }}/"
+          fi
+          echo "Building with NUXT_APP_BASE_URL=$NUXT_APP_BASE_URL"
           npm run generate
         env:
-          NUXT_APP_BASE_URL: ${{ vars.NUXT_APP_BASE_URL || '/dietator/' }}
           NITRO_PRESET: github-pages
           NUXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ vars.NUXT_PUBLIC_GOOGLE_CLIENT_ID }}
 
@@ -108,7 +113,11 @@ jobs:
       - name: Build (Nuxt generate)
         run: |
           export NUXT_PUBLIC_APP_VERSION="0.0.0-pr"
+          if [ -n "${{ vars.NUXT_APP_BASE_URL }}" ]; then
+            export NUXT_APP_BASE_URL="${{ vars.NUXT_APP_BASE_URL }}"
+          else
+            export NUXT_APP_BASE_URL="/${{ github.event.repository.name }}/"
+          fi
           npm run generate
         env:
-          NUXT_APP_BASE_URL: /
           NITRO_PRESET: github-pages
