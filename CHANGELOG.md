@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.1.0...v1.2.0) (2026-09-30)
+
+
+### Features
+
+* **pwa:** update app icon, splash screen and screenshots with shopping cart design ([4a01789](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/4a01789cb57287c532d418e36680488d92a77521))
+
 # [1.1.0](https://github.com/Redneck-Vibecoding/dietator/compare/v1.0.0...v1.1.0) (2026-09-30)
 
 
