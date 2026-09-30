@@ -1,7 +1,7 @@
 <div class="splash-container">
     <style>
         .splash-container {
-            background-color: #f5dc00;
+            background: linear-gradient(145deg, #065f46 0%, #047857 50%, #022c22 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -14,44 +14,132 @@
         }
 
         .splash-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
-            color: #434343;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #ecfdf5;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 24px;
+        }
+
+        .splash-icon-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .splash-icon-glow {
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            border-radius: 32px;
+            background: #34d399;
+            filter: blur(24px);
+            opacity: 0.35;
+            animation: splashGlow 2.4s infinite ease-in-out;
         }
 
         .splash-icon {
-            width: 128px;
-            height: 128px;
-            animation: pulse 2s infinite ease-in-out;
+            position: relative;
+            width: 112px;
+            height: 112px;
+            border-radius: 26px;
+            box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.45);
+            animation: splashPulse 2.4s infinite ease-in-out;
         }
 
-        .splash-text {
-            margin-top: 1rem;
-            font-size: 1.5rem;
+        .splash-title {
+            font-size: 1.625rem;
             font-weight: 700;
-            letter-spacing: 0.05em;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+            margin: 0;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
-        @keyframes pulse {
-            0% {
+        .splash-subtitle {
+            margin-top: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #a7f3d0;
+            letter-spacing: 0.01em;
+            opacity: 0.9;
+        }
+
+        .splash-loader {
+            width: 140px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 9999px;
+            margin-top: 1.75rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .splash-loader-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 40%;
+            background: linear-gradient(90deg, #34d399, #fde047);
+            border-radius: 9999px;
+            animation: splashLoading 1.6s infinite ease-in-out;
+        }
+
+        @keyframes splashPulse {
+
+            0%,
+            100% {
                 transform: scale(1);
-                opacity: 0.8;
             }
 
             50% {
-                transform: scale(1.1);
-                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes splashGlow {
+
+            0%,
+            100% {
+                transform: scale(0.95);
+                opacity: 0.25;
+            }
+
+            50% {
+                transform: scale(1.15);
+                opacity: 0.45;
+            }
+        }
+
+        @keyframes splashLoading {
+            0% {
+                left: -40%;
+            }
+
+            50% {
+                left: 100%;
             }
 
             100% {
-                transform: scale(1);
-                opacity: 0.8;
+                left: 100%;
             }
         }
     </style>
     <div class="splash-content">
-        <img data-src="icon.svg" alt="Dietator Loading" class="splash-icon">
-        <div class="splash-text">Dietator</div>
+        <div class="splash-icon-wrapper">
+            <div class="splash-icon-glow"></div>
+            <img data-src="icon.svg" alt="Cuánto llevo gastao" class="splash-icon">
+        </div>
+        <h1 class="splash-title">Cuánto llevo gastao</h1>
+        <div class="splash-subtitle">Control de gastos de Supermercado</div>
+        <div class="splash-loader">
+            <div class="splash-loader-bar"></div>
+        </div>
     </div>
     <script>
         (function loadSplashIcon() {

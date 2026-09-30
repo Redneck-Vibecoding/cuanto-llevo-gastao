@@ -4,32 +4,118 @@
     xmlns="http://www.w3.org/2000/svg"
     class="shrink-0"
   >
-    <!-- Background rounded square with vibrant emerald -->
-    <rect width="512" height="512" rx="128" fill="#10B981" />
-    
-    <!-- Bag handles -->
-    <path
-      d="M208 176V136c0-26.51 21.49-48 48-48s48 21.49 48 48v40"
-      stroke="#ffffff"
-      stroke-width="36"
-      stroke-linecap="round"
+    <defs>
+      <linearGradient id="siteLogoBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#10B981" />
+        <stop offset="60%" stop-color="#059669" />
+        <stop offset="100%" stop-color="#047857" />
+      </linearGradient>
+
+      <linearGradient id="siteLogoCoinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FDE047" />
+        <stop offset="40%" stop-color="#FBBF24" />
+        <stop offset="100%" stop-color="#D97706" />
+      </linearGradient>
+
+      <filter id="siteLogoShadow" x="-15%" y="-15%" width="130%" height="130%">
+        <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#022c22" flood-opacity="0.35" />
+      </filter>
+
+      <filter id="siteLogoCoinGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.25" />
+      </filter>
+    </defs>
+
+    <!-- App Icon Background Squircle -->
+    <rect width="512" height="512" rx="116" fill="url(#siteLogoBgGrad)" />
+
+    <!-- Inner Soft Highlight -->
+    <rect
+      x="10"
+      y="10"
+      width="492"
+      height="492"
+      rx="106"
       fill="none"
+      stroke="#FFFFFF"
+      stroke-width="4"
+      stroke-opacity="0.2"
     />
-    
-    <!-- Shopping Bag Body -->
-    <path
-      d="M136 176h240l-22 220a28 28 0 0 1-28 24H186a28 28 0 0 1-28-24L136 176z"
-      fill="#ffffff"
-    />
-    
-    <!-- Euro symbol inside bag -->
-    <path
-      d="M280 260c-28 0-44 18-44 44s16 44 44 44c16 0 28-8 34-18M216 292h56M216 316h56"
-      stroke="#10B981"
-      stroke-width="16"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      fill="none"
-    />
+
+    <!-- Main Shopping Cart + Coin Group -->
+    <g transform="translate(0, -6)">
+      <!-- Golden Euro Coin in Cart -->
+      <g filter="url(#siteLogoCoinGlow)">
+        <circle cx="286" cy="180" r="54" fill="url(#siteLogoCoinGrad)" />
+        <circle cx="286" cy="180" r="46" fill="none" stroke="#F59E0B" stroke-width="3" stroke-opacity="0.8" />
+        <path
+          d="M 302 163 C 295 154 282 153 273 160 C 263 168 262 192 273 200 C 282 207 295 206 302 197 M 258 175 L 290 175 M 258 187 L 290 187"
+          fill="none"
+          stroke="#78350F"
+          stroke-width="7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+
+      <!-- Sparkles -->
+      <path
+        d="M 366 126 Q 366 138 372 144 Q 366 150 366 162 Q 366 150 360 144 Q 366 138 366 126 Z"
+        fill="#FDE047"
+        opacity="0.95"
+      />
+      <path
+        d="M 206 142 Q 206 150 210 154 Q 206 158 206 166 Q 206 158 202 154 Q 206 150 206 142 Z"
+        fill="#FDE047"
+        opacity="0.8"
+      />
+
+      <!-- Cart Elements with Shadow -->
+      <g filter="url(#siteLogoShadow)">
+        <!-- Wheel Struts / Mounts -->
+        <path
+          d="M 222 330 L 222 376 M 348 330 L 348 376"
+          stroke="#E2E8F0"
+          stroke-width="16"
+          stroke-linecap="round"
+        />
+
+        <!-- Cart Wheels -->
+        <circle cx="222" cy="392" r="30" fill="#FFFFFF" />
+        <circle cx="222" cy="392" r="14" fill="#047857" />
+        <circle cx="348" cy="392" r="30" fill="#FFFFFF" />
+        <circle cx="348" cy="392" r="14" fill="#047857" />
+
+        <!-- Cart Handle & Basket Perimeter -->
+        <path
+          d="M 104 150 H 146 L 186 322 C 189 334 199 342 212 342 H 360 C 373 342 383 334 386 322 L 414 186 C 417 174 408 164 396 164 H 164"
+          fill="none"
+          stroke="#FFFFFF"
+          stroke-width="26"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+
+        <!-- Basket Grid Lines (Horizontal) -->
+        <path
+          d="M 178 220 H 400 M 194 274 H 378"
+          fill="none"
+          stroke="#FFFFFF"
+          stroke-width="16"
+          stroke-linecap="round"
+          stroke-opacity="0.95"
+        />
+
+        <!-- Basket Grid Lines (Vertical Ribs) -->
+        <path
+          d="M 248 178 L 242 328 M 310 178 L 308 328 M 366 178 L 360 316"
+          fill="none"
+          stroke="#FFFFFF"
+          stroke-width="14"
+          stroke-linecap="round"
+          stroke-opacity="0.85"
+        />
+      </g>
+    </g>
   </svg>
 </template>
