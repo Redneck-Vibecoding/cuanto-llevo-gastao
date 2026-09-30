@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import {
-  EXPENSE_CATEGORIES, SUPERMARKET_CATEGORIES, CATEGORY_COLORS, resolveExpenseCategory, categoryCountsTowardBalance,
+  EXPENSE_CATEGORIES, SUPERMARKET_CATEGORIES, CATEGORY_COLORS, resolveExpenseCategory,
   type ExpenseCategory
 } from '~/utils/expenseCategories'
 
 const expenseStore = useExpenseStore()
-const serviceStore = useServiceStore()
 const { expenses } = storeToRefs(expenseStore)
-const { records: serviceRecords } = storeToRefs(serviceStore)
 const { t, locale } = useI18n()
-const { getRecordsForMonth, calculateTotals } = useServiceStats()
 const expenseListRef = ref<{
   openNewExpense: () => void
   openQrScanner: () => void
@@ -143,65 +140,22 @@ const selectedMonthLabel = computed(() => {
   return `${monthLabel} ${selectedYear.value}`
 })
 
-// Diet and non-diet expenses are kept separate: diet ones are offset by the
-// per-diem, the rest go to a different account, so the totals are never merged.
-const dietItems = computed(() =>
-  listExpenses.value.filter(e => categoryCountsTowardBalance(resolveExpenseCategory(e))))
-const otherItems = computed(() =>
-  listExpenses.value.filter(e => !categoryCountsTowardBalance(resolveExpenseCategory(e))))
+const totalSpent = computed(() =>
+  listExpenses.value.reduce((sum, e) => sum + (e.amount || 0), 0))
 
-const sumAmount = (items: { amount?: number }[]) =>
-  items.reduce((sum, e) => sum + (e.amount || 0), 0)
+const averagePurchase = computed(() => {
+  if (listExpenses.value.length === 0) return 0
+  return totalSpent.value / listExpenses.value.length
+})
 
-const dietExpenses = computed(() => sumAmount(dietItems.value))
-const otherExpenses = computed(() => sumAmount(otherItems.value))
-
-// Distinct local days that have at least one diet expense (the daily average is
-// about diet spending only).
-const dietExpenseDays = computed(() => {
+const purchaseDaysCount = computed(() => {
   const days = new Set<string>()
-  dietItems.value.forEach(expense => {
+  listExpenses.value.forEach(expense => {
     const date = new Date(expense.timestamp)
     if (!Number.isNaN(date.getTime())) days.add(dayKey(date))
   })
   return days.size
 })
-
-const averageDailyDiet = computed(() => {
-  if (dietExpenseDays.value === 0) return 0
-  return dietExpenses.value / dietExpenseDays.value
-})
-
-// Diet allowance accrued during the same period, used to compute the net balance.
-// A diet is not meant to earn money, only to offset expenses, so this is a balance.
-const dietCategoryIsIncluded = computed(() =>
-  categoryFilter.value.length === 0 || categoryFilter.value.includes('diet'))
-
-const selectedServiceRecords = computed(() => {
-  const range = selectedRange.value
-  if (range?.start) {
-    const startKey = dayKey(range.start)
-    const endKey = dayKey(range.end ?? range.start)
-    return serviceRecords.value.filter(record => {
-      const date = new Date(record.startTime)
-      if (Number.isNaN(date.getTime())) return false
-      const key = dayKey(date)
-      return key >= startKey && key <= endKey
-    })
-  }
-
-  if (showAllMonths.value) return getRecordsForMonth(null, selectedYear.value)
-
-  const monthValue = `${selectedYear.value}-${String(selectedMonthValue.value).padStart(2, '0')}`
-  return getRecordsForMonth(monthValue)
-})
-
-const dietAllowance = computed(() => {
-  if (!dietCategoryIsIncluded.value) return 0
-  return calculateTotals(selectedServiceRecords.value).allowance
-})
-
-const netBalance = computed(() => dietAllowance.value - dietExpenses.value)
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat(locale.value, { style: 'currency', currency: 'EUR' }).format(value || 0)
@@ -288,9 +242,9 @@ const calendarMonth = computed(() => showAllMonths.value ? new Date().getMonth()
           <div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">
             {{ $t('expenses.stats.diet_total') }}
           </div>
-          <div class="text-3xl font-bold text-primary-500 mt-2">{{ formatCurrency(dietExpenses) }}</div>
+          <div class="text-3xl font-bold text-primary-500 mt-2">{{ formatCurrency(totalSpent) }}</div>
           <p class="text-xs text-gray-400">
-            {{ $t('expenses.stats.count', { count: dietItems.length }) }}
+            {{ $t('expenses.stats.count', { count: listExpenses.length }) }}
           </p>
         </div>
       </UCard>
@@ -299,9 +253,9 @@ const calendarMonth = computed(() => showAllMonths.value ? new Date().getMonth()
           <div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">
             {{ $t('expenses.stats.other_total') }}
           </div>
-          <div class="text-3xl font-bold text-gray-700 dark:text-gray-200 mt-2">{{ formatCurrency(otherExpenses) }}</div>
+          <div class="text-3xl font-bold text-gray-700 dark:text-gray-200 mt-2">{{ listExpenses.length }}</div>
           <p class="text-xs text-gray-400">
-            {{ $t('expenses.stats.other_total_subtitle', { count: otherItems.length }) }}
+            {{ $t('expenses.stats.other_total_subtitle') }}
           </p>
         </div>
       </UCard>
@@ -310,9 +264,9 @@ const calendarMonth = computed(() => showAllMonths.value ? new Date().getMonth()
           <div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">
             {{ $t('expenses.stats.daily_average') }}
           </div>
-          <div class="text-3xl font-bold text-primary-500 mt-2">{{ formatCurrency(averageDailyDiet) }}</div>
+          <div class="text-3xl font-bold text-primary-500 mt-2">{{ formatCurrency(averagePurchase) }}</div>
           <p class="text-xs text-gray-400">
-            {{ $t('expenses.stats.daily_average_subtitle', { days: dietExpenseDays }) }}
+            {{ $t('expenses.stats.daily_average_subtitle') }}
           </p>
         </div>
       </UCard>
@@ -321,14 +275,11 @@ const calendarMonth = computed(() => showAllMonths.value ? new Date().getMonth()
           <div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">
             {{ $t('expenses.stats.net_balance') }}
           </div>
-          <div
-            class="text-3xl font-bold mt-2"
-            :class="netBalance >= 0 ? 'text-green-500' : 'text-red-500'">
-            {{ formatCurrency(netBalance) }}
+          <div class="text-3xl font-bold text-emerald-500 mt-2">
+            {{ purchaseDaysCount }}
           </div>
           <p class="text-xs text-gray-400">
-            {{ $t('expenses.stats.net_balance_subtitle', {
-              diet: formatCurrency(dietAllowance), food: formatCurrency(dietExpenses) }) }}
+            {{ $t('expenses.stats.net_balance_subtitle', { days: purchaseDaysCount }) }}
           </p>
         </div>
       </UCard>

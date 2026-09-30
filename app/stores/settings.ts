@@ -1,17 +1,5 @@
 import { defineStore } from 'pinia'
-import { useRuntimeConfig } from '#imports'
 import { setSettings as persistSettings } from '~/utils/appDatabase'
-import type { Displacement } from '~/stores/services'
-
-export type TemplateType = 'monthly' | 'service'
-
-export interface TemplateFile {
-  name: string
-  mimeType: string
-  dataUrl: string
-  size: number
-  updatedAt: string
-}
 
 export interface CalendarConfig {
   day: number
@@ -19,94 +7,36 @@ export interface CalendarConfig {
   isRecurring: boolean
 }
 
-interface SettingsState {
-  halfDietPrice: number
-  fullDietPrice: number
-  monthlyTemplate: TemplateFile | null
-  serviceTemplate: TemplateFile | null
-  exportTemplates: boolean
+export interface SettingsState {
+  monthlyBudget: number
   googleMapsApiKey: string
   openAiApiKey: string
-  firstName?: string
-  lastName?: string
-  nationalId?: string
   reminder: CalendarConfig
-  googleClientId?: string
-  googleCalendarId?: string
-  habitualRoute: Displacement[]
-  monthlyBudget: number
 }
 
 export const useSettingsStore = defineStore('settings', {
   state: (): SettingsState => ({
-    halfDietPrice: 0,
-    fullDietPrice: 0,
-    monthlyTemplate: null,
-    serviceTemplate: null,
-    exportTemplates: false,
+    monthlyBudget: 400,
     googleMapsApiKey: '',
     openAiApiKey: '',
-    firstName: '',
-    lastName: '',
-    nationalId: '',
     reminder: {
       day: 1,
       time: '09:00',
       isRecurring: true
-    },
-    googleClientId: useRuntimeConfig().public.googleClientId || '',
-    googleCalendarId: '',
-    habitualRoute: [],
-    monthlyBudget: 400
+    }
   }),
   actions: {
     async updateMonthlyBudget(budget: number) {
       this.monthlyBudget = budget
       await persistSettings(this.$state)
     },
-    async updateDietPrices(prices: { half: number, full: number }) {
-      this.halfDietPrice = prices.half
-      this.fullDietPrice = prices.full
-      await persistSettings(this.$state)
-    },
-    async updatePersonalData(data: { firstName: string, lastName: string, nationalId: string }) {
-      this.firstName = data.firstName
-      this.lastName = data.lastName
-      this.nationalId = data.nationalId
-      await persistSettings(this.$state)
-    },
-    async setTemplate(type: TemplateType, template: TemplateFile | null) {
-      if (type === 'monthly') {
-        this.monthlyTemplate = template
-      } else {
-        this.serviceTemplate = template
-      }
-      await persistSettings(this.$state)
-    },
-    async loadSettings(settings: Partial<SettingsState>) {
+    async loadSettings(settings: Partial<SettingsState> & Record<string, unknown>) {
       if (typeof settings.monthlyBudget === 'number') this.monthlyBudget = settings.monthlyBudget
-      if (typeof settings.halfDietPrice === 'number') this.halfDietPrice = settings.halfDietPrice
-      if (typeof settings.fullDietPrice === 'number') this.fullDietPrice = settings.fullDietPrice
-      if (settings.monthlyTemplate || settings.monthlyTemplate === null) this.monthlyTemplate = settings.monthlyTemplate
-      if (settings.serviceTemplate || settings.serviceTemplate === null) this.serviceTemplate = settings.serviceTemplate
-      if (typeof settings.exportTemplates === 'boolean') this.exportTemplates = settings.exportTemplates
-      this.googleMapsApiKey = settings.googleMapsApiKey || ''
-      this.openAiApiKey = settings.openAiApiKey || ''
-      this.firstName = settings.firstName || ''
-      this.lastName = settings.lastName || ''
-      this.nationalId = settings.nationalId || ''
+      if (typeof settings.googleMapsApiKey === 'string') this.googleMapsApiKey = settings.googleMapsApiKey
+      if (typeof settings.openAiApiKey === 'string') this.openAiApiKey = settings.openAiApiKey
       if (settings.reminder) {
-        this.reminder = settings.reminder
+        this.reminder = settings.reminder as CalendarConfig
       }
-      this.googleClientId = settings.googleClientId || ''
-      this.googleCalendarId = settings.googleCalendarId || ''
-      if (settings.habitualRoute) {
-        this.habitualRoute = settings.habitualRoute
-      }
-      await persistSettings(this.$state)
-    },
-    async updateHabitualRoute(route: Displacement[]) {
-      this.habitualRoute = route
       await persistSettings(this.$state)
     }
   }

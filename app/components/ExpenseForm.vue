@@ -570,7 +570,7 @@ const submitLabel = computed(() => isEditing.value
             : $t('components.expense_form.ocr_action') }}
         </UButton>
         <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400 text-center">
-          Detecta automáticamente supermercado, fecha, importe y desglose de productos
+          {{ $t('components.expense_form.ocr_hint') }}
         </p>
       </div>
     </UFormField>
@@ -605,12 +605,12 @@ const submitLabel = computed(() => isEditing.value
           icon="i-heroicons-banknotes" placeholder="0.00" class="w-full font-bold text-lg" />
         <template v-if="itemsTotal > 0" #help>
           <span class="text-xs text-gray-500">
-            Suma de productos: <strong>{{ itemsTotal.toFixed(2) }} €</strong>
+            {{ $t('components.expense_form.items_sum') }}: <strong>{{ itemsTotal.toFixed(2) }} €</strong>
             <button
               type="button"
               class="ml-2 text-primary-600 dark:text-primary-400 hover:underline font-semibold"
               @click="calculateTotalFromItems">
-              Usar como total
+              {{ $t('components.expense_form.use_as_total') }}
             </button>
           </span>
         </template>
@@ -712,7 +712,7 @@ const submitLabel = computed(() => isEditing.value
 
         <div class="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700 text-sm">
           <span class="text-gray-500 font-medium">
-            Total productos: <strong class="text-gray-900 dark:text-white">{{ itemsTotal.toFixed(2) }} €</strong>
+            {{ $t('components.expense_form.items_total') }}: <strong class="text-gray-900 dark:text-white">{{ itemsTotal.toFixed(2) }} €</strong>
           </span>
           <UButton
             v-if="itemsTotal > 0 && state.amount !== itemsTotal"
@@ -778,9 +778,7 @@ const submitLabel = computed(() => isEditing.value
       v-model:open="isViewerOpen" :src="state.ticket || null"
       :name="state.ticketName" :type="state.ticketType" />
 
-    <div
-      class="sticky bottom-0 z-20 -mx-6 -mb-6 border-t border-gray-200 bg-white/95 p-4
-             shadow-[0_-8px_24px_rgba(0,0,0,0.08)] backdrop-blur dark:border-gray-800 dark:bg-gray-900/95">
+    <div class="pt-4 border-t border-gray-200 dark:border-gray-800">
       <UButton type="submit" block size="xl" color="primary" :loading="isLoading">
         {{ submitLabel }}
       </UButton>

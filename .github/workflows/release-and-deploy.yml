@@ -64,6 +64,9 @@ jobs:
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -78,11 +81,12 @@ jobs:
           if [ -n "${{ vars.NUXT_APP_BASE_URL }}" ]; then
             export NUXT_APP_BASE_URL="${{ vars.NUXT_APP_BASE_URL }}"
           else
-            export NUXT_APP_BASE_URL="/${{ github.event.repository.name }}/"
+            export NUXT_APP_BASE_URL="/${{ github.event.repository.name || 'cuanto-llevo-gastao' }}/"
           fi
           echo "Building with NUXT_APP_BASE_URL=$NUXT_APP_BASE_URL"
           npm run generate
         env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
           NITRO_PRESET: github-pages
           NUXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ vars.NUXT_PUBLIC_GOOGLE_CLIENT_ID }}
 
@@ -116,8 +120,9 @@ jobs:
           if [ -n "${{ vars.NUXT_APP_BASE_URL }}" ]; then
             export NUXT_APP_BASE_URL="${{ vars.NUXT_APP_BASE_URL }}"
           else
-            export NUXT_APP_BASE_URL="/${{ github.event.repository.name }}/"
+            export NUXT_APP_BASE_URL="/${{ github.event.repository.name || 'cuanto-llevo-gastao' }}/"
           fi
           npm run generate
         env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
           NITRO_PRESET: github-pages

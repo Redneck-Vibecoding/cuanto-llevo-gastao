@@ -1,44 +1,16 @@
 import type { ExpenseRecord } from '~/stores/expenses'
-import type { Displacement, ServiceRecord } from '~/stores/services'
-import type { TemplateFile } from '~/stores/settings'
-import type { GoogleEvent } from '~/stores/externalCalendar'
+import type { CalendarConfig } from '~/stores/settings'
 
 export interface AppSettingsSnapshot {
-    halfDietPrice?: number
-    fullDietPrice?: number
-    monthlyTemplate?: TemplateFile | null
-    serviceTemplate?: TemplateFile | null
-    exportTemplates?: boolean
-    googleMapsApiKey?: string
-    firstName?: string
-    lastName?: string
-    nationalId?: string
-    reminder?: {
-        day: number
-        time: string
-        isRecurring: boolean
-    }
-    googleClientId?: string
-    googleCalendarId?: string
-    habitualRoute?: Displacement[]
     monthlyBudget?: number
-}
-
-export interface ExternalCalendarPersistenceSnapshot {
-    events?: Record<string, GoogleEvent[]>
-    calendars?: { id: string, summary: string }[]
-    lastSync?: number | null
-    refreshToken?: string | null
-    accessToken?: string | null
-    tokenExpiresAt?: number | null
+    googleMapsApiKey?: string
+    openAiApiKey?: string
+    reminder?: CalendarConfig
 }
 
 export interface AppDatabaseState {
-    services: ServiceRecord[]
     expenses: ExpenseRecord[]
     settings: AppSettingsSnapshot | null
-    distancesCache: Record<string, number>
-    externalCalendar: ExternalCalendarPersistenceSnapshot | null
 }
 
 export type UiPreferences = Record<string, boolean | string | number | null>
@@ -63,21 +35,15 @@ export const APP_STORE_NAMES = {
 } as const
 
 export const APP_STATE_KEYS = {
-    services: 'services',
     expenses: 'expenses',
     settings: 'settings',
-    distances: 'distances',
-    externalCalendar: 'externalCalendar',
     uiPreferences: 'uiPreferences',
     migrationVersion: 'migrationVersion'
 } as const
 
 const LOCAL_STORAGE_KEYS = {
-    services: 'services',
     expenses: 'expenses',
-    settings: 'settings',
-    distances: 'distances',
-    externalCalendar: 'external-calendar-v2'
+    settings: 'settings'
 } as const
 
 const CURRENT_MIGRATION_VERSION = 1
@@ -186,17 +152,11 @@ export const migrateLocalStorageToIndexedDb = async (): Promise<void> => {
     const migrationVersion = await getAppStateValue<number>(APP_STATE_KEYS.migrationVersion)
     if (migrationVersion && migrationVersion >= CURRENT_MIGRATION_VERSION) return
 
-    const servicesState = getLegacyState<{ records?: ServiceRecord[] }>(LOCAL_STORAGE_KEYS.services)
     const expensesState = getLegacyState<{ expenses?: ExpenseRecord[] }>(LOCAL_STORAGE_KEYS.expenses)
     const settingsState = getLegacyState<AppSettingsSnapshot>(LOCAL_STORAGE_KEYS.settings)
-    const distancesState = getLegacyState<{ cache?: Record<string, number> }>(LOCAL_STORAGE_KEYS.distances)
-    const externalCalendarState = getLegacyState<ExternalCalendarPersistenceSnapshot>(LOCAL_STORAGE_KEYS.externalCalendar)
 
-    if (servicesState?.records) await setServices(servicesState.records)
     if (expensesState?.expenses) await setExpenses(expensesState.expenses)
     if (settingsState) await setSettings(settingsState)
-    if (distancesState?.cache) await setDistancesCache(distancesState.cache)
-    if (externalCalendarState) await setExternalCalendar(externalCalendarState)
 
     await setAppStateValue(APP_STATE_KEYS.migrationVersion, CURRENT_MIGRATION_VERSION)
     clearLegacyLocalStorageData()
@@ -219,28 +179,15 @@ const getLegacyLocalStorageStats = (): { bytes: number, keys: string[] } => {
     }, { bytes: 0, keys: [] as string[] })
 }
 
-export const getServices = () => getAppStateValue<ServiceRecord[]>(APP_STATE_KEYS.services)
-export const setServices = (records: ServiceRecord[]) => setAppStateValue(APP_STATE_KEYS.services, records)
-
 export const getExpenses = () => getAppStateValue<ExpenseRecord[]>(APP_STATE_KEYS.expenses)
 export const setExpenses = (expenses: ExpenseRecord[]) => setAppStateValue(APP_STATE_KEYS.expenses, expenses)
 
 export const getSettings = () => getAppStateValue<AppSettingsSnapshot>(APP_STATE_KEYS.settings)
 export const setSettings = (settings: AppSettingsSnapshot) => setAppStateValue(APP_STATE_KEYS.settings, settings)
 
-export const getDistancesCache = () => getAppStateValue<Record<string, number>>(APP_STATE_KEYS.distances)
-export const setDistancesCache = (cache: Record<string, number>) => setAppStateValue(APP_STATE_KEYS.distances, cache)
-
-export const getExternalCalendar = () => getAppStateValue<ExternalCalendarPersistenceSnapshot>(APP_STATE_KEYS.externalCalendar)
-export const setExternalCalendar = (snapshot: ExternalCalendarPersistenceSnapshot) =>
-    setAppStateValue(APP_STATE_KEYS.externalCalendar, snapshot)
-
 export const getAppDatabaseState = async (): Promise<AppDatabaseState> => ({
-    services: await getServices() ?? [],
     expenses: await getExpenses() ?? [],
-    settings: await getSettings(),
-    distancesCache: await getDistancesCache() ?? {},
-    externalCalendar: await getExternalCalendar()
+    settings: await getSettings()
 })
 
 export const getUiPreferences = () => getAppStateValue<UiPreferences>(APP_STATE_KEYS.uiPreferences)
@@ -258,19 +205,22 @@ export const setUiPreference = async (key: string, value: boolean | string | num
 
 export const getAppDatabaseUsageStats = async (): Promise<AppDatabaseUsageStats> => {
     const [appStateRecords, attachmentRecords, storageEstimate] = await Promise.all([
-        getObjectStoreValues(APP_STORE_NAMES.appState),
-        getObjectStoreValues<{ dataUrl?: string, size?: number }>(APP_STORE_NAMES.expenseAttachments),
+        getObjectStoreValues<{ key: string, value: unknown }>(APP_STORE_NAMES.appState),
+        getObjectStoreValues<{ id: string, dataUrl: string, size?: number }>(APP_STORE_NAMES.expenseAttachments),
         typeof navigator !== 'undefined' && navigator.storage?.estimate
-            ? navigator.storage.estimate().catch(() => null)
-            : Promise.resolve(null)
+            ? navigator.storage.estimate().catch(() => undefined)
+            : Promise.resolve(undefined)
     ])
-    const legacyStats = getLegacyLocalStorageStats()
-    const appStateBytes = jsonByteSize(appStateRecords)
-    const attachmentBytes = attachmentRecords.reduce((total, attachment) => {
-        if (typeof attachment.size === 'number') return total + attachment.size
-        if (attachment.dataUrl) return total + dataUrlByteSize(attachment.dataUrl)
-        return total
+
+    const appStateBytes = appStateRecords.reduce((total, record) => total + jsonByteSize(record), 0)
+    const attachmentBytes = attachmentRecords.reduce((total, record) => {
+        if (typeof record.size === 'number' && Number.isFinite(record.size)) {
+            return total + record.size
+        }
+        return total + dataUrlByteSize(record.dataUrl)
     }, 0)
+
+    const legacyStats = getLegacyLocalStorageStats()
 
     return {
         appStateBytes,

@@ -1,47 +1,24 @@
-import type { Displacement, ServiceRecord } from '~/stores/services'
 import type { ExpenseRecord } from '~/stores/expenses'
-import type { TemplateFile } from '~/stores/settings'
-import type { GoogleEvent } from '~/stores/externalCalendar'
+import type { CalendarConfig } from '~/stores/settings'
 
 interface SettingsSnapshot {
-  halfDietPrice: number
-  fullDietPrice: number
-  monthlyTemplate: TemplateFile | null
-  serviceTemplate: TemplateFile | null
-  exportTemplates: boolean
-  googleMapsApiKey: string
+  monthlyBudget?: number
+  googleMapsApiKey?: string
   openAiApiKey?: string
-  firstName?: string
-  lastName?: string
-  nationalId?: string
-  reminder?: {
-    day: number
-    time: string
-    isRecurring: boolean
-  }
-  googleCalendarId?: string
-  habitualRoute?: Displacement[]
+  reminder?: CalendarConfig
   locale?: string
-}
-
-export interface ExternalCalendarSnapshot {
-  events: Record<string, GoogleEvent[]>
-  calendars: { id: string, summary: string }[]
-  lastSync: number | null
-  refreshToken?: string | null
+  [key: string]: unknown
 }
 
 export interface BackupPayload {
-  services?: ServiceRecord[]
   expenses?: ExpenseRecord[]
   settings?: SettingsSnapshot
-  distancesCache?: Record<string, number>
-  externalCalendar?: ExternalCalendarSnapshot
   meta?: {
     month?: string
     year?: number
     type?: 'config' | 'data' | 'full'
   }
+  [key: string]: unknown
 }
 
 export interface EncryptedBackup {

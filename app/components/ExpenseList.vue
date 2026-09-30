@@ -86,14 +86,6 @@ const paginatedData = computed(() => {
 const isModalOpen = ref(false)
 const selectedExpense = ref<ExpenseRecord | null>(null)
 
-const modalTitle = computed(() => selectedExpense.value
-  ? t('components.expense_list.modals.edit_title')
-  : t('components.expense_list.modals.new_title'))
-
-const modalDescription = computed(() => selectedExpense.value
-  ? t('components.expense_list.modals.edit_desc')
-  : t('components.expense_list.modals.new_desc'))
-
 const columns = computed(() => [
   { accessorKey: 'select', id: 'select', header: '' },
   { accessorKey: 'actions', id: 'actions', header: t('components.expense_list.actions') },
@@ -458,25 +450,13 @@ defineExpose({
       </div>
     </UCard>
 
-    <!-- Custom Modal Overlay -->
-    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" @click="closeModal" />
-
-      <div
-        class="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg bg-white shadow-xl dark:bg-gray-900">
-        <div class="flex shrink-0 items-center justify-between border-b border-gray-200 p-4 dark:border-gray-800">
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ modalTitle }}</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">{{ modalDescription }}</p>
-          </div>
-          <UButton icon="i-heroicons-x-mark-20-solid" color="neutral" variant="ghost" @click="closeModal" />
-        </div>
-
-        <div class="min-h-0 flex-1 overflow-y-auto p-6">
-          <ExpenseForm :initial-data="selectedExpense" @saved="handleSaved" />
-        </div>
-      </div>
-    </div>
+    <!-- Form Modal -->
+    <ExpenseModal
+      v-model:open="isModalOpen"
+      :expense="selectedExpense"
+      @saved="handleSaved"
+      @close="closeModal"
+    />
 
     <!-- Confirmation Modal -->
     <UModal v-model:open="confirmModal.isOpen" :title="confirmModal.title" :description="confirmModal.description">

@@ -30,26 +30,25 @@ definePageMeta({
                         </div>
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Exportar Dades</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Guarda els registres dels teus serveis a
-                                un fitxer.</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Guarda els registres de les teues compres i tiquets a un fitxer.</p>
                         </div>
                     </div>
                 </template>
 
                 <div class="space-y-4 text-sm text-gray-600 dark:text-gray-300">
                     <p>
-                        Pots exportar les teues dades des de <em>Configuració > Exportar i Importar</em>. L'aplicació
+                        Pots exportar les teues dades des de <em>Configuració > Copia de seguretat</em>. L'aplicació
                         genera un fitxer
                         <code>.json</code> que pots guardar al teu dispositiu o al núvol.
                     </p>
 
                     <h4 class="font-medium text-gray-900 dark:text-white mt-4">Opcions d'Exportació:</h4>
                     <ul class="list-disc list-inside space-y-2 ml-2">
-                        <li><strong>Tot l'historial:</strong> Inclou tots els anys i mesos.</li>
+                        <li><strong>Tot l'historial:</strong> Inclou tots els anys i mesos amb els seus desglossaments i tiquets.</li>
                         <li><strong>Per Any:</strong> Selecciona un any específic per generar un fitxer més petit i
                             fàcil de gestionar.
                         </li>
-                        <li><strong>Per Mes:</strong> Ideal per fer tancaments mensuals.</li>
+                        <li><strong>Per Mes:</strong> Ideal per fer tancaments mensuals de compres.</li>
                     </ul>
 
                     <UAlert
@@ -78,14 +77,13 @@ icon="i-heroicons-shield-check" color="success" variant="soft" title="Sempre Loc
 
                 <div class="space-y-4 text-sm text-gray-600 dark:text-gray-300">
                     <p>
-                        Aquesta opció és independent de les dades de serveis i inclou:
+                        Aquesta opció és independent de les despeses i inclou:
                     </p>
                     <ul class="list-disc list-inside space-y-2 ml-2">
-                        <li>Dades personals (Nom, DNI...).</li>
-                        <li>Preus de dietes.</li>
-                        <li>Plantilles de Word personalitzades.</li>
-                        <li>Configuració de Google Maps i Calendar.</li>
-                        <li>Credencials d'accés a Google Calendar (si es marca l'opció).</li>
+                        <li>Pressupost mensual configurat.</li>
+                        <li>Claus d'API (OpenAI i Google Maps).</li>
+                        <li>Configuració i preferències de recordatoris.</li>
+                        <li>Idioma i opcions de visualització.</li>
                     </ul>
                 </div>
             </UCard>

@@ -18,25 +18,20 @@ beforeAll(() => {
 })
 
 const samplePayload: BackupPayload = {
-  services: [
+  expenses: [
     {
-      id: 'svc-1',
-      startTime: '2026-01-10T08:00:00.000Z',
-      endTime: '2026-01-10T16:00:00.000Z',
-      displacements: [
-        { id: 'd-1', province: 'Barcelona', municipality: 'Manresa', hasLunch: true, hasDinner: false }
-      ],
-      kilometers: 42.5
+      id: 'exp-1',
+      description: 'Mercadona',
+      amount: 45.2,
+      timestamp: '2026-01-10T08:00:00.000Z',
+      category: 'groceries'
     }
   ],
   settings: {
-    halfDietPrice: 12,
-    fullDietPrice: 24,
-    monthlyTemplate: null,
-    serviceTemplate: null,
-    exportTemplates: false,
+    monthlyBudget: 350,
     googleMapsApiKey: '',
-    firstName: 'Anna'
+    openAiApiKey: '',
+    reminder: { day: 1, time: '09:00', isRecurring: true }
   },
   meta: { month: '2026-01', year: 2026, type: 'full' }
 }
@@ -50,7 +45,7 @@ describe('secureBackup', () => {
     expect(typeof encrypted.iv).toBe('string')
     expect(typeof encrypted.ciphertext).toBe('string')
     // Ciphertext must not leak plaintext field values.
-    expect(encrypted.ciphertext).not.toContain('Anna')
+    expect(encrypted.ciphertext).not.toContain('Mercadona')
   })
 
   it('round-trips encrypt -> decrypt with the correct password', async () => {

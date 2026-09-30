@@ -1,64 +1,28 @@
 <script setup lang="ts">
-import { validateSpanishId } from 'spain-id'
-
-// Components are auto-imported due to naming convention (Settings/Language.vue -> <SettingsLanguage />)
-
 const settingsStore = useSettingsStore()
 const { t } = useI18n()
 const toast = useToast()
-const { provinces } = useLocations()
 
 const formState = reactive({
   monthlyBudget: (settingsStore.monthlyBudget || 400) as number | string,
-  halfDietPrice: (settingsStore.halfDietPrice || 0) as number | string,
-  fullDietPrice: (settingsStore.fullDietPrice || 0) as number | string,
   googleMapsApiKey: settingsStore.googleMapsApiKey || '',
   openAiApiKey: settingsStore.openAiApiKey || '',
-  firstName: settingsStore.firstName || '',
-  lastName: settingsStore.lastName || '',
-  nationalId: settingsStore.nationalId || '',
   reminderDay: settingsStore.reminder?.day || 1,
   reminderTime: settingsStore.reminder?.time || '09:00',
-  reminderRecurring: settingsStore.reminder?.isRecurring ?? true,
-  googleClientId: settingsStore.googleClientId || '',
-  googleCalendarId: settingsStore.googleCalendarId || '',
-  habitualRoute: (settingsStore.habitualRoute || []).map(d => ({ ...d, id: d.id || crypto.randomUUID() }))
+  reminderRecurring: settingsStore.reminder?.isRecurring ?? true
 })
 
 const parseCurrency = (input: string | number) => {
   if (typeof input === 'number') return input
-  // Replace commas with dots
   const normalized = String(input).replace(/,/g, '.')
   const val = parseFloat(normalized)
   return Number.isNaN(val) ? 0 : val
 }
 
 const saveSettings = async () => {
-  if (formState.nationalId && !validateSpanishId(formState.nationalId)) {
-    toast.add({ title: t('common.error'), description: 'DNI incorrecte', color: 'error' })
-    return
-  }
-
   const normalizedBudget = parseCurrency(formState.monthlyBudget)
   formState.monthlyBudget = normalizedBudget
   await settingsStore.updateMonthlyBudget(normalizedBudget)
-
-  const normalizedHalfPrice = parseCurrency(formState.halfDietPrice)
-  const normalizedFullPrice = parseCurrency(formState.fullDietPrice)
-
-  // Update UI with parsed values
-  formState.halfDietPrice = normalizedHalfPrice
-  formState.fullDietPrice = normalizedFullPrice
-
-  await settingsStore.updateDietPrices({
-    half: normalizedHalfPrice,
-    full: normalizedFullPrice
-  })
-  await settingsStore.updatePersonalData({
-    firstName: formState.firstName,
-    lastName: formState.lastName,
-    nationalId: formState.nationalId.toUpperCase()
-  })
 
   settingsStore.$patch({
     googleMapsApiKey: formState.googleMapsApiKey,
@@ -67,62 +31,33 @@ const saveSettings = async () => {
       day: formState.reminderDay,
       time: formState.reminderTime,
       isRecurring: formState.reminderRecurring
-    },
-    googleClientId: formState.googleClientId,
-    googleCalendarId: formState.googleCalendarId
+    }
   })
 
-  await settingsStore.updateHabitualRoute(formState.habitualRoute)
   toast.add({ title: t('common.success'), color: 'success' })
 }
 
 const hasChanges = computed(() => {
   const current = {
-    halfDietPrice: Number(String(formState.halfDietPrice).replace(',', '.')) || 0,
-    fullDietPrice: Number(String(formState.fullDietPrice).replace(',', '.')) || 0,
+    monthlyBudget: parseCurrency(formState.monthlyBudget),
     googleMapsApiKey: formState.googleMapsApiKey,
     openAiApiKey: formState.openAiApiKey,
-    firstName: formState.firstName,
-    lastName: formState.lastName,
-    nationalId: formState.nationalId,
     reminder: {
       day: formState.reminderDay,
       time: formState.reminderTime,
       isRecurring: formState.reminderRecurring
-    },
-    googleClientId: formState.googleClientId,
-    googleCalendarId: formState.googleCalendarId,
-    habitualRoute: formState.habitualRoute.map(d => ({
-      province: d.province,
-      municipality: d.municipality,
-      hasLunch: d.hasLunch,
-      hasDinner: d.hasDinner,
-      observations: d.observations || ''
-    }))
+    }
   }
 
   const saved = {
-    halfDietPrice: settingsStore.halfDietPrice,
-    fullDietPrice: settingsStore.fullDietPrice,
+    monthlyBudget: settingsStore.monthlyBudget || 400,
     googleMapsApiKey: settingsStore.googleMapsApiKey || '',
     openAiApiKey: settingsStore.openAiApiKey || '',
-    firstName: settingsStore.firstName || '',
-    lastName: settingsStore.lastName || '',
-    nationalId: settingsStore.nationalId || '',
     reminder: {
       day: settingsStore.reminder?.day || 1,
       time: settingsStore.reminder?.time || '09:00',
       isRecurring: settingsStore.reminder?.isRecurring ?? true
-    },
-    googleClientId: settingsStore.googleClientId || '',
-    googleCalendarId: settingsStore.googleCalendarId || '',
-    habitualRoute: (settingsStore.habitualRoute || []).map(d => ({
-      province: d.province,
-      municipality: d.municipality,
-      hasLunch: d.hasLunch,
-      hasDinner: d.hasDinner,
-      observations: d.observations || ''
-    }))
+    }
   }
 
   return JSON.stringify(current) !== JSON.stringify(saved)
@@ -140,19 +75,12 @@ onBeforeRouteLeave((to, from, next) => {
 
 // Refresh Logic when import happens
 const onBackupImported = () => {
-  formState.halfDietPrice = settingsStore.halfDietPrice || 0
-  formState.fullDietPrice = settingsStore.fullDietPrice || 0
+  formState.monthlyBudget = settingsStore.monthlyBudget || 400
   formState.googleMapsApiKey = settingsStore.googleMapsApiKey || ''
   formState.openAiApiKey = settingsStore.openAiApiKey || ''
-  formState.firstName = settingsStore.firstName || ''
-  formState.lastName = settingsStore.lastName || ''
-  formState.nationalId = settingsStore.nationalId || ''
   formState.reminderDay = settingsStore.reminder?.day || 1
   formState.reminderTime = settingsStore.reminder?.time || '09:00'
   formState.reminderRecurring = settingsStore.reminder?.isRecurring ?? true
-  formState.googleClientId = settingsStore.googleClientId || ''
-  formState.googleCalendarId = settingsStore.googleCalendarId || ''
-  formState.habitualRoute = (settingsStore.habitualRoute || []).map(d => ({ ...d, id: d.id || crypto.randomUUID() }))
 }
 </script>
 
@@ -199,30 +127,18 @@ const onBackupImported = () => {
       </UFormField>
     </div>
 
-    <!-- Personal Data -->
-    <SettingsPersonalData
-v-model:first-name="formState.firstName" v-model:last-name="formState.lastName"
-      v-model:national-id="formState.nationalId" />
-
-    <!-- Prices -->
-    <SettingsPrices v-model:half-diet-price="formState.halfDietPrice" v-model:full-diet-price="formState.fullDietPrice" />
-
-    <!-- Habitual Route -->
-    <SettingsHabitualRoute v-model="formState.habitualRoute" :provinces="provinces" />
-
-    <!-- Integrations -->
+    <!-- Integrations (OpenAI API key & Google Maps) -->
     <SettingsIntegrations
-v-model:google-maps-api-key="formState.googleMapsApiKey"
+      v-model:google-maps-api-key="formState.googleMapsApiKey"
       v-model:open-ai-api-key="formState.openAiApiKey"
-      v-model:google-calendar-id="formState.googleCalendarId" @save="saveSettings" />
-
-    <!-- Templates -->
-    <SettingsTemplates />
+    />
 
     <!-- Reminders -->
     <SettingsReminders
-v-model:reminder-day="formState.reminderDay" v-model:reminder-time="formState.reminderTime"
-      v-model:reminder-recurring="formState.reminderRecurring" />
+      v-model:reminder-day="formState.reminderDay"
+      v-model:reminder-time="formState.reminderTime"
+      v-model:reminder-recurring="formState.reminderRecurring"
+    />
 
     <!-- Backup -->
     <SettingsBackup @imported="onBackupImported" />
@@ -231,11 +147,12 @@ v-model:reminder-day="formState.reminderDay" v-model:reminder-time="formState.re
     <SettingsMaintenance />
 
     <UButton
-      icon="i-heroicons-check-circle" color="primary" size="xl"
+      icon="i-heroicons-check-circle"
+      color="primary"
+      size="xl"
       class="page-floating-action fixed right-4 z-40 rounded-full shadow-xl sm:right-6"
       @click="saveSettings">
       {{ $t('settings.save') }}
     </UButton>
-
   </div>
 </template>

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { encryptBackup, decryptBackup, isEncryptedBackup, type BackupPayload } from '~/utils/secureBackup'
-import type { ServiceRecord } from '~/stores/services'
 import type { ExpenseRecord } from '~/stores/expenses'
-import { ensureUtc } from '~/utils/datetime'
 
 const emit = defineEmits<{
     (e: 'imported'): void
@@ -11,10 +9,7 @@ const emit = defineEmits<{
 const { t, locale, setLocale } = useI18n()
 const toast = useToast()
 const settingsStore = useSettingsStore()
-const serviceStore = useServiceStore()
 const expenseStore = useExpenseStore()
-const distancesStore = useDistancesStore()
-const externalCalendarStore = useExternalCalendarStore()
 
 const importFileInput = ref<HTMLInputElement | null>(null)
 const isExportingConfig = ref(false)
@@ -25,9 +20,7 @@ const exportState = reactive({
     password: '',
     selectedYear: 0, // 0 = All
     selectedMonth: 0, // 0 = All
-    includeTemplates: true,
-    encrypt: false,
-    includeGoogleAuth: true
+    encrypt: false
 })
 
 const importState = reactive({
@@ -65,8 +58,8 @@ const months = computed(() => [
 
 const exportYearOptions = computed(() => {
     const years = new Set<number>()
-    serviceStore.records.forEach(r => {
-        const d = new Date(r.startTime)
+    expenseStore.expenses.forEach(r => {
+        const d = new Date(r.timestamp)
         if (!Number.isNaN(d.getTime())) years.add(d.getFullYear())
     })
     const sortedYears = Array.from(years).sort((a, b) => b - a).map(y => ({ label: String(y), value: y }))
@@ -75,20 +68,6 @@ const exportYearOptions = computed(() => {
         { label: t('months.0'), value: 0 },
         ...sortedYears
     ]
-})
-
-const filteredServices = computed(() => {
-    let records = serviceStore.records
-
-    if (exportState.selectedYear !== 0) {
-        records = records.filter(r => new Date(r.startTime).getFullYear() === exportState.selectedYear)
-    }
-
-    if (exportState.selectedMonth !== 0) {
-        records = records.filter(r => new Date(r.startTime).getMonth() + 1 === exportState.selectedMonth)
-    }
-
-    return records
 })
 
 // Expenses store UTC timestamps; filter by local date to match the UI grouping.
@@ -112,21 +91,11 @@ watch(() => exportState.selectedYear, (newYear) => {
     }
 })
 
-const buildSettingsPayload = (includeTemplates: boolean) => ({
-    halfDietPrice: settingsStore.halfDietPrice,
-    fullDietPrice: settingsStore.fullDietPrice,
-    monthlyTemplate: includeTemplates ? settingsStore.monthlyTemplate : null,
-    serviceTemplate: includeTemplates ? settingsStore.serviceTemplate : null,
-    exportTemplates: includeTemplates,
+const buildSettingsPayload = () => ({
+    monthlyBudget: settingsStore.monthlyBudget,
     googleMapsApiKey: settingsStore.googleMapsApiKey,
     openAiApiKey: settingsStore.openAiApiKey,
-    firstName: settingsStore.firstName,
-    lastName: settingsStore.lastName,
-    nationalId: settingsStore.nationalId,
     reminder: settingsStore.reminder,
-    googleClientId: settingsStore.googleClientId,
-    googleCalendarId: settingsStore.googleCalendarId,
-    habitualRoute: settingsStore.habitualRoute,
     locale: locale.value
 })
 
@@ -145,7 +114,7 @@ const buildBackupFilename = (type: 'config' | 'data', timestamp: string) => {
         prefix += '-'
     }
 
-    return `${prefix}dades-cuanto-llevo-gastao-${timestamp}.json`
+    return `${prefix}compres-cuanto-llevo-gastao-${timestamp}.json`
 }
 
 const exportBackup = async (type: 'config' | 'data', method: 'download' | 'share' = 'download') => {
@@ -168,14 +137,9 @@ const exportBackup = async (type: 'config' | 'data', method: 'download' | 'share
         }
 
         if (type === 'config') {
-            payload.settings = buildSettingsPayload(exportState.includeTemplates)
-            if (exportState.includeGoogleAuth) {
-                payload.externalCalendar = externalCalendarStore.getBackupSnapshot()
-            }
-            payload.distancesCache = distancesStore.cache
+            payload.settings = buildSettingsPayload()
             payload.meta = { type: 'config' }
         } else {
-            payload.services = JSON.parse(JSON.stringify(filteredServices.value)) as ServiceRecord[]
             payload.expenses = JSON.parse(JSON.stringify(filteredExpenses.value)) as ExpenseRecord[]
 
             const metaMonth = (exportState.selectedYear !== 0 && exportState.selectedMonth !== 0)
@@ -188,7 +152,7 @@ const exportBackup = async (type: 'config' | 'data', method: 'download' | 'share
                 year: exportState.selectedYear !== 0 ? exportState.selectedYear : undefined
             }
 
-            if (payload.services.length === 0 && payload.expenses.length === 0) {
+            if (payload.expenses.length === 0) {
                 toast.add({ title: t('common.error'), description: 'No hi ha dades per exportar', color: 'warning' })
                 return
             }
@@ -255,67 +219,35 @@ const handleFileSelect = () => {
     importFileInput.value?.click()
 }
 
-const onFileChange = async (event: Event) => {
-    const target = event.target as HTMLInputElement
-    const file = target.files?.[0] ?? null
+const onFileChange = async (e: Event) => {
+    const input = e.target as HTMLInputElement
+    const file = input.files?.[0]
+    if (!file) return
+
     importState.file = file
 
-    if (file) {
-        try {
-            const content = await file.text()
-            const parsed = JSON.parse(content)
-            importState.isEncryptedFile = isEncryptedBackup(parsed)
-        } catch (e) {
-            console.error('Error sniffing file', e)
-            importState.isEncryptedFile = false
-        }
-    } else {
+    try {
+        const text = await file.text()
+        const parsed = JSON.parse(text)
+        importState.isEncryptedFile = isEncryptedBackup(parsed)
+    } catch {
         importState.isEncryptedFile = false
     }
 }
 
-// Extended payload for internal use during import
-type ImportPayload = BackupPayload & {
+interface ImportPayload extends BackupPayload {
     detectedYear?: number
 }
 
 const processImport = async (payload: ImportPayload) => {
-    const rawServices = Array.isArray(payload?.services) ? payload.services : undefined
-    const expenses = Array.isArray(payload?.expenses) ? payload.expenses : undefined
-    const settings = payload?.settings
-
-    // Normalise legacy service timestamps (naive local) to UTC on import.
-    const services = rawServices?.map(record => ({
-        ...record,
-        startTime: ensureUtc(record.startTime),
-        endTime: ensureUtc(record.endTime)
-    }))
+    const { expenses, settings } = payload
 
     const importMonth = payload.meta?.month ?? 'all'
     const importYear = payload.detectedYear
 
-    // Both stores keep UTC timestamps; compare by local date to match the
-    // export grouping (which selects by the user's local month/year).
     const [importYearStr, importMonthStr] = importMonth.split('-')
     const targetYear = Number(importYearStr)
     const targetMonth = Number(importMonthStr)
-
-    if (services) {
-        if (importMonth !== 'all') {
-            const preserved = serviceStore.records.filter(record => {
-                const date = new Date(record.startTime)
-                return !(date.getFullYear() === targetYear && date.getMonth() + 1 === targetMonth)
-            })
-            await serviceStore.setRecords([...preserved, ...services])
-        } else if (importYear) {
-            const preserved = serviceStore.records.filter(record => {
-                return new Date(record.startTime).getFullYear() !== importYear
-            })
-            await serviceStore.setRecords([...preserved, ...services])
-        } else {
-            await serviceStore.setRecords(services)
-        }
-    }
 
     if (expenses) {
         if (importMonth !== 'all') {
@@ -336,24 +268,14 @@ const processImport = async (payload: ImportPayload) => {
 
     if (settings) {
         await settingsStore.loadSettings(settings)
-        // Removed direct formState updates. The parent should handle this upon event.
-        // However, setLocale is global.
         if (settings.locale) {
             setLocale(settings.locale as 'ca' | 'es')
         }
     }
 
-    if (payload.distancesCache) {
-        distancesStore.$patch({ cache: payload.distancesCache })
-    }
-
-    if (payload.externalCalendar) {
-        externalCalendarStore.restoreFromBackup(payload.externalCalendar)
-    }
-
-    const description = services && settings
+    const description = expenses && settings
         ? t('settings.backup.updated_data_config')
-        : services
+        : expenses
             ? t('settings.backup.updated_data')
             : t('settings.backup.updated_config')
 
@@ -390,45 +312,35 @@ const prepareImport = async () => {
         let payload: BackupPayload
         if (isEncryptedBackup(parsed)) {
             payload = await decryptBackup(importState.password, parsed)
-        } else if (Array.isArray(parsed)) {
-            // Legacy backup support (raw array from old Wrapped export)
-            payload = {
-                services: parsed as ServiceRecord[], // Use proper type instead of any
-                meta: { type: 'data', month: 'all' }
-            }
         } else {
             payload = parsed as BackupPayload
         }
 
-        // Validate content
-        const services = Array.isArray(payload?.services) ? payload.services : undefined
+        const expenses = Array.isArray(payload?.expenses) ? payload.expenses : undefined
         const settings = payload?.settings
 
-        if (!services && !settings) {
+        if (!expenses && !settings) {
             throw new Error(t('settings.backup.malformed'))
         }
 
-        // Determine warning message
         let title = ''
         let description = ''
 
         if (settings) {
             title = t('settings.backup.import_config_title')
             description = t('settings.backup.import_config_confirm')
-        } else if (services) {
+        } else if (expenses) {
             title = t('settings.backup.import_data_title')
             const month = payload.meta?.month
             const yearMeta = payload.meta?.year
 
-            // Scan for year if not present in meta
             let detectedYear: number | undefined
             if (yearMeta) {
                 detectedYear = yearMeta
             } else {
-                // Fallback: analyze services
                 const years = new Set<number>()
-                services.forEach(s => {
-                    const y = new Date(s.startTime).getFullYear()
+                expenses.forEach(e => {
+                    const y = new Date(e.timestamp).getFullYear()
                     if (!Number.isNaN(y)) years.add(y)
                 })
 
@@ -437,7 +349,6 @@ const prepareImport = async () => {
                 }
             }
 
-            // Pass detected year to processImport via payload mutation
             (payload as ImportPayload).detectedYear = detectedYear
 
             if (month && month !== 'all') {
@@ -528,13 +439,6 @@ v-model="exportState.password" type="password"
                     </p>
 
                     <div class="space-y-4 pt-2">
-                        <UCheckbox
-v-model="exportState.includeTemplates"
-                            :label="$t('settings.backup.include_templates')"
-                            :help="$t('settings.backup.include_templates_help')" />
-                        <UCheckbox
-v-model="exportState.includeGoogleAuth" :label="$t('settings.backup.include_google')"
-                            :help="$t('settings.backup.include_google_help')" />
                         <UButton
 :loading="isExportingConfig" block variant="soft" icon="i-heroicons-share"
                             @click="exportBackup('config', 'share')">

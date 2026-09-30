@@ -16,40 +16,19 @@
     "success": "Configuració guardada",
     "export": "Exportar",
     "import": "Importar",
-    "diets": "Dietes",
-    "lunch_abbr": "D",
-    "dinner_abbr": "S",
-    "lunch_dinner_abbr": "D+N",
-    "kilometers": "Kilòmetres",
-    "km_per_service": "km/servei",
     "disconnect": "Desconnectar",
     "all": "Tots",
     "current_month": "Mes actual",
     "all_months": "Tots els mesos"
-  },
-  "warnings": {
-    "late_finish_no_dinner": "Has finalitzat a les 22:30 o més tard i no has marcat sopar. Revisa si et corresponia.",
-    "no_meals_claimed": "Aquest servei no genera dret a dieta perquè encara no s'ha declarat cap menjada.",
-    "duration_over_24h": "📌 La durada supera les 24 hores; comprova que la data final sigui correcta.",
-    "check_lunch_right": "Compte. Assegura't de que has dinat i tens dret a dieta",
-    "check_dinner_right": "Compte. Assegura't de que has sopat i tens dret a dieta",
-    "start_after_16_lunch": "Inici del servei posterior a les 16:00. Comprova si realment et correspon dieta de dinar."
   },
   "errors": {
     "share_not_allowed": "Compartició no permesa, descarregant...",
     "share_not_supported": "El teu dispositiu no suporta compartir aquest fitxer, descarregant...",
     "export_failed": "No s'ha pogut exportar",
     "no_data": "No hi ha dades per exportar",
-    "dni_incorrect": "DNI incorrecte",
-    "select_month_export": "Selecciona un mes per exportar",
-    "no_services_month": "No hi ha serveis per al mes seleccionat",
-    "configure_template": "Configura una plantilla Word abans d'exportar",
-    "documents_generation_failed": "No s'han pogut generar els documents"
+    "select_month_export": "Selecciona un mes per exportar"
   },
-  "success": {
-    "documents_shared": "Documents compartits correctament",
-    "documents_exported": "Documents exportats correctament"
-  },
+  "success": {},
   "settings": {
     "title": "Configuració",
     "description": "Gestiona les teves dades personals i preferències de l'aplicació.",
@@ -58,79 +37,25 @@
       "title": "Idioma",
       "description": "Selecciona l'idioma de l'aplicació."
     },
-    "personal_data": {
-      "title": "Dades Personals",
-      "description": "Informació bàsica per als documents.",
-      "firstNamePlaceholder": "El teu nom",
-      "lastNamePlaceholder": "Els teus cognoms"
-    },
-    "prices": {
-      "title": "Preus de les dietes",
-      "description": "Defineix l'import per a cada tipus de dieta (en €).",
-      "half_diet": "Mitja Dieta",
-      "full_diet": "Dieta Completa"
-    },
     "integrations": {
       "title": "Integracions",
       "description": "Configureu serveis externs per automatitzar tasques."
     },
     "api_keys": {
       "title": "Google Maps",
-      "description": "Clau API necessària per calcular les distàncies automàticament.",
+      "description": "Clau API necessària per a l'autocompletat i geolocalització de supermercats i establiments.",
       "label": "Clau API de Google Maps",
       "placeholder": "Enganxa la teva clau API aquí",
-      "help": "Com aconseguir-la?",
-      "clear_cache": "Netejar Caché",
-      "cache_size": "Mida de la caché local: {size}"
+      "help": "Com aconseguir-la?"
     },
     "reminders": {
       "title": "Recordatoris",
-      "description": "Configura un recordatori mensual per omplir les dietes.",
+      "description": "Configura un recordatori mensual per revisar les despeses i el pressupost.",
       "day": "Dia",
       "time": "Hora",
       "recurring": "Mensualment",
       "add_to_calendar": "Afegir a Google Calendar",
       "download_ics": "Descarregar ICS"
-    },
-    "calendar": {
-      "title": "Google Calendar",
-      "description": "Connecta el teu compte per importar esdeveniments automàticament.",
-      "client_id": "Client ID",
-      "calendar_id": "ID del Calendari",
-      "connect": "Connectar amb Google",
-      "connected": "Connectat",
-      "sync": "Sincronitzar ara",
-      "help": "Com configurar Google Calendar",
-      "change_calendar": "Canviar calendari",
-      "select_calendar": "Selecciona un calendari",
-      "client_id_missing": "Falta configurar la variable d'entorn NUXT_PUBLIC_GOOGLE_CLIENT_ID."
-    },
-    "habitual_route": {
-      "title": "Ruta Habitual",
-      "description": "Defineix una ruta per defecte per als nous serveis.",
-      "add_stop": "Afegir parada"
-    },
-    "templates": {
-      "title": "Plantilles Word",
-      "description": "Puja les plantilles .docx per generar els informes.",
-      "monthly": "Plantilla Mensual",
-      "service": "Plantilla per Servei",
-      "upload": "Pujar plantilla",
-      "download": "Descarregar",
-      "delete": "Eliminar",
-      "saved_at": "Guardada el {date}",
-      "help": "Veure ajudes i variables disponibles",
-      "select_file": "Selecciona fitxer",
-      "monthly_description": "S'utilitza per generar tots els desplaçaments del mes.",
-      "service_description": "Per generar documents d'un servei individual.",
-      "no_monthly_template": "Encara no hi ha cap plantilla mensual guardada.",
-      "no_service_template": "Cap plantilla individual guardada.",
-      "size": "Tamany: {size}",
-      "no_file_selected": "Cap fitxer seleccionat",
-      "saved": "Plantilla guardada",
-      "read_error": "No s'ha pogut llegir la plantilla",
-      "deleted": "Plantilla eliminada",
-      "none_available": "Cap plantilla disponible"
     },
     "backup": {
       "title": "Còpies de seguretat",
@@ -140,13 +65,9 @@
       "export_data": "Exportar Dades",
       "select_year": "Selecciona any",
       "select_month": "Selecciona mes",
-      "include_templates": "Incloure plantilles",
-      "include_templates_help": "El fitxer serà més gran.",
-      "include_google": "Incloure calendari i token de Google",
-      "include_google_help": "Guarda calendaris i permisos per reutilitzar-los (aconsellable xifrar el fitxer).",
       "export_config_btn": "Exportar Config",
-      "export_config_description": "Guarda els preus, les plantilles Word i les opcions de l'aplicació.",
-      "export_data_description": "Guarda els registres dels serveis realitzats.",
+      "export_config_description": "Guarda el pressupost, les claus API i les opcions de l'aplicació.",
+      "export_data_description": "Guarda el registre de compres, desglossaments i tiquets.",
       "export_data_btn": "Exportar Dades",
       "import_config_description": "Restaura una configuració o dades des d'un fitxer `.json` anterior.",
       "select_file": "Selecciona fitxer",
@@ -168,11 +89,11 @@
       "select_file_warning": "Selecciona un fitxer de backup",
       "malformed": "Backup malformat o buit",
       "import_config_title": "Importar Configuració",
-      "import_config_confirm": "Això sobreescriurà la configuració actual, incloent els preus i les plantilles. Vols continuar?",
+      "import_config_confirm": "Això sobreescriurà la configuració actual. Vols continuar?",
       "import_data_title": "Importar Dades",
       "overwrite_month": "Estàs a punt de sobreescriure les dades del mes de {month}. Vols continuar?",
       "overwrite_year": "Estàs a punt de sobreescriure les dades de l'any {year}. La resta d'anys es mantindran intactes. Vols continuar?",
-      "overwrite_all": "Estàs a punt de sobreescriure TOTES les dades de serveis. Aquesta acció no es pot desfer. Vols continuar?",
+      "overwrite_all": "Estàs a punt de sobreescriure TOTES les compres registrades. Aquesta acció no es pot desfer. Vols continuar?",
       "confirm_import": "Confirmar i Importar",
       "import_error": "Error en importar (contrasenya incorrecta?)"
     },
@@ -182,12 +103,7 @@
       "delete_data": "Esborrar Dades",
       "storage_usage": "Ús aproximat d'emmagatzematge",
       "local_data": "Dades locals guardades a IndexedDB",
-      "total_services": "{count} serveis totals",
       "total_expenses": "{count} despeses totals",
-      "cache_title": "Caché de kilòmetres",
-      "cache_description": "Distàncies guardades per estalviar peticions",
-      "routes_count": "{count} rutes",
-      "clear_cache": "Netejar",
       "year": "Any",
       "select_year": "Selecciona un any",
       "month_optional": "Mes (Opcional)",
@@ -196,12 +112,9 @@
       "delete_month_data": "Esborrar dades de {month}",
       "delete_year_data": "Esborrar tot l'any {year}",
       "confirm_delete_title": "Esborrar dades?",
-      "confirm_delete_month": "Això eliminarà tots els serveis, despeses i tiquets del mes de {month}. Aquesta acció és irreversible.",
-      "confirm_delete_year": "Això eliminarà tots els serveis, despeses i tiquets de l'any {year}. Aquesta acció és irreversible.",
+      "confirm_delete_month": "Això eliminarà totes les compres i tiquets del mes de {month}. Aquesta acció és irreversible.",
+      "confirm_delete_year": "Això eliminarà totes les compres i tiquets de l'any {year}. Aquesta acció és irreversible.",
       "data_deleted": "Dades eliminades",
-      "confirm_clear_cache_title": "Netejar caché?",
-      "confirm_clear_cache_description": "Perdràs les distàncies guardades i s'hauran de tornar a calcular. Això pot consumir quota d'API.",
-      "cache_cleared": "Caché de kilòmetres netejada",
       "tickets_title": "Tiquets adjunts",
       "tickets_description": "Imatges i PDF guardats a IndexedDB juntament amb la resta de dades locals.",
       "tickets_count": "{count} tiquets",
@@ -371,8 +284,8 @@
       "title": "4. Privacitat i Dades",
       "p1": "Cuánto llevo gastao funciona sota una filosofia <strong>Local-First</strong>. Totes les dades que introduïu (compres, tiquets, pressupost, dades personals) es guarden exclusivament al vostre navegador (IndexedDB).",
       "p2": "No s'envia cap informació a servidors de tercers, amb l'excepció de:",
-      "li1": "L'ús de l'API de Google Calendar si decidiu connectar-hi el vostre compte (la comunicació és directa entre el vostre navegador i Google).",
-      "li2": "L'ús de l'API de Google Maps, si configureu la vostra clau, per calcular distàncies."
+      "li1": "L'ús de l'API d'OpenAI si decideix utilitzar l'extracció intel·ligent de tiquets amb IA (la comunicació és directa entre el seu navegador i OpenAI).",
+      "li2": "L'ús de l'API de Google Maps si configura la seva clau per a l'autocompletat d'ubicacions de supermercats."
     },
     "license": {
       "title": "5. Llicència",
@@ -390,106 +303,17 @@
       "theme": "Tema",
       "statistics": "Estadístiques"
     },
-    "calendar": {
-      "title": "Calendari",
-      "today": "Avui",
-      "sync": "Sincronitzar calendari extern",
-      "configure": "Configurar",
-      "last_sync": "Última sinc: {date}"
-    },
-    "month_calendar": {
-      "clear_day": "Veure tot el mes",
-      "clear_range": "Veure tot el mes",
-      "range_hint": "Fes clic en una data d'inici i en una de final per seleccionar un interval."
-    },
-    "service_list": {
-      "title": "Serveis registrats",
-      "records_count": "{count} registres",
-      "description": "Consulta, edita o esborra els registres existents.",
-      "search_placeholder": "Buscar per municipi, notes...",
-      "add": "Afegir servei",
-      "import": "Importar",
-      "import_qr": "Importar servei amb QR",
-      "empty": "Encara no hi ha serveis registrats.",
-      "per_page": "{count} per pàgina",
-      "all": "Tots",
-      "actions": "Accions",
-      "start": "Inici",
-      "end": "Fi",
-      "displacements": "Desplaçaments",
-      "edit": "Editar",
-      "duplicate": "Duplicar",
-      "qr": "Generar QR",
-      "delete": "Eliminar",
-      "modals": {
-        "duplicate_title": "Duplicar servei",
-        "duplicate_desc": "Crea un nou servei a partir de les dades existents",
-        "edit_title": "Editar servei",
-        "edit_desc": "Actualitza les dades del servei seleccionat",
-        "new_title": "Nou servei",
-        "new_desc": "Ompli les dades del servei",
-        "import_success": "Servei importat correctament",
-        "import_error": "Format invàlid",
-        "import_error_title": "Error important el codi QR",
-        "delete_title": "Eliminar servei",
-        "delete_desc": "Estàs segur que vols eliminar aquest servei? Aquesta acció no es pot desfer.",
-        "deleted": "Servei eliminat"
-      }
-    },
-    "service_form": {
-      "start_time": "Hora d'inici",
-      "end_time": "Hora de fi",
-      "kilometers": "Kilòmetres (Opcional)",
-      "notes": "Notes (Opcional)",
-      "duration": "Durada",
-      "notes_placeholder": "Afegeix comentaris o observacions...",
-      "displacements": "Desplaçaments",
-      "import_route": "Importar ruta habitual",
-      "generate_qr": "Generar QR",
-      "save": "Guardar servei",
-      "update": "Actualitzar servei",
-      "validation": {
-        "start_required": "L'hora d'inici és obligatòria",
-        "end_required": "L'hora de fi és obligatòria",
-        "province_required": "La província és obligatòria",
-        "municipality_required": "El municipi és obligatori",
-        "one_displacement_required": "Es requereix almenys un desplaçament",
-        "end_after_start": "L'hora de fi ha de ser posterior a l'hora d'inici"
-      },
-      "alerts": {
-        "replace_route": "Això substituirà els desplaçaments actuals. Vols continuar?",
-        "route_imported": "Ruta habitual importada",
-        "distance_calculated": "Kilòmetres calculats: {distance}",
-        "distance_error": "Error calculant distància",
-        "duplicate_date": "Ja existeix un servei amb aquesta data d'inici",
-        "saved": "Servei registrat correctament",
-        "updated": "Servei actualitzat correctament",
-        "save_error": "Error guardant el servei"
-      },
-      "maps_errors": {
-        "api_key": "API Key incorrecta",
-        "api_key_desc": "Comprova la configuració i que l'API Distance Matrix estigui activada.",
-        "blocked": "API Key bloquejada",
-        "blocked_desc": "La clau API no permet peticions des d'aquest domini. Revisa les restriccions a Google Cloud.",
-        "quota": "Quota superada",
-        "quota_desc": "S'ha superat el límit de peticions de Google Maps.",
-        "not_found": "Ruta no trobada",
-        "not_found_desc": "No s'ha trobat una ruta per carretera entre els punts indicats.",
-        "timeout": "Temps d'espera esgotat",
-        "timeout_desc": "Google Maps no respon. S'ha continuat sense calcular distància automàticament."
-      }
-    },
     "qr_modal": {
       "title": "Codi QR",
-      "description": "Escaneja aquest codi des d'un altre dispositiu per importar el servei.",
+      "description": "Escaneja aquest codi des d'un altre dispositiu per importar la compra.",
       "generating": "Generant QR...",
       "error": "No s'ha pogut generar el codi QR",
       "close": "Tancar",
-      "share_title": "Compartir formulari actual"
+      "share_title": "Compartir compra"
     },
     "qr_scanner": {
       "title": "Escanejar QR",
-      "description": "Enfoca el codi QR dins del requadre per importar el servei.",
+      "description": "Enfoca el codi QR dins del requadre per importar la compra.",
       "loading": "Iniciant càmera...",
       "errors": {
         "permission": "Necessites donar permís d'accés a la càmera.",
@@ -509,19 +333,6 @@
       "install": "Instal·lar App",
       "install_description": "Instal·la l'aplicació per accedir-hi ràpidament i treballar sense connexió."
     },
-    "displacement_editor": {
-      "province": "Província",
-      "municipality": "Municipi",
-      "select_province": "Selecciona província",
-      "select_municipality": "Selecciona municipi",
-      "lunch": "Dinar inclòs",
-      "dinner": "Sopar inclòs",
-      "observations": "Observacions",
-      "observations_placeholder": "Detalls addicionals d'aquest desplaçament...",
-      "duplicate": "Duplicar desplaçament",
-      "add": "Afegir un altre desplaçament",
-      "duplicated_toast": "Desplaçament duplicat"
-    },
     "selectors": {
       "search_municipality": "Buscar municipi...",
       "select_municipality": "Selecciona municipi",
@@ -535,7 +346,7 @@
       "amount": "Import (€)",
       "category": "Categoria",
       "category_placeholder": "Selecciona una categoria",
-      "category_hint": "Només les despeses de Dieta descompten del balanç; la resta es registren a part.",
+      "category_hint": "Tria la categoria de supermercat per a les estadístiques i el pressupost.",
       "ticket": "Tiquet (opcional)",
       "ticket_hint": "Adjunta una foto o un fitxer del comprovant",
       "ticket_step_title": "Comença pel tiquet",
@@ -550,8 +361,8 @@
       "ticket_crop_confirm": "Aplicar",
       "ticket_grayscale": "Escala de grisos",
       "ticket_download": "Descarregar",
-      "save": "Desar despesa",
-      "update": "Actualitzar despesa",
+      "save": "Desar compra",
+      "update": "Actualitzar compra",
       "validation": {
         "description_required": "La descripció és obligatòria",
         "date_required": "La data és obligatòria",
@@ -560,9 +371,9 @@
         "category_required": "La categoria és obligatòria"
       },
       "alerts": {
-        "saved": "Despesa desada correctament",
-        "updated": "Despesa actualitzada correctament",
-        "save_error": "Error desant la despesa",
+        "saved": "Compra desada correctament",
+        "updated": "Compra actualitzada correctament",
+        "save_error": "Error desant la compra",
         "ticket_too_large": "El tiquet és massa gran (màxim {size} MB)",
         "ticket_invalid": "Format de fitxer no vàlid",
         "ticket_error": "No s'ha pogut carregar el tiquet",
@@ -571,11 +382,14 @@
         "ocr_error": "No s'ha pogut llegir el tiquet",
         "location_detected": "Ubicació detectada",
         "location_error": "No s’ha pogut detectar la ubicació",
-        "ticket_removed_for_space": "La despesa s'ha desat, però s'ha eliminat el tiquet adjunt perquè el navegador no tenia prou espai per guardar-lo a IndexedDB. Pots alliberar espai d'IndexedDB des de Configuració."
+        "ticket_removed_for_space": "La compra s'ha desat, però s'ha eliminat el tiquet adjunt perquè el navegador no tenia prou espai per guardar-lo a IndexedDB. Pots alliberar espai d'IndexedDB des de Configuració."
       },
       "ticket_extract": "Extreure dades",
       "ticket_extract_progress": "Extraient… {progress}%",
       "ticket_extract_hint": "Llegeix el tiquet i omple els camps buits automàticament (import, data i descripció).",
+      "ocr_action": "Extreure dades del tiquet",
+      "ocr_progress": "Llegint tiquet… {progress}%",
+      "ocr_hint": "Detecta automàticament supermercat, data, import i desglossament de productes",
       "location": "Ubicació (opcional)",
       "location_placeholder": "Cerca un lloc, adreça o zona...",
       "location_searching": "Cercant ubicacions…",
@@ -593,6 +407,10 @@
       "item_qty": "Quant.",
       "item_price": "Cost (€)",
       "item_category": "Categoria",
+      "items_sum": "Suma de productes",
+      "use_as_total": "Utilitzar com a total",
+      "items_total": "Total productes",
+      "total_calculated": "Total calculat: {amount} €",
       "calculate_total": "Calcular total des dels productes",
       "no_items": "Sense desglossament de productes encara",
       "items_count": "{count} productes detectats"
@@ -619,16 +437,16 @@
       "share_qr": "Compartir QR",
       "qr_title": "Compartir despesa",
       "modals": {
-        "edit_title": "Editar despesa",
-        "edit_desc": "Actualitza les dades de la despesa seleccionada",
-        "new_title": "Nova despesa",
-        "new_desc": "Ompli les dades de la despesa",
-        "delete_title": "Eliminar despesa",
-        "delete_desc": "Estàs segur que vols eliminar aquesta despesa? Aquesta acció no es pot desfer.",
-        "deleted": "Despesa eliminada",
-        "import_success": "Despesa importada correctament",
+        "edit_title": "Editar compra",
+        "edit_desc": "Actualitza les dades de la compra seleccionada",
+        "new_title": "Nova compra",
+        "new_desc": "Ompli les dades de la compra o tiquet",
+        "delete_title": "Eliminar compra",
+        "delete_desc": "Estàs segur que vols eliminar aquesta compra? Aquesta acció no es pot desfer.",
+        "deleted": "Compra eliminada",
+        "import_success": "Compra importada correctament",
         "import_error_title": "Error en la importació",
-        "import_error": "El codi QR no conté una despesa vàlida."
+        "import_error": "El codi QR no conté una compra vàlida."
       },
       "selected_count": "{count} seleccionats",
       "share_selected": "Compartir selecció",
@@ -665,15 +483,7 @@
       },
       "maps": {
         "title": "API de Google Maps",
-        "description": "Càlcul automàtic de quilòmetres i estalvi de costos."
-      },
-      "templates": {
-        "title": "Plantilles de Word",
-        "description": "Guia de variables i condicionals per personalitzar informes."
-      },
-      "calendar": {
-        "title": "Integració Google Calendar",
-        "description": "Sincronitza els teus esdeveniments de Google Calendar automàticament."
+        "description": "Autocompletat de supermercats i geolocalització."
       },
       "backups": {
         "title": "Còpies de Seguretat",
@@ -686,60 +496,6 @@
       "rights": "Tots els drets reservats.",
       "terms": "Condicions Generals",
       "privacy": "Política de Privacitat"
-    }
-  },
-  "wrapped": {
-    "title": "El teu {year}",
-    "subtitle": "Resum de l'any a Cuánto llevo gastao",
-    "stats": {
-      "income": "Total dietes",
-      "hours": "Hores",
-      "services": "Serveis",
-      "km": "Kilòmetres",
-      "per_week_hours": "h/setm",
-      "per_service_hours": "h/serv",
-      "per_week_services": "serveis/setmana",
-      "per_week_km": "km/setm",
-      "per_service_km": "km/serv"
-    },
-    "chart": {
-      "title": "Activitat Mensual",
-      "income": "Dietes",
-      "hours": "Hores",
-      "km": "Km",
-      "tooltip": {
-        "income": "Ingressos",
-        "hours": "Hores",
-        "km": "Km"
-      }
-    },
-    "comparisons": {
-      "title": "On has arribat?",
-      "completed": "Completat! 🚀",
-      "labels": {
-        "santiago": "Camí de Santiago",
-        "route66": "Ruta 66 (EUA)",
-        "dakar": "Rally París-Dakar",
-        "world": "Volta al món"
-      }
-    },
-    "fun_stats": {
-      "marathon_title": "Marató Laboral ⏱️",
-      "marathon_desc": "És el temps que hauries passat treballant si no haguessis parat ni per dormir!",
-      "days": "dies",
-      "active_day_title": "Dia més actiu 🔥",
-      "active_day_desc": "Vas treballar <span class=\"font-bold text-white\">{hours} hores</span> aquest dia.",
-      "travel_day_title": "Dia més viatger 🚗",
-      "travel_day_desc": "Vas recórrer <span class=\"font-bold text-white\">{km} km</span>.",
-      "route": "Ruta"
-    },
-    "actions": {
-      "download_title": "Descarrega el teu report",
-      "share_pdf": "Compartir PDF",
-      "share_success": "PDF compartit correctament",
-      "download_success": "PDF descarregat correctament",
-      "share_error": "Error compartint el PDF",
-      "generate_error": "Error generant el PDF"
     }
   },
   "expenses": {
@@ -767,14 +523,14 @@
       "other": "Altres"
     },
     "stats": {
-      "count": "{count} despeses",
-      "diet_total": "Despeses de dieta",
-      "other_total": "Altres despeses",
-      "other_total_subtitle": "{count} despeses · compte a part",
-      "daily_average": "Mitjana diària (dieta)",
-      "daily_average_subtitle": "Repartit en {days} dies amb dieta",
-      "net_balance": "Balanç net",
-      "net_balance_subtitle": "Dietes ({diet}) − despeses de dieta ({food})",
+      "count": "{count} compres",
+      "diet_total": "Total gastat",
+      "other_total": "Nombre de compres",
+      "other_total_subtitle": "En el període seleccionat",
+      "daily_average": "Gasto mitjà",
+      "daily_average_subtitle": "Mitjana per tiquet/compra",
+      "net_balance": "Dies amb compres",
+      "net_balance_subtitle": "{days} dies amb compres registrades",
       "by_category": "Per categoria"
     },
     "list_description_range": "Despeses del {start} al {end}"

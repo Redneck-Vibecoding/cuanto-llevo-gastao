@@ -1,39 +1,33 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest'
 import {
-  getDistancesCache,
   getExpenses,
-  getServices,
+  getSettings,
   migrateLocalStorageToIndexedDb
 } from '../../app/utils/appDatabase'
 
 describe('appDatabase migration', () => {
   it('moves legacy localStorage data into IndexedDB and removes the old copy', async () => {
-    const service = {
-      id: 'service-1',
-      startTime: '2026-01-01T08:00:00.000Z',
-      endTime: '2026-01-01T16:00:00.000Z',
-      displacements: []
-    }
     const expense = {
       id: 'expense-1',
-      description: 'Parking',
+      description: 'Mercadona',
       timestamp: '2026-01-01T12:00:00.000Z',
-      amount: 12,
-      ticket: 'data:image/jpeg;base64,AAAA'
+      amount: 45.2,
+      category: 'groceries'
+    }
+    const settings = {
+      monthlyBudget: 350,
+      googleMapsApiKey: 'AIzaTest'
     }
 
-    localStorage.setItem('services', JSON.stringify({ state: { records: [service] } }))
     localStorage.setItem('expenses', JSON.stringify({ state: { expenses: [expense] } }))
-    localStorage.setItem('distances', JSON.stringify({ state: { cache: { 'a:b': 42 } } }))
+    localStorage.setItem('settings', JSON.stringify(settings))
 
     await migrateLocalStorageToIndexedDb()
 
-    await expect(getServices()).resolves.toEqual([service])
     await expect(getExpenses()).resolves.toEqual([expense])
-    await expect(getDistancesCache()).resolves.toEqual({ 'a:b': 42 })
-    expect(localStorage.getItem('services')).toBeNull()
+    await expect(getSettings()).resolves.toMatchObject(settings)
     expect(localStorage.getItem('expenses')).toBeNull()
-    expect(localStorage.getItem('distances')).toBeNull()
+    expect(localStorage.getItem('settings')).toBeNull()
   })
 })
