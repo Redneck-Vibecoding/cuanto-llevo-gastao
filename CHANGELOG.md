@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/Redneck-Vibecoding/dietator/compare/v1.0.0...v1.1.0) (2026-09-30)
+
+
+### Bug Fixes
+
+* **ci:** disable PR comment lookups in semantic release and support manual deploy ([ceddfae](https://github.com/Redneck-Vibecoding/dietator/commit/ceddfae43f7754ffbc64e5e8c853251a32ce25da))
+
+
+### Features
+
+* **ci:** add cuanto-llevo-gastao branch support and dynamic base url ([42930d6](https://github.com/Redneck-Vibecoding/dietator/commit/42930d6bb474c5bd6704e3c9debaf2132c695c55))
+
 # 1.0.0 (2026-09-30)
 
 
