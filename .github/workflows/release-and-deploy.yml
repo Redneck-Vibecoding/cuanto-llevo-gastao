@@ -79,7 +79,11 @@ jobs:
         run: |
           export NUXT_PUBLIC_APP_VERSION="${{ needs.release.outputs.version || '1.0.0' }}"
           if [ -n "${{ vars.NUXT_APP_BASE_URL }}" ]; then
-            export NUXT_APP_BASE_URL="${{ vars.NUXT_APP_BASE_URL }}"
+            # Ensure leading and trailing slashes
+            BASE_URL="${{ vars.NUXT_APP_BASE_URL }}"
+            [[ "${BASE_URL}" != /* ]] && BASE_URL="/${BASE_URL}"
+            [[ "${BASE_URL}" != */ ]] && BASE_URL="${BASE_URL}/"
+            export NUXT_APP_BASE_URL="$BASE_URL"
           else
             export NUXT_APP_BASE_URL="/${{ github.event.repository.name || 'cuanto-llevo-gastao' }}/"
           fi
@@ -118,7 +122,11 @@ jobs:
         run: |
           export NUXT_PUBLIC_APP_VERSION="0.0.0-pr"
           if [ -n "${{ vars.NUXT_APP_BASE_URL }}" ]; then
-            export NUXT_APP_BASE_URL="${{ vars.NUXT_APP_BASE_URL }}"
+            # Ensure leading and trailing slashes
+            BASE_URL="${{ vars.NUXT_APP_BASE_URL }}"
+            [[ "${BASE_URL}" != /* ]] && BASE_URL="/${BASE_URL}"
+            [[ "${BASE_URL}" != */ ]] && BASE_URL="${BASE_URL}/"
+            export NUXT_APP_BASE_URL="$BASE_URL"
           else
             export NUXT_APP_BASE_URL="/${{ github.event.repository.name || 'cuanto-llevo-gastao' }}/"
           fi
