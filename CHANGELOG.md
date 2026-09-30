@@ -1,3 +1,16 @@
+# [1.3.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.2.0...v1.3.0) (2026-09-30)
+
+
+### Bug Fixes
+
+* remove unused file ([777b255](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/777b255453df41a11cb6cef9af927bc9d6466754))
+
+
+### Features
+
+* add settings page, secure backup system, and expense form components ([eae0a4f](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/eae0a4f12e24fbc600cd6e6d7da3c8374bcae2b4))
+* implement expense tracking, secure backup utilities, UI components, localizations, and release workflow ([4473e45](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/4473e456f923734880ecf9d8b56d1bee87d1a30f))
+
 # [1.2.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.1.0...v1.2.0) (2026-09-30)
 
 
