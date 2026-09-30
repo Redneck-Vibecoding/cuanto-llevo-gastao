@@ -8,18 +8,18 @@ const links = computed(() => [
   },
   {
     label: t('components.header.expenses'),
-    icon: 'i-heroicons-banknotes',
+    icon: 'i-heroicons-shopping-bag',
     to: '/expenses'
+  },
+  {
+    label: t('components.header.statistics'),
+    icon: 'i-heroicons-chart-bar',
+    to: '/statistics'
   },
   {
     label: t('components.header.settings'),
     icon: 'i-heroicons-cog-6-tooth',
     to: '/settings'
-  },
-  {
-    label: t('components.header.help'),
-    icon: 'i-heroicons-question-mark-circle',
-    to: '/help'
   }
 ])
 

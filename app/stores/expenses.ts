@@ -15,11 +15,21 @@ export interface ExpenseSaveResult {
     attachmentRemoved: boolean
 }
 
+export interface ExpenseItem {
+    id: string
+    name: string
+    quantity?: number
+    unitPrice?: number
+    price: number
+    category?: ExpenseCategory
+}
+
 export interface ExpenseRecord {
     id: string
     description: string
     timestamp: string // ISO string, always stored in UTC
     amount: number
+    items?: ExpenseItem[]
     // Optional receipt/ticket loaded in memory as a data URL (image or PDF).
     ticket?: string
     // IndexedDB key for the persisted attachment. The data URL itself is not

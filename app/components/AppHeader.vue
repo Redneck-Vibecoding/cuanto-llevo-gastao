@@ -23,12 +23,12 @@ const links = computed(() => [
     to: '/expenses'
   },
   {
-    label: t('components.header.settings'),
-    to: '/settings'
+    label: t('components.header.statistics'),
+    to: '/statistics'
   },
   {
-    label: t('components.header.help'),
-    to: '/help'
+    label: t('components.header.settings'),
+    to: '/settings'
   }
 ])
 </script>
@@ -37,13 +37,13 @@ const links = computed(() => [
   <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
     <div class="container mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-8">
-        <div class="flex items-center gap-2">
+        <NuxtLink to="/" class="flex items-center gap-2 hover:opacity-90 transition-opacity">
           <SiteLogo class="w-8 h-8" />
-          <div class="flex items-center gap-1">
-            <span class="text-xl font-bold text-gray-900 dark:text-white">{{ $t('components.header.title') }}</span>
-            <UBadge label="PRO" variant="subtle" size="xs" />
+          <div class="flex items-center gap-1.5">
+            <span class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">{{ $t('components.header.title') }}</span>
+            <UBadge label="PWA" variant="subtle" color="primary" size="xs" />
           </div>
-        </div>
+        </NuxtLink>
 
         <nav class="hidden md:flex items-center gap-6">
           <NuxtLink

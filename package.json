@@ -1,5 +1,5 @@
 {
-  "name": "dietator",
+  "name": "cuanto-llevo-gastao",
   "type": "module",
   "private": true,
   "scripts": {
@@ -13,8 +13,7 @@
     "test": "cross-env TZ=Europe/Madrid vitest run",
     "test:watch": "cross-env TZ=Europe/Madrid vitest",
     "test:coverage": "cross-env TZ=Europe/Madrid vitest run --coverage",
-    "generate-icons": "npx pwa-asset-generator public/icon.svg public/ --opaque false --icon-only --favicon --mstile --type png",
-    "prepare": "husky"
+    "generate-icons": "npx pwa-asset-generator public/icon.svg public/ --opaque false --icon-only --favicon --mstile --type png"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.2",

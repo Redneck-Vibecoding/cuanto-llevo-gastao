@@ -1,117 +1,103 @@
-# Dietator
+# Cuánto llevo gastao
 
-**Dietator** és una aplicació web progressiva (PWA) dissenyada per a la gestió eficient de dietes i desplaçaments professionals. Permet registrar serveis, calcular quilometratges automàticament i generar informes detallats en formats Word i PDF.
+**Cuánto llevo gastao** es una Aplicación Web Progresiva (PWA) moderna diseñada para el control inteligente de compras y gastos de supermercado y del hogar. Permite registrar compras, escanear tickets físicos para desglosar productos automáticamente con OCR/IA, controlar el presupuesto mensual en tiempo real y analizar estadísticas de consumo por categorías.
 
-## Característiques Principals
+---
 
-- **Gestió de Serveis**: Registre de serveis amb data, hora d'inici/fi i múltiples desplaçaments.
-- **Càlcul Automàtic de KM**: Integració amb Google Maps API (Distance Matrix) per calcular distàncies entre municipis.
-    - Sistema de *caching* local per reduir costos de l'API.
-    - Suport per a rutes complexes amb múltiples parades.
-- **Gestió de Despeses**: Registre de les despeses vinculades a les dietes.
-    - **Categories**: Dieta, Pàrquing, Benzina, Peatges i Altres. Només les de *Dieta* descompten del balanç; la resta es comptabilitzen a part (compte diferent).
-    - **Tiquets**: Adjunta el comprovant des de la galeria o la càmera, amb pas de retall i mode escala de grisos per reduir-ne la mida. Es poden previsualitzar i descarregar dins l'app.
-    - **Balanç i estadístiques**: Totals separats de despeses de dieta i altres, mitjana diària de dieta, balanç net (dietes − despeses de dieta) i desglossament per categoria.
-    - **Calendari**: Navega pels mesos, marca els dies amb despeses i filtra la llista per dia; filtre addicional per categoria.
-    - **Compartir per QR**: Genera un codi QR d'una despesa i importa-la a un altre dispositiu amb la càmera (el tiquet no s'hi inclou).
-    - **Manteniment**: Consulta l'espai ocupat pels tiquets i elimina'ls (tots o per període) des de Configuració, sense perdre les despeses.
-- **Generació de Documents**:
-    - **Informes Word**: Generació de documents mensuals o per servei utilitzant plantilles `.docx` personalitzables.
-    - **Estadístiques PDF**: Resums visuals de les dietes, serveis i imports totals.
-- **Dades Personals i Configuració**:
-    - Gestió de preus de mitja dieta i dieta completa.
-    - Camps de dades personals (Nom, Cognoms, DNI) per a les plantilles.
-- **Privacitat i Seguretat**:
-    - Totes les dades es guarden localment al navegador mitjançant IndexedDB.
-    - Sistema de Backups (Importar/Exportar) amb opció de xifratge per contrasenya.
-- **Mode Offline**: Funciona sense connexió gràcies a la tecnologia PWA.
+## 🚀 Características Principales
 
-## Tecnologies
+### 📊 1. Resumen Mensual y Presupuesto Configurable
+- **¿Cuánto llevo gastao este mes?**: Vista en tiempo real del gasto total acumulado en el mes en curso.
+- **Presupuesto Mensual**: Configura tu objetivo de gasto mensual (por ejemplo 400 €).
+- **Indicador de Estado**: Visualiza el porcentaje consumido, dinero restante o importe en el que te has excedido, con barra de progreso dinámica por colores (verde, ámbar y rojo).
+- **Métricas Rápidas**: Gasto medio diario, número de compras realizadas y ticket medio por visita al supermercado.
 
-- **Framework**: [Nuxt 4](https://nuxt.com/) (Vue 4)
-- **UI/Styling**: [Nuxt UI](https://ui.nuxt.com/) / Tailwind CSS
-- **Estat**: Pinia amb persistència local.
-- **Mapes**: Google Maps Distance Matrix API.
-- **Documents**: `docxtemplater`, `pizzip` (Word) i `pdfmake` (PDF).
+### 🛒 2. Control de Compras de Supermercado y Desglose de Productos
+- **Registro Rápido**: Selector rápido de los supermercados más frecuentes en España (*Mercadona, Carrefour, Lidl, Día, Alcampo, Consum, Eroski, Aldi, Ahorramas, Farmacias*, etc.) o cualquier tienda personalizada.
+- **Desglose de Artículos**: Cada compra permite detallar los productos adquiridos con su nombre, cantidad, coste unitario y categoría.
+- **Cálculo Automático**: Suma automática de artículos para rellenar el coste total del ticket con un solo clic.
 
-## Configuració Google Calendar (Desenvolupament)
+### 📷 3. Escaneo de Tickets (OCR en el Navegador e IA Opcional)
+- **OCR 100% Local (Privacidad Total)**: Mediante `tesseract.js`, escanea fotos o PDFs de tickets directamente en el navegador sin enviar datos a servidores externos.
+  - Detección automática del establecimiento o supermercado.
+  - Extracción de fecha y hora de la compra.
+  - Detección del importe total.
+  - **Extracción automática del desglose de productos**: Detecta líneas de producto, precios y categoriza cada artículo automáticamente por palabras clave.
+- **Escaneo con IA (Opcional)**: Soporte para Vision API de OpenAI mediante clave de usuario para una precisión superior en tickets complejos.
+- **Recorte y Optimización**: Permite recortar el comprobante, aplicar escala de grises y guardarlo comprimido en el dispositivo.
 
-Per habilitar la integració amb Google Calendar, cal crear un projecte a Google Cloud Platform i configurar les credencials OAuth.
+### 📈 4. Apartado Estadístico por Categorías de Productos
+- Análisis exhaustivo por categorías esenciales:
+  - **Alimentación** (conservas, lácteos, despensa, etc.)
+  - **Frescos** (fruta, verdura, carne, pescado)
+  - **Bebidas** (agua, refrescos, zumos, etc.)
+  - **Limpieza** (detergentes, lejía, lavavajillas, etc.)
+  - **Higiene y Cuidado Personal** (gel, champú, desodorante, etc.)
+  - **Farmacia** (medicamentos, apósitos, salud)
+  - **Hogar** (menaje, bombillas, papel cocina, etc.)
+  - **Mascotas** (pienso, comida, accesorios)
+  - **Otros**
+- Visualización mediante barras de distribución porcentual y tarjetas de detalle.
+- Ranking de supermercados con mayor volumen de gasto y frecuencia de compra.
 
-1.  **Crear Projecte**: Ves a [Google Cloud Console](https://console.cloud.google.com/) i crea un nou projecte.
-2.  **Habilitar API**: Al menú "APIs & Services" -> "Library", busca "Google Calendar API" i habilita-la.
-3.  **Pantalla de Consentiment**: Ves a "APIs & Services" -> "OAuth consent screen".
-    -   Tria "External" (per proves personals) o "Internal" (si tens organització).
-    -   Omple els camps obligatoris (Nom App, correus de suport).
-    -   Afegeix l'scope: `https://www.googleapis.com/auth/calendar.readonly`.
-    -   Afegeix el teu correu com a "Test User".
-4.  **Crear Credencials**: Ves a "APIs & Services" -> "Credentials".
-    -   "Create Credentials" -> "OAuth Client ID".
-    -   Application type: "Web application".
-    -   **Authorized JavaScript origins**: `http://localhost:3000` (i la URL de producció quan es desplegui).
-    -   **Authorized redirect URIs**: `http://localhost:3000` (tot i que el flux implícit pot no fer-ho servir, Google ho requereix).
-5.  **Configurar App**: Copia el "Client ID" generat.
-    -   Crea un fitxer `.env` a l'arrel del projecte (fes servir `.env.example` com a base).
-    -   Defineix la variable: `NUXT_PUBLIC_GOOGLE_CLIENT_ID=teu-client-id`.
+### 📱 5. PWA (Progressive Web App) y Modo Offline
+- **Instalable**: Añade la aplicación a la pantalla de inicio de tu teléfono móvil (Android/iOS) o navegador de escritorio como una aplicación nativa.
+- **Offline First**: Todas las compras, fotos de tickets y configuraciones se almacenan localmente en el dispositivo mediante **IndexedDB**. Funciona perfectamente sin cobertura.
+- **Copias de Seguridad**: Exporta e importa copias de seguridad en formato JSON seguro (opcionalmente cifrado con contraseña).
 
-## Desenvolupament
+---
 
-### Requisits Previs
+## 🛠️ Tecnologías
 
-- Node.js (v20 o superior)
-- npm o pnpm
+- **Framework**: [Nuxt 4](https://nuxt.com/) / Vue 3
+- **UI & Diseño**: [Nuxt UI](https://ui.nuxt.com/) / Tailwind CSS
+- **PWA & Offline**: `@vite-pwa/nuxt` / Workbox / IndexedDB
+- **Estado**: Pinia con sincronización persistente
+- **Reconocimiento de Tickets**: Tesseract.js (OCR local) + OpenAI Vision (opcional)
+- **Idiomas**: Soporte en Español (`es`) por defecto y Català (`ca`)
 
-### Instal·lació
+---
 
-```bash
-# Instal·lar dependències
-npm install
-```
+## 💻 Ejecución Local
 
-### Execució Local
+### 1. Requisitos
+- **Node.js** v20 o superior (instalado en tu sistema).
 
-Inicia el servidor de desenvolupament a `http://localhost:3000`:
+### 2. Arrancar Servidor de Desarrollo
+
+Inicia la aplicación en tu navegador:
 
 ```bash
 npm run dev
 ```
 
-### Construcció (Build)
+La aplicación estará disponible en:
+```
+http://localhost:3000
+```
 
-Generar l'aplicació per a producció:
+### 3. Instalar en el Móvil o Navegador
+1. Para probarla en tu teléfono móvil desde la misma red WiFi, abre la dirección IP local de tu ordenador con el puerto 3000 (ej: `http://192.168.1.X:3000`).
+2. Pulsa en el navegador de tu móvil en **"Instalar aplicación"** o **"Añadir a la pantalla de inicio"**.
+
+---
+
+## 📦 Compilación para Producción
+
+Generar los archivos optimizados listos para desplegar:
 
 ```bash
 npm run build
 ```
 
-Per previsualitzar la versió de producció localment:
+O generar estáticos para GitHub Pages, Cloudflare Pages o Netlify:
+
+```bash
+npm run generate
+```
+
+Previsualizar la compilación de producción:
 
 ```bash
 npm run preview
 ```
-
-### Linting i Testing
-
-```bash
-# Executar verificació de tipus
-npm run typecheck
-
-# Executar linter
-npm run lint
-
-# Executar els tests unitaris (Vitest)
-npm test
-
-# Tests en mode watch
-npm run test:watch
-
-# Tests amb informe de cobertura
-npm run test:coverage
-```
-
-Els tests unitaris (`test/`) cobreixen la lògica de domini principal: xifratge
-de backups, generació de recordatoris de calendari, emmagatzematge segur, el
-store de serveis i les advertències de validació de serveis. S'executen amb
-[Vitest](https://vitest.dev/) sense necessitat d'arrencar Nuxt, de manera que
-són ràpids i deterministes. S'executen automàticament al *hook* de pre-commit i
-a la CI (GitHub Actions).

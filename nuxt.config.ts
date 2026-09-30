@@ -9,7 +9,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      appVersion: process.env.NUXT_PUBLIC_APP_VERSION || 'dev',
+      appVersion: process.env.NUXT_PUBLIC_APP_VERSION || '1.0.0',
       googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || ''
     }
   },
@@ -19,6 +19,7 @@ export default defineNuxtConfig({
   app: {
     baseURL: baseURL,
     head: {
+      title: 'Cuánto llevo gastao',
       link: [
         { rel: 'icon', type: 'image/png', sizes: '196x196', href: baseURL + 'favicon-196.png' },
         { rel: 'icon', type: 'image/x-icon', href: baseURL + 'favicon.ico' },
@@ -26,6 +27,7 @@ export default defineNuxtConfig({
         { rel: 'manifest', href: baseURL + 'manifest.webmanifest' }
       ],
       meta: [
+        { name: 'theme-color', content: '#10b981' },
         { name: 'msapplication-square70x70logo', content: baseURL + 'mstile-icon-128.png' },
         { name: 'msapplication-square150x150logo', content: baseURL + 'mstile-icon-270.png' },
         { name: 'msapplication-square310x310logo', content: baseURL + 'mstile-icon-558.png' },
@@ -57,7 +59,7 @@ export default defineNuxtConfig({
       { code: 'es', language: 'es-ES', file: 'es.json' },
       { code: 'ca', language: 'ca-ES', file: 'ca.json' }
     ],
-    defaultLocale: 'ca',
+    defaultLocale: 'es',
     strategy: 'no_prefix',
     compilation: {
       strictMessage: false
@@ -79,6 +81,21 @@ export default defineNuxtConfig({
         'heroicons:chevron-up',
         'heroicons:chevron-down',
         'heroicons:archive-box-arrow-down',
+        'heroicons:chart-bar',
+        'heroicons:shopping-cart',
+        'heroicons:shopping-bag',
+        'heroicons:banknotes',
+        'heroicons:calendar',
+        'heroicons:cog-6-tooth',
+        'heroicons:home',
+        'heroicons:plus',
+        'heroicons:camera',
+        'heroicons:sparkles',
+        'heroicons:trash',
+        'heroicons:pencil-square',
+        'heroicons:arrow-trending-up',
+        'heroicons:check-circle',
+        'heroicons:exclamation-triangle',
         'lucide:chevron-left',
         'lucide:chevron-right',
         'lucide:chevron-up',
@@ -97,10 +114,11 @@ export default defineNuxtConfig({
     manifest: {
       scope: baseURL,
       start_url: baseURL,
-      name: 'Dietator',
-      short_name: 'Dietator',
-      background_color: '#f5dc00',
-      theme_color: '#f5dc00',
+      name: 'Cuánto llevo gastao',
+      short_name: 'CuántoGasto',
+      description: 'Control inteligente de gastos de supermercado y compras',
+      background_color: '#ffffff',
+      theme_color: '#10b981',
       display: 'standalone',
       icons: [
         {

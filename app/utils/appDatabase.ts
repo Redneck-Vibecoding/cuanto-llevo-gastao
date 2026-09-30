@@ -21,6 +21,7 @@ export interface AppSettingsSnapshot {
     googleClientId?: string
     googleCalendarId?: string
     habitualRoute?: Displacement[]
+    monthlyBudget?: number
 }
 
 export interface ExternalCalendarPersistenceSnapshot {

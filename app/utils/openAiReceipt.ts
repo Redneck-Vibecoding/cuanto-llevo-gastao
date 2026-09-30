@@ -1,5 +1,5 @@
-import type { ParsedReceipt } from '~/utils/ocr'
-import { EXPENSE_CATEGORIES, type ExpenseCategory } from '~/utils/expenseCategories'
+import type { ParsedReceipt, ParsedReceiptItem } from '~/utils/ocr'
+import { EXPENSE_CATEGORIES, SUPERMARKET_CATEGORIES, type ExpenseCategory } from '~/utils/expenseCategories'
 
 interface OpenAiResponse {
   output_text?: string
@@ -37,17 +37,48 @@ const parseResponse = (value: string): ParsedReceipt => {
     ? data.category as ExpenseCategory
     : undefined
 
+  const rawItems = Array.isArray(data.items) ? data.items : []
+  const items: ParsedReceiptItem[] = rawItems
+    .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+    .map((item, index): ParsedReceiptItem => {
+      const name = typeof item.name === 'string' ? item.name.trim() : `Producto ${index + 1}`
+      const price = typeof item.price === 'number' && Number.isFinite(item.price) ? item.price : 0
+      const quantity = typeof item.quantity === 'number' && Number.isFinite(item.quantity) ? item.quantity : 1
+      const unitPrice = typeof item.unitPrice === 'number' && Number.isFinite(item.unitPrice)
+        ? item.unitPrice
+        : (quantity > 1 ? Number((price / quantity).toFixed(2)) : price)
+
+      let itemCategory: ExpenseCategory = 'alimentacion'
+      if (typeof item.category === 'string' && EXPENSE_CATEGORIES.includes(item.category as ExpenseCategory)) {
+        itemCategory = item.category as ExpenseCategory
+      }
+
+      return {
+        id: `openai-item-${Date.now()}-${index}`,
+        name,
+        quantity,
+        unitPrice,
+        price,
+        category: itemCategory
+      }
+    })
+    .filter(item => item.price > 0 || item.name.length > 0)
+
+  const establishment = typeof data.establishment === 'string' ? data.establishment.trim() : undefined
+  const description = establishment || (typeof data.description === 'string' ? data.description.trim() || undefined : undefined)
+
   return {
     amount: typeof data.amount === 'number' && Number.isFinite(data.amount) ? data.amount : undefined,
     date,
     dateTime: date && time ? `${date}T${time}` : undefined,
-    description: typeof data.description === 'string' ? data.description.trim() || undefined : undefined,
+    description,
     location: typeof data.location === 'string' ? data.location.trim() || undefined : undefined,
-    category
+    category,
+    items: items.length > 0 ? items : undefined
   }
 }
 
-/** Sends receipt images to OpenAI for structured field extraction. */
+/** Sends receipt images to OpenAI for structured supermarket field extraction. */
 export async function analyzeReceiptWithOpenAi(images: string[], apiKey: string): Promise<ParsedReceipt> {
   if (!apiKey.trim()) throw new Error('missing_api_key')
   if (images.length === 0) throw new Error('no_images')
@@ -65,7 +96,7 @@ export async function analyzeReceiptWithOpenAi(images: string[], apiKey: string)
         content: [
           {
             type: 'input_text',
-            text: 'Extract this receipt as JSON only with keys amount (number or null), date (local YYYY-MM-DD or null), time (local HH:mm or null), description (short merchant or expense concept), location (address or place, or null), and category. Return time as null unless a purchase or transaction time is explicitly printed on the receipt; never invent 00:00 and never infer a time from the filename or PDF metadata. Category must be one of: diet for meals, food or drinks; parking for parking expenses; gas for fuel; tolls for road tolls; other for expenses that clearly do not match the previous categories; or null when it cannot be determined. Do not guess unreadable values.'
+            text: `Extract this supermarket/store receipt as JSON only with keys: establishment (merchant or supermarket name, e.g. Mercadona, Carrefour, Lidl, Dia, Alcampo, Consum, Eroski), amount (total number or null), date (local YYYY-MM-DD or null), time (local HH:mm or null), location (address or place, or null), category, and items (array of purchased products where each item has: name, quantity, unitPrice, price, category). Return time as null unless a purchase or transaction time is explicitly printed on the receipt; never invent 00:00 and never infer a time from the filename or PDF metadata. Category must be one of: ${SUPERMARKET_CATEGORIES.join(', ')}, diet, parking, gas, tolls, other, or null when it cannot be determined. Do not guess unreadable values. Return valid JSON only.`
           },
           ...images.map(imageUrl => ({ type: 'input_image', image_url: imageUrl }))
         ]

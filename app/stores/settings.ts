@@ -34,6 +34,7 @@ interface SettingsState {
   googleClientId?: string
   googleCalendarId?: string
   habitualRoute: Displacement[]
+  monthlyBudget: number
 }
 
 export const useSettingsStore = defineStore('settings', {
@@ -55,9 +56,14 @@ export const useSettingsStore = defineStore('settings', {
     },
     googleClientId: useRuntimeConfig().public.googleClientId || '',
     googleCalendarId: '',
-    habitualRoute: []
+    habitualRoute: [],
+    monthlyBudget: 400
   }),
   actions: {
+    async updateMonthlyBudget(budget: number) {
+      this.monthlyBudget = budget
+      await persistSettings(this.$state)
+    },
     async updateDietPrices(prices: { half: number, full: number }) {
       this.halfDietPrice = prices.half
       this.fullDietPrice = prices.full
@@ -78,6 +84,7 @@ export const useSettingsStore = defineStore('settings', {
       await persistSettings(this.$state)
     },
     async loadSettings(settings: Partial<SettingsState>) {
+      if (typeof settings.monthlyBudget === 'number') this.monthlyBudget = settings.monthlyBudget
       if (typeof settings.halfDietPrice === 'number') this.halfDietPrice = settings.halfDietPrice
       if (typeof settings.fullDietPrice === 'number') this.fullDietPrice = settings.fullDietPrice
       if (settings.monthlyTemplate || settings.monthlyTemplate === null) this.monthlyTemplate = settings.monthlyTemplate

@@ -381,13 +381,14 @@
   },
   "components": {
     "header": {
-      "title": "Dietator",
+      "title": "Quant porto gastat",
       "beta": "Beta",
       "home": "Inici",
-      "expenses": "Despeses",
+      "expenses": "Compres i Tiquets",
       "settings": "Configuració",
       "help": "Ajuda",
-      "theme": "Tema"
+      "theme": "Tema",
+      "statistics": "Estadístiques"
     },
     "calendar": {
       "title": "Calendari",
@@ -581,7 +582,20 @@
       "location_autocomplete_error": "No s’han pogut carregar els suggeriments de Google Maps.",
       "location_hint": "Es pot escriure manualment, usar autocompletat de Google Maps o detectar la ubicació del dispositiu.",
       "detect_location": "Detectar ubicació",
-      "ticket_extract_hint_ai": "Analitza el tiquet amb OpenAI per detectar amb més precisió l’import, la data, la descripció, la categoria i la ubicació."
+      "ticket_extract_hint_ai": "Analitza el tiquet amb OpenAI per detectar amb més precisió l’import, la data, la descripció, la categoria i la ubicació.",
+      "establishment": "Establiment / Supermercat",
+      "establishment_placeholder": "Ex: Mercadona, Carrefour, Lidl, Día...",
+      "items_title": "Desglossament de productes",
+      "items_hint": "Afegeix els productes per a les estadístiques per categoria",
+      "add_item": "Afegir producte",
+      "item_name": "Producte",
+      "item_name_placeholder": "Nom del producte",
+      "item_qty": "Quant.",
+      "item_price": "Cost (€)",
+      "item_category": "Categoria",
+      "calculate_total": "Calcular total des dels productes",
+      "no_items": "Sense desglossament de productes encara",
+      "items_count": "{count} productes detectats"
     },
     "expense_list": {
       "title": "Despeses registrades",
@@ -737,7 +751,16 @@
     "calendar_title": "Calendari de despeses",
     "all_categories": "Totes les categories",
     "categories": {
-      "diet": "Dieta",
+      "alimentacion": "Alimentació",
+      "frescos": "Frescos (Fruita, Verdura, Carn)",
+      "bebidas": "Begudes",
+      "limpieza": "Neteja",
+      "cuidado_personal": "Higiene i Cura Personal",
+      "farmacia": "Farmàcia",
+      "hogar": "Llar i Basar",
+      "mascotas": "Mascotes",
+      "otros": "Altres",
+      "diet": "Alimentació",
       "parking": "Pàrquing",
       "gas": "Benzina",
       "tolls": "Peatges",
@@ -755,5 +778,41 @@
       "by_category": "Per categoria"
     },
     "list_description_range": "Despeses del {start} al {end}"
+  },
+  "dashboard": {
+    "title": "Quant porto gastat?",
+    "subtitle": "Control intel·ligent de compres de supermercat",
+    "spent_this_month": "Gastat aquest mes",
+    "monthly_budget": "Pressupost mensual",
+    "budget_remaining": "Et queden {amount} €",
+    "budget_exceeded": "Superat en {amount} €",
+    "budget_pct": "{pct}% gastat",
+    "edit_budget": "Ajustar pressupost",
+    "set_budget_title": "Pressupost mensual",
+    "set_budget_description": "Configura el teu límit de despesa mensual per a supermercat.",
+    "budget_input_label": "Pressupost mensual (€)",
+    "new_expense": "Nova compra",
+    "scan_ticket": "Escanejar tiquet",
+    "categories_overview": "Despesa per categories aquest mes",
+    "recent_purchases": "Últimes compres del mes",
+    "no_purchases_month": "No hi ha compres registrades aquest mes encara.",
+    "view_all": "Veure totes les compres",
+    "daily_average": "Despesa mitjana diària",
+    "total_tickets": "Tiquets aquest mes",
+    "avg_ticket": "Mitjana per compra",
+    "items_breakdown": "Desglossament de productes",
+    "items_count": "{count} productes"
+  },
+  "statistics": {
+    "title": "Estadístiques de compres",
+    "subtitle": "Anàlisi detallada de les teves despeses per categoria i supermercat",
+    "all_months": "Tots els mesos",
+    "total_spent": "Total gastat",
+    "avg_ticket": "Tiquet mitjà",
+    "purchases_count": "{count} compres",
+    "by_category": "Despesa per categoria de productes",
+    "by_supermarket": "Despesa per supermercat",
+    "no_data": "No hi ha dades de compres per aquest període.",
+    "top_products": "Productes més freqüents"
   }
 }

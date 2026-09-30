@@ -2,7 +2,7 @@
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
 import type { FormSubmitEvent } from '#ui/types'
-import type { ExpenseRecord } from '~/stores/expenses'
+import type { ExpenseRecord, ExpenseItem } from '~/stores/expenses'
 import type { ExpenseLocationSuggestion } from '~/composables/useExpenseLocation'
 import { utcToLocalInput, localInputToUtc } from '~/utils/datetime'
 import {
@@ -12,7 +12,10 @@ import {
 import { recognizeImages, parseReceiptText } from '~/utils/ocr'
 import { analyzeReceiptWithOpenAi } from '~/utils/openAiReceipt'
 import { renderPdfToImages } from '~/utils/pdf'
-import { EXPENSE_CATEGORIES, resolveExpenseCategory, type ExpenseCategory } from '~/utils/expenseCategories'
+import {
+  EXPENSE_CATEGORIES, SUPERMARKET_CATEGORIES, resolveExpenseCategory,
+  CATEGORY_ICONS, type ExpenseCategory
+} from '~/utils/expenseCategories'
 
 const props = withDefaults(defineProps<{
   initialData?: ExpenseRecord | null
@@ -33,8 +36,11 @@ const { detectCurrentLocation, getLocationSuggestions, selectLocationSuggestion 
 const isEditing = computed(() => Boolean(props.initialData))
 const isLoading = ref(false)
 
-// `dateTime` holds a local datetime-local value (YYYY-MM-DDTHH:mm). We convert
-// to/from UTC when loading and saving so the stored timestamp is always UTC.
+const COMMON_SUPERMARKETS = [
+  'Mercadona', 'Carrefour', 'Lidl', 'Dia', 'Alcampo', 'Consum', 'Eroski', 'Aldi', 'Ahorramas', 'Farmacia'
+]
+
+// State with items breakdown
 const state = reactive({
   description: '',
   dateTime: '',
@@ -44,11 +50,12 @@ const state = reactive({
   ticketName: undefined as string | undefined,
   ticketType: undefined as string | undefined,
   ticketSize: undefined as number | undefined,
-  // No category is preselected for new expenses. Receipt AI or the user sets it.
-  category: undefined as ExpenseCategory | undefined,
+  category: 'alimentacion' as ExpenseCategory | undefined,
   locationLabel: '',
-  location: undefined as ExpenseRecord['location']
+  location: undefined as ExpenseRecord['location'],
+  items: [] as ExpenseItem[]
 })
+
 const locationSuggestions = ref<ExpenseLocationSuggestion[]>([])
 const locationSuggestionsElement = ref<HTMLElement | null>(null)
 const isLocationInputFocused = ref(false)
@@ -115,7 +122,6 @@ const selectLocation = async (suggestion: ExpenseLocationSuggestion) => {
 }
 
 const closeLocationSuggestions = () => {
-  // Let a pointer selection run before hiding its target.
   setTimeout(() => { isLocationInputFocused.value = false }, 150)
 }
 
@@ -133,25 +139,21 @@ const autoDetectLocation = async () => {
   }
 }
 
-const categoryItems = computed(() => EXPENSE_CATEGORIES.map(value => ({
-  value,
-  label: t(`expenses.categories.${value}`)
+const categoryItems = computed(() => SUPERMARKET_CATEGORIES.map(value => ({
+  value: value as ExpenseCategory,
+  label: t(`expenses.categories.${value}`),
+  icon: CATEGORY_ICONS[value] || 'i-heroicons-tag'
 })))
 
-// The amount is edited as free text (so trailing decimals like "1.0" or "1,"
-// are not swallowed by numeric coercion) and mirrored into state.amount as a
-// number for validation and saving. Both '.' and ',' are accepted as the
-// decimal separator.
 const amountInput = ref('')
 watch(amountInput, (raw) => {
-  // Keep only digits and a single decimal separator (first one wins).
   let cleaned = raw.replace(/[^0-9.,]/g, '')
   const firstSep = cleaned.search(/[.,]/)
   if (firstSep !== -1) {
     cleaned = cleaned.slice(0, firstSep + 1) + cleaned.slice(firstSep + 1).replace(/[.,]/g, '')
   }
   if (cleaned !== raw) {
-    amountInput.value = cleaned // Re-runs the watcher with the sanitised value.
+    amountInput.value = cleaned
     return
   }
   if (cleaned === '') {
@@ -162,12 +164,46 @@ watch(amountInput, (raw) => {
   state.amount = Number.isFinite(parsed) ? parsed : undefined
 })
 
-// Two hidden inputs: a plain file picker and a camera capture (mobile).
+const selectSupermarket = (name: string) => {
+  state.description = name
+}
+
+// Items management
+const addItem = () => {
+  state.items.push({
+    id: `item-${Date.now()}-${state.items.length}`,
+    name: '',
+    quantity: 1,
+    price: 0,
+    category: 'alimentacion'
+  })
+}
+
+const removeItem = (index: number) => {
+  state.items.splice(index, 1)
+}
+
+const itemsTotal = computed(() => {
+  return state.items.reduce((sum, item) => sum + (Number(item.price) || 0), 0)
+})
+
+const calculateTotalFromItems = () => {
+  const sum = itemsTotal.value
+  if (sum > 0) {
+    state.amount = Number(sum.toFixed(2))
+    amountInput.value = sum.toFixed(2)
+    toast.add({
+      title: t('components.expense_form.total_calculated', { amount: sum.toFixed(2) }),
+      color: 'success'
+    })
+  }
+}
+
+// Ticket handling
 const uploadInput = ref<HTMLInputElement | null>(null)
 const cameraInput = ref<HTMLInputElement | null>(null)
 const isProcessingTicket = ref(false)
 
-// Crop step: images are routed through the cropper before compression.
 const isCropOpen = ref(false)
 const cropSrc = ref<string | null>(null)
 const pendingTicketName = ref('ticket.jpg')
@@ -183,7 +219,6 @@ const formatBytes = (bytes: number) => {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
 }
 
-// Decoded byte size of the stored ticket data URL, shown next to the file name.
 const ticketSize = computed(() => {
   if (!state.ticket && state.ticketSize) return formatBytes(state.ticketSize)
   if (!state.ticket) return null
@@ -209,11 +244,9 @@ const notifyTicketError = (error: unknown) => {
 async function onTicketSelected(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
-  // Allow re-selecting the same file later.
   input.value = ''
   if (!file) return
 
-  // Images go through the crop step first; PDFs are stored directly.
   if (isImageFile(file)) {
     try {
       cropSrc.value = await fileToDataUrl(file)
@@ -261,7 +294,6 @@ const onCropCancel = () => {
   cropSrc.value = null
 }
 
-// Re-open the cropper to adjust an image ticket that was already attached.
 const editTicket = () => {
   if (!state.ticket || !ticketIsImage.value) return
   cropSrc.value = state.ticket
@@ -282,8 +314,7 @@ const viewTicket = () => {
   if (state.ticket) isViewerOpen.value = true
 }
 
-// OCR: read the attached image ticket locally and prefill empty fields. The
-// engine (tesseract.js) and its language model are loaded on demand.
+// OCR / AI extraction
 const isExtracting = ref(false)
 const extractProgress = ref(0)
 
@@ -292,7 +323,6 @@ async function extractFromTicket() {
   isExtracting.value = true
   extractProgress.value = 0
   try {
-    // PDFs are rasterised first (OCR only reads images); images go straight in.
     const images = ticketIsPdf.value
       ? await renderPdfToImages(state.ticket)
       : [state.ticket]
@@ -305,14 +335,12 @@ async function extractFromTicket() {
     const filled: string[] = []
     if (parsed.description && !state.description.trim()) {
       state.description = parsed.description
-      filled.push(t('components.expense_form.description'))
+      filled.push(parsed.description)
     }
     if (parsed.amount != null && state.amount == null) {
       amountInput.value = String(parsed.amount)
-      filled.push(t('components.expense_form.amount'))
+      filled.push(`${parsed.amount} €`)
     }
-    // Only override the date for a brand-new expense (it defaults to "now").
-    // If the receipt does not print a time, preserve the form's current time.
     if (parsed.dateTime && !isEditing.value) {
       state.dateTime = parsed.dateTime
       filled.push(t('components.expense_form.date'))
@@ -325,15 +353,29 @@ async function extractFromTicket() {
       setLocation({ label: parsed.location })
       filled.push(t('components.expense_form.location'))
     }
-    if (parsed.category && !state.category) {
-      state.category = parsed.category
-      filled.push(t('components.expense_form.category'))
+
+    // Populate detected items
+    if (parsed.items && parsed.items.length > 0) {
+      state.items = parsed.items.map((it, idx) => ({
+        id: it.id || `ocr-item-${Date.now()}-${idx}`,
+        name: it.name,
+        quantity: it.quantity || 1,
+        unitPrice: it.unitPrice,
+        price: it.price,
+        category: it.category || 'alimentacion'
+      }))
+      filled.push(t('components.expense_form.items_count', { count: parsed.items.length }))
+
+      if (state.amount == null) {
+        const sum = state.items.reduce((acc, it) => acc + (it.price || 0), 0)
+        state.amount = Number(sum.toFixed(2))
+        amountInput.value = sum.toFixed(2)
+      }
     }
 
     if (filled.length > 0) {
       toast.add({
-        title: t('components.expense_form.alerts.ocr_success'),
-        description: filled.join(', '),
+        title: t('components.expense_form.alerts.ocr_success', { description: filled.join(', ') }),
         color: 'success'
       })
     } else {
@@ -372,6 +414,7 @@ const resetState = () => {
     state.ticketType = props.initialData.ticketType
     state.ticketSize = props.initialData.ticketSize
     state.category = resolveExpenseCategory(props.initialData)
+    state.items = props.initialData.items ? JSON.parse(JSON.stringify(props.initialData.items)) : []
     setLocation(props.initialData.location)
   } else {
     state.description = ''
@@ -383,7 +426,8 @@ const resetState = () => {
     state.ticketName = undefined
     state.ticketType = undefined
     state.ticketSize = undefined
-    state.category = undefined
+    state.category = 'alimentacion'
+    state.items = []
     setLocation(undefined)
   }
 }
@@ -402,6 +446,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
       timestamp: localInputToUtc(event.data.dateTime),
       amount: event.data.amount,
       category: event.data.category,
+      items: state.items.length > 0 ? state.items : undefined,
       ...(state.location ? { location: state.location } : {}),
       ...(state.ticket || state.ticketId
         ? {
@@ -448,15 +493,14 @@ const submitLabel = computed(() => isEditing.value
 
 <template>
   <UForm :schema="schema" :state="state" class="flex flex-col gap-6" @submit="onSubmit">
-    <!-- Uploading the receipt is the usual first step, so keep this section
-         first in both the visual and keyboard navigation order. -->
+    <!-- Ticket & OCR Section -->
     <UFormField
       name="ticket"
-      class="rounded-2xl border-2 border-primary-300 bg-primary-50/70 p-5 shadow-sm
-             dark:border-primary-800 dark:bg-primary-950/25">
+      class="rounded-2xl border-2 border-emerald-300 bg-emerald-50/70 p-5 shadow-sm
+             dark:border-emerald-800 dark:bg-emerald-950/25">
       <div class="mb-4 flex items-start gap-3">
         <span
-          class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-500
+          class="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-600
                  font-bold text-white shadow-sm">1</span>
         <div>
           <h3 class="font-semibold text-gray-900 dark:text-white">
@@ -468,7 +512,6 @@ const submitLabel = computed(() => isEditing.value
         </div>
       </div>
 
-      <!-- Hidden native inputs drive both the file picker and the camera. -->
       <input
         ref="uploadInput" type="file" accept="image/*,application/pdf" class="hidden"
         @change="onTicketSelected">
@@ -491,17 +534,17 @@ const submitLabel = computed(() => isEditing.value
 
       <div
         v-else
-        class="flex items-center gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+        class="flex items-center gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800 bg-white dark:bg-gray-900">
         <img
           v-if="ticketIsImage && state.ticket" :src="state.ticket" alt="ticket"
-          class="h-16 w-16 cursor-pointer rounded object-cover" @click="viewTicket">
+          class="h-16 w-16 cursor-pointer rounded object-cover border" @click="viewTicket">
         <UIcon v-else name="i-heroicons-document" class="h-10 w-10 text-gray-400" />
         <div class="min-w-0 flex-1">
-          <p class="truncate text-sm text-gray-700 dark:text-gray-300">{{ state.ticketName }}</p>
+          <p class="truncate text-sm font-medium text-gray-700 dark:text-gray-300">{{ state.ticketName || 'Ticket adjunto' }}</p>
           <div class="flex items-center gap-2 text-xs">
             <span v-if="ticketSize" class="text-gray-400">{{ ticketSize }}</span>
             <button
-              type="button" class="text-primary-500 hover:underline disabled:text-gray-400 disabled:no-underline"
+              type="button" class="text-primary-600 hover:underline disabled:text-gray-400 disabled:no-underline font-semibold"
               :disabled="!state.ticket" @click="viewTicket">
               {{ $t('components.expense_form.ticket_view') }}
             </button>
@@ -515,31 +558,42 @@ const submitLabel = computed(() => isEditing.value
           :aria-label="$t('components.expense_form.ticket_remove')" @click="removeTicket" />
       </div>
 
-      <!-- OCR: extract the expense fields from the attached image or PDF. -->
+      <!-- OCR Extract Button -->
       <div
         v-if="state.ticket && (ticketIsImage || ticketIsPdf)"
-        class="mt-4 rounded-xl border border-primary-200 bg-white/80 p-3 dark:border-primary-900 dark:bg-gray-900/60">
+        class="mt-4 rounded-xl border border-emerald-200 bg-white/90 p-3 dark:border-emerald-900 dark:bg-gray-900/80">
         <UButton
           icon="i-heroicons-sparkles" color="primary" variant="solid" size="lg" block
           :loading="isExtracting" @click="extractFromTicket">
           {{ isExtracting && extractProgress > 0
-            ? $t('components.expense_form.ticket_extract_progress', { progress: extractProgress })
-            : $t('components.expense_form.ticket_extract') }}
+            ? `${$t('components.expense_form.ocr_progress', { progress: extractProgress })}`
+            : $t('components.expense_form.ocr_action') }}
         </UButton>
-        <p class="mt-1 text-xs text-gray-400">
-          {{ $t(settingsStore.openAiApiKey
-            ? 'components.expense_form.ticket_extract_hint_ai'
-            : 'components.expense_form.ticket_extract_hint') }}
+        <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400 text-center">
+          Detecta automáticamente supermercado, fecha, importe y desglose de productos
         </p>
       </div>
     </UFormField>
 
-    <UFormField :label="$t('components.expense_form.description')" name="description" required>
+    <!-- Supermarket / Establishment -->
+    <UFormField :label="$t('components.expense_form.establishment')" name="description" required>
       <UInput
-        v-model="state.description" icon="i-heroicons-document-text"
-        :placeholder="$t('components.expense_form.description_placeholder')" class="w-full" />
+        v-model="state.description" icon="i-heroicons-shopping-bag"
+        :placeholder="$t('components.expense_form.establishment_placeholder')" class="w-full" />
+      <div class="mt-2 flex flex-wrap gap-1.5">
+        <UBadge
+          v-for="market in COMMON_SUPERMARKETS"
+          :key="market"
+          :label="market"
+          variant="subtle"
+          :color="state.description === market ? 'primary' : 'neutral'"
+          class="cursor-pointer hover:opacity-80 transition-opacity"
+          @click="selectSupermarket(market)"
+        />
+      </div>
     </UFormField>
 
+    <!-- Date & Amount -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <UFormField :label="$t('components.expense_form.date')" name="dateTime" required>
         <UInput v-model="state.dateTime" type="datetime-local" icon="i-heroicons-clock" class="w-full" />
@@ -548,10 +602,22 @@ const submitLabel = computed(() => isEditing.value
       <UFormField :label="$t('components.expense_form.amount')" name="amount" required>
         <UInput
           v-model="amountInput" type="text" inputmode="decimal"
-          icon="i-heroicons-banknotes" placeholder="0.00" class="w-full" />
+          icon="i-heroicons-banknotes" placeholder="0.00" class="w-full font-bold text-lg" />
+        <template v-if="itemsTotal > 0" #help>
+          <span class="text-xs text-gray-500">
+            Suma de productos: <strong>{{ itemsTotal.toFixed(2) }} €</strong>
+            <button
+              type="button"
+              class="ml-2 text-primary-600 dark:text-primary-400 hover:underline font-semibold"
+              @click="calculateTotalFromItems">
+              Usar como total
+            </button>
+          </span>
+        </template>
       </UFormField>
     </div>
 
+    <!-- Category -->
     <UFormField :label="$t('components.expense_form.category')" name="category" required>
       <USelect
         v-model="state.category" :items="categoryItems" option-attribute="label" value-attribute="value"
@@ -559,6 +625,109 @@ const submitLabel = computed(() => isEditing.value
       <template #help>{{ $t('components.expense_form.category_hint') }}</template>
     </UFormField>
 
+    <!-- Product Breakdown (Desglose de productos) -->
+    <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-900/50">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <UIcon name="i-heroicons-shopping-cart" class="w-5 h-5 text-primary-600 dark:text-primary-400" />
+          <h4 class="font-semibold text-gray-900 dark:text-white">
+            {{ $t('components.expense_form.items_title') }}
+          </h4>
+          <UBadge v-if="state.items.length > 0" :label="`${state.items.length}`" color="primary" variant="subtle" size="xs" />
+        </div>
+        <UButton
+          icon="i-heroicons-plus" color="primary" variant="soft" size="xs"
+          @click="addItem">
+          {{ $t('components.expense_form.add_item') }}
+        </UButton>
+      </div>
+
+      <p v-if="state.items.length === 0" class="text-xs text-gray-500 dark:text-gray-400 py-2">
+        {{ $t('components.expense_form.items_hint') }}
+      </p>
+
+      <div v-else class="space-y-2.5">
+        <div
+          v-for="(item, index) in state.items"
+          :key="item.id || index"
+          class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xs">
+          <!-- Item Name -->
+          <div class="flex-1">
+            <UInput
+              v-model="item.name"
+              :placeholder="$t('components.expense_form.item_name_placeholder')"
+              size="sm"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Item Category -->
+          <div class="w-full sm:w-44">
+            <USelect
+              v-model="item.category"
+              :items="categoryItems"
+              option-attribute="label"
+              value-attribute="value"
+              size="sm"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Quantity -->
+          <div class="w-20">
+            <UInput
+              v-model.number="item.quantity"
+              type="number"
+              step="any"
+              min="0.01"
+              :placeholder="$t('components.expense_form.item_qty')"
+              size="sm"
+              class="w-full text-center"
+            />
+          </div>
+
+          <!-- Price -->
+          <div class="w-28">
+            <UInput
+              v-model.number="item.price"
+              type="number"
+              step="0.01"
+              min="0"
+              :placeholder="$t('components.expense_form.item_price')"
+              size="sm"
+              icon="i-heroicons-currency-euro"
+              class="w-full font-medium"
+            />
+          </div>
+
+          <!-- Remove Item -->
+          <UButton
+            icon="i-heroicons-trash"
+            color="error"
+            variant="ghost"
+            size="sm"
+            @click="removeItem(index)"
+          />
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700 text-sm">
+          <span class="text-gray-500 font-medium">
+            Total productos: <strong class="text-gray-900 dark:text-white">{{ itemsTotal.toFixed(2) }} €</strong>
+          </span>
+          <UButton
+            v-if="itemsTotal > 0 && state.amount !== itemsTotal"
+            icon="i-heroicons-arrow-path"
+            color="primary"
+            variant="ghost"
+            size="xs"
+            @click="calculateTotalFromItems">
+            {{ $t('components.expense_form.calculate_total') }}
+          </UButton>
+        </div>
+      </div>
+    </div>
+
+    <!-- Location -->
     <UFormField :label="$t('components.expense_form.location')" name="location">
       <div class="flex flex-col sm:flex-row gap-3">
         <div class="w-full">
@@ -598,9 +767,9 @@ const submitLabel = computed(() => isEditing.value
           {{ $t('components.expense_form.detect_location') }}
         </UButton>
       </div>
-      <template #help>{{ $t('components.expense_form.location_hint') }}</template>
     </UFormField>
 
+    <!-- Modals -->
     <TicketCropperModal
       v-model:open="isCropOpen" :src="cropSrc"
       @confirm="onCropConfirm" @cancel="onCropCancel" />
@@ -612,7 +781,7 @@ const submitLabel = computed(() => isEditing.value
     <div
       class="sticky bottom-0 z-20 -mx-6 -mb-6 border-t border-gray-200 bg-white/95 p-4
              shadow-[0_-8px_24px_rgba(0,0,0,0.08)] backdrop-blur dark:border-gray-800 dark:bg-gray-900/95">
-      <UButton type="submit" block size="xl" :loading="isLoading">
+      <UButton type="submit" block size="xl" color="primary" :loading="isLoading">
         {{ submitLabel }}
       </UButton>
     </div>

@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import type { MonthOption } from '~/composables/useServiceStats'
-import type { ServiceRecord } from '~/stores/services'
-import { generateWordReport } from '~/utils/export'
+import {
+  SUPERMARKET_CATEGORIES, CATEGORY_COLORS, CATEGORY_ICONS, CATEGORY_HEX_COLORS,
+  resolveExpenseCategory
+} from '~/utils/expenseCategories'
+import type { ExpenseRecord } from '~/stores/expenses'
 
-const settingsStore = useSettingsStore()
-const serviceStore = useServiceStore()
 const expenseStore = useExpenseStore()
-const externalCalendar = useExternalCalendarStore()
-const toast = useToast()
-const { t, locale } = useI18n()
-const { records } = storeToRefs(serviceStore)
+const settingsStore = useSettingsStore()
 const { expenses } = storeToRefs(expenseStore)
-const { calculateTotals, currentMonthValue, monthOptions, getRecordsForMonth } = useServiceStats()
+const { t } = useI18n()
+const toast = useToast()
 
+// Date filtering (current month by default)
+const currentYear = new Date().getFullYear()
+const currentMonth = new Date().getMonth() + 1
+const selectedYear = ref(currentYear)
+const selectedMonth = ref(currentMonth)
 
-// Month/Year Selection Logic
 const months = computed(() => [
-  { value: 0, label: t('months.0') },
   { value: 1, label: t('months.1') },
   { value: 2, label: t('months.2') },
   { value: 3, label: t('months.3') },
@@ -32,533 +33,568 @@ const months = computed(() => [
   { value: 12, label: t('months.12') }
 ])
 
-const currentYear = new Date().getFullYear()
-const selectedYear = ref(currentYear)
-const selectedMonthValue = ref(new Date().getMonth() + 1)
-
 const availableYears = computed(() => {
   const years = new Set([currentYear])
-  monthOptions.value.forEach(opt => {
-    const [y] = opt.value.split('-')
-    years.add(Number(y))
+  expenses.value.forEach(e => {
+    const d = new Date(e.timestamp)
+    if (!Number.isNaN(d.getTime())) years.add(d.getFullYear())
   })
   return Array.from(years).sort((a, b) => b - a)
 })
 
-const activeMonth = computed<MonthOption | null>(() => {
-  if (selectedMonthValue.value === 0) return null
-  const monthLabel = months.value.find(m => m.value === selectedMonthValue.value)?.label
-  return {
-    value: `${selectedYear.value}-${String(selectedMonthValue.value).padStart(2, '0')}`,
-    label: `${monthLabel} ${selectedYear.value}`
-  }
+const isCurrentMonthView = computed(() => {
+  return selectedYear.value === currentYear && selectedMonth.value === currentMonth
 })
 
-const showAllMonths = computed(() => selectedMonthValue.value === 0)
-const selectedMonth = computed(() => activeMonth.value) // Alias for compatibility
-
-const selectedRecords = computed(() => {
-  const monthValue = activeMonth.value?.value ?? null
-  if (monthValue) {
-    return getRecordsForMonth(monthValue)
-  }
-  // All months selected, filter by the current selectedYear
-  return records.value.filter((record) => {
-    const date = new Date(record.startTime)
-    return !isNaN(date.getTime()) && date.getFullYear() === selectedYear.value
-  })
-})
-
-const selectedExpenses = computed(() => {
-  const monthValue = activeMonth.value?.value ?? null
-  return expenses.value.filter((expense) => {
+// Filter expenses for selected month
+const monthExpenses = computed(() => {
+  return expenses.value.filter(expense => {
     const date = new Date(expense.timestamp)
     if (Number.isNaN(date.getTime())) return false
-    if (monthValue) {
-      const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-      return value === monthValue
-    }
-    return date.getFullYear() === selectedYear.value
+    return date.getFullYear() === selectedYear.value && date.getMonth() + 1 === selectedMonth.value
+  }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+})
+
+// Total spent this month
+const totalSpentMonth = computed(() => {
+  return monthExpenses.value.reduce((sum, e) => sum + (e.amount || 0), 0)
+})
+
+// Budget calculations
+const currentBudget = computed(() => settingsStore.monthlyBudget || 400)
+const budgetPercentage = computed(() => {
+  if (currentBudget.value <= 0) return 0
+  return Math.round((totalSpentMonth.value / currentBudget.value) * 100)
+})
+
+const budgetDifference = computed(() => {
+  return currentBudget.value - totalSpentMonth.value
+})
+
+const isBudgetExceeded = computed(() => budgetDifference.value < 0)
+
+// Category Breakdown Calculation
+// Takes into account product item breakdown when present, or main ticket category otherwise
+const categoryStats = computed(() => {
+  const totals: Record<string, { amount: number, itemsCount: number }> = {}
+
+  SUPERMARKET_CATEGORIES.forEach(cat => {
+    totals[cat] = { amount: 0, itemsCount: 0 }
   })
-})
 
-const selectionTotals = computed(() => calculateTotals(selectedRecords.value))
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat(locale.value, { style: 'currency', currency: 'EUR' }).format(value || 0)
-}
-
-const HOURS_PER_MS = 1 / (1000 * 60 * 60)
-interface ParsedMonth {
-  year: number
-  month: number
-}
-
-const parseMonthValueFromString = (value?: string | null): ParsedMonth | null => {
-  if (!value) return null
-  const [yearStr, monthStr] = value.split('-')
-  const year = Number(yearStr)
-  const month = Number(monthStr)
-  if (!Number.isFinite(year) || !Number.isFinite(month)) return null
-  if (month < 1 || month > 12) return null
-  return { year, month }
-}
-
-const calculateRecordDurationMs = (record: ServiceRecord) => {
-  const start = new Date(record.startTime)
-  const end = new Date(record.endTime)
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0
-  return Math.max(0, end.getTime() - start.getTime())
-}
-
-const getWeeksInMonth = (value?: string | null) => {
-  const targetValue = value ?? currentMonthValue.value
-  const parsed = parseMonthValueFromString(targetValue)
-  if (!parsed) return 1
-
-  const lastDay = new Date(parsed.year, parsed.month, 0)
-  const daysInMonth = lastDay.getDate()
-  return Math.max(1, daysInMonth / 7)
-}
-
-const totalHoursWorked = computed(() => {
-  const totalMs = selectedRecords.value.reduce((sum, record) => sum + calculateRecordDurationMs(record), 0)
-  return totalMs * HOURS_PER_MS
-})
-
-const weeksInSelectedMonth = computed(() => {
-  if (selectedRecords.value.length === 0) {
-    // If no records, fallback to standard weeks in month for display, or 1 for year
-    return getWeeksInMonth(activeMonth.value?.value ?? currentMonthValue.value)
-  }
-
-  const weeks = new Set<string>()
-  selectedRecords.value.forEach((record) => {
-    const d = new Date(record.startTime)
-    if (Number.isNaN(d.getTime())) return
-
-    // Monday of the week as unique identifier
-    const date = new Date(d.getTime())
-    const day = date.getDay()
-    const diff = date.getDate() - day + (day === 0 ? -6 : 1)
-    date.setDate(diff)
-    date.setHours(0, 0, 0, 0)
-    const isoDate = date.toISOString().split('T')[0]
-    if (isoDate) {
-      weeks.add(isoDate)
-    }
-  })
-  
-  return weeks.size
-})
-const averageWeeklyHours = computed(() => {
-  if (weeksInSelectedMonth.value <= 0) return 0
-  return totalHoursWorked.value / weeksInSelectedMonth.value
-})
-
-const averageHoursPerService = computed(() => {
-  if (selectionTotals.value.serviceCount <= 0) return 0
-  return totalHoursWorked.value / selectionTotals.value.serviceCount
-})
-
-const averageKmPerService = computed(() => {
-  if (selectionTotals.value.serviceCount <= 0) return 0
-  return (selectionTotals.value.kilometers || 0) / selectionTotals.value.serviceCount
-})
-
-const formatHours = (value: number) => {
-  return `${new Intl.NumberFormat(locale.value, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value || 0)} h`
-}
-const formatWeeks = (value: number) => {
-  return new Intl.NumberFormat(locale.value, { minimumFractionDigits: 1, maximumFractionDigits: 2 }).format(value || 0)
-}
-
-const selectedMonthLabel = computed(() => {
-  if (showAllMonths.value) return t('common.all_months')
-  return activeMonth.value?.label ?? t('common.current_month')
-})
-const hasTemplates = computed(() => Boolean(settingsStore.monthlyTemplate || settingsStore.serviceTemplate))
-const dietPriceSet = computed(() => settingsStore.fullDietPrice > 0 || settingsStore.halfDietPrice > 0)
-const canExportReport = computed(() => Boolean(activeMonth.value) && selectedRecords.value.length > 0 && hasTemplates.value)
-const serviceListDescription = computed(() => `${t('home.lunches', { count: selectionTotals.value.lunches })} | ${t('home.dinners', { count: selectionTotals.value.dinners })}`)
-
-const exportReport = async () => {
-  if (!selectedMonth.value) {
-    toast.add({ title: t('errors.select_month_export'), color: 'warning' })
-    return
-  }
-
-  if (selectedRecords.value.length === 0) {
-    toast.add({ title: t('errors.no_services_month'), color: 'info' })
-    return
-  }
-
-  if (!hasTemplates.value) {
-    toast.add({ title: t('errors.configure_template'), color: 'warning' })
-    return
-  }
-
-  try {
-    await expenseStore.hydrateTicketAttachments()
-
-    const result = await generateWordReport({
-      records: selectedRecords.value,
-      expenses: selectedExpenses.value,
-      totals: selectionTotals.value,
-      month: selectedMonth.value,
-      settings: {
-        halfDietPrice: settingsStore.halfDietPrice,
-        fullDietPrice: settingsStore.fullDietPrice,
-        firstName: settingsStore.firstName,
-        lastName: settingsStore.lastName,
-        nationalId: settingsStore.nationalId
-      },
-      templates: {
-        monthly: settingsStore.monthlyTemplate,
-        service: settingsStore.serviceTemplate
-      }
-    })
-
-    if (!result) return
-
-    const { blob, filename } = result
-    const file = new File([blob], filename, { type: blob.type })
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({
-          files: [file]
-        })
-        toast.add({ title: 'Documents compartits correctament', color: 'success' })
-        return
-      } catch (err) {
-        if ((err as Error).name !== 'AbortError') {
-          // Continue to fallback
-          if ((err as Error).name === 'NotAllowedError') {
-            toast.add({ title: t('errors.share_not_allowed'), color: 'info' })
-          }
-        } else {
-          // User cancelled share
-          return
-        }
-      }
-    }
-
-    // Fallback download
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename
-    link.click()
-    URL.revokeObjectURL(url)
-    toast.add({ title: t('success.documents_exported'), color: 'success' })
-
-  } catch (error) {
-    console.error(error)
-    toast.add({ title: t('errors.documents_generation_failed'), color: 'error' })
-  }
-}
-const showWelcome = ref(true)
-
-const dismissWelcome = () => {
-  showWelcome.value = false
-  try {
-    void setUiPreference('dietator_welcome_dismissed', true)
-  } catch {
-    // Ignore storage errors
-  }
-}
-
-const serviceListRef = ref()
-const serviceFloatingActions = computed(() => [{
-  label: t('components.service_list.add'),
-  icon: 'i-heroicons-plus',
-  onSelect: () => serviceListRef.value?.openNewService()
-}, {
-  label: t('components.service_list.import_qr'),
-  icon: 'i-heroicons-qr-code',
-  onSelect: () => serviceListRef.value?.openQrScanner()
-}])
-
-const handleRecordSelected = (record: ServiceRecord) => {
-  if (serviceListRef.value) {
-    serviceListRef.value.openRecord(record)
-  }
-}
-
-const handleDateSelected = (date: Date) => {
-  const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-  const events = externalCalendar.getEventsForDate(dateStr) // Now returns GoogleEvent objects
-
-  if (!events || events.length === 0) {
-    if (serviceListRef.value) {
-      serviceListRef.value.openNewService(date)
-    }
-    return
-  }
-
-
-  // Explicitly format to local time string for datetime-local input (YYYY-MM-DDTHH:mm)
-  const formatLocalTime = (d: Date) => {
-    const yyyy = d.getFullYear()
-    const mm = String(d.getMonth() + 1).padStart(2, '0')
-    const dd = String(d.getDate()).padStart(2, '0')
-    const hh = String(d.getHours()).padStart(2, '0')
-    const min = String(d.getMinutes()).padStart(2, '0')
-    return `${yyyy}-${mm}-${dd}T${hh}:${min}`
-  }
-
-  // Calculate Start/End times
-  // We assume events are sorted by start time, but let's be safe
-  const sortedEvents = [...events].sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
-
-  // Filter out all-day events for time calculation to avoid skewing start/end times
-  const timedEvents = sortedEvents.filter(e => !e.isAllDay)
-
-  let startTime = ''
-  let endTime = ''
-
-  if (timedEvents.length > 0) {
-    const firstEvent = timedEvents[0]!
-    const lastEvent = timedEvents.reduce((latest, current) => {
-      // Ensure 'latest' is defined (it is initiated with firstEvent)
-      return new Date(current.end) > new Date(latest.end) ? current : latest
-    }, firstEvent)
-
-    startTime = formatLocalTime(new Date(firstEvent.start))
-    endTime = formatLocalTime(new Date(lastEvent.end))
-  }
-
-  // Create a simple list of all events for the notes field
-  const notesLines: string[] = []
-
-  sortedEvents.forEach(e => {
-    let timeStr = ''
-    if (e.isAllDay) {
-      timeStr = t('home.all_day')
+  monthExpenses.value.forEach(expense => {
+    if (expense.items && expense.items.length > 0) {
+      expense.items.forEach(item => {
+        const cat = item.category || 'alimentacion'
+        if (!totals[cat]) totals[cat] = { amount: 0, itemsCount: 0 }
+        totals[cat].amount += (item.price || 0)
+        totals[cat].itemsCount += 1
+      })
     } else {
-      const parts = formatLocalTime(new Date(e.start)).split('T')
-      timeStr = parts[1] || ''
-    }
-
-    if (e.location) {
-      notesLines.push(`- [${timeStr}] ${e.summary} (📍 ${e.location})`)
-    } else {
-      notesLines.push(`- [${timeStr}] ${e.summary}`)
+      const cat = resolveExpenseCategory(expense)
+      if (!totals[cat]) totals[cat] = { amount: 0, itemsCount: 0 }
+      totals[cat].amount += (expense.amount || 0)
+      totals[cat].itemsCount += 1
     }
   })
 
-  // Join all lines
-  const notes = notesLines.length > 0
-    ? `${t('home.events_of_day')}:\n` + notesLines.join('\n')
-    : ''
+  const total = totalSpentMonth.value || 1
 
-  // Open the service form with pre-filled notes and empty displacements
-  if (serviceListRef.value) {
-    serviceListRef.value.openNewService(date, notes, startTime, endTime, [])
+  return SUPERMARKET_CATEGORIES.map(category => {
+    const data = totals[category] || { amount: 0, itemsCount: 0 }
+    const pct = totalSpentMonth.value > 0 ? (data.amount / total) * 100 : 0
+    return {
+      category,
+      label: t(`expenses.categories.${category}`),
+      amount: data.amount,
+      itemsCount: data.itemsCount,
+      percentage: pct,
+      icon: CATEGORY_ICONS[category] || 'i-heroicons-tag',
+      color: CATEGORY_COLORS[category] || 'primary',
+      hexColor: CATEGORY_HEX_COLORS[category] || '#10b981'
+    }
+  }).filter(c => c.amount > 0).sort((a, b) => b.amount - a.amount)
+})
+
+// Daily average in current month
+const dailyAverage = computed(() => {
+  const today = new Date()
+  const daysInCalc = isCurrentMonthView.value ? today.getDate() : 30
+  if (daysInCalc <= 0 || totalSpentMonth.value <= 0) return 0
+  return Number((totalSpentMonth.value / daysInCalc).toFixed(2))
+})
+
+const averageTicket = computed(() => {
+  if (monthExpenses.value.length === 0) return 0
+  return Number((totalSpentMonth.value / monthExpenses.value.length).toFixed(2))
+})
+
+// Modals
+const isFormModalOpen = ref(false)
+const editingExpense = ref<ExpenseRecord | null>(null)
+const isBudgetModalOpen = ref(false)
+const tempBudget = ref(currentBudget.value)
+const isViewerOpen = ref(false)
+const viewingTicket = ref<string | null>(null)
+const viewingTicketName = ref<string | undefined>(undefined)
+
+// Expanded tickets to view item breakdown
+const expandedTicketIds = ref<Set<string>>(new Set())
+
+const toggleExpandTicket = (id: string) => {
+  if (expandedTicketIds.value.has(id)) {
+    expandedTicketIds.value.delete(id)
+  } else {
+    expandedTicketIds.value.add(id)
   }
 }
 
-onMounted(async () => {
-  try {
-    if (await getUiPreference<boolean>('dietator_welcome_dismissed')) {
-      showWelcome.value = false
-    }
-  } catch {
-    // Ignore storage errors
+const openNewExpense = () => {
+  editingExpense.value = null
+  isFormModalOpen.value = true
+}
+
+const openEditExpense = (expense: ExpenseRecord) => {
+  editingExpense.value = expense
+  isFormModalOpen.value = true
+}
+
+const openBudgetModal = () => {
+  tempBudget.value = currentBudget.value
+  isBudgetModalOpen.value = true
+}
+
+const saveBudget = async () => {
+  if (tempBudget.value > 0) {
+    await settingsStore.updateMonthlyBudget(tempBudget.value)
+    isBudgetModalOpen.value = false
+    toast.add({ title: 'Presupuesto actualizado', color: 'success' })
   }
+}
+
+const viewTicketAttachment = (expense: ExpenseRecord) => {
+  if (expense.ticket) {
+    viewingTicket.value = expense.ticket
+    viewingTicketName.value = expense.ticketName
+    isViewerOpen.value = true
+  }
+}
+
+const deleteExpense = async (id: string) => {
+  if (confirm('¿Eliminar esta compra?')) {
+    await expenseStore.deleteExpense(id)
+    toast.add({ title: 'Compra eliminada', color: 'success' })
+  }
+}
+
+const formatDate = (iso: string) => {
+  const d = new Date(iso)
+  return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+}
+
+const monthName = computed(() => {
+  return months.value.find(m => m.value === selectedMonth.value)?.label || ''
 })
 </script>
 
 <template>
-  <div class="space-y-8">
-    <!-- Hero Section -->
-    <div
-v-if="showWelcome"
-      class="relative bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 sm:p-12">
-      <UButton
-icon="i-heroicons-x-mark" color="neutral" variant="ghost" class="absolute top-4 right-4"
-        @click="dismissWelcome" />
-      <section class="text-center space-y-4">
-        <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-          {{ $t('home.welcome.title') }} <span class="text-primary-500">Dietator</span>
+  <div class="space-y-6 max-w-5xl mx-auto">
+    <!-- Header with Month Filter -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          {{ $t('dashboard.title') }}
         </h1>
-        <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          {{ $t('home.welcome.description') }}
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          {{ $t('dashboard.subtitle') }}
         </p>
-      </section>
+      </div>
+
+      <!-- Month & Year Selector -->
+      <div class="flex items-center gap-2">
+        <USelect
+          v-model="selectedMonth"
+          :items="months"
+          option-attribute="label"
+          value-attribute="value"
+          size="sm"
+          class="w-36"
+        />
+        <USelect
+          v-model="selectedYear"
+          :items="availableYears.map(y => ({ value: y, label: String(y) }))"
+          option-attribute="label"
+          value-attribute="value"
+          size="sm"
+          class="w-24"
+        />
+      </div>
     </div>
 
-    <UAlert
-v-if="!dietPriceSet" color="warning" icon="i-heroicons-exclamation-triangle" variant="subtle"
-      :title="$t('home.alerts.price_missing.title')" :description="$t('home.alerts.price_missing.description')" />
-
-    <!-- Calendar View -->
-    <section>
-      <CalendarWidget
-:records="selectedRecords" :year="selectedYear" :month="selectedMonthValue"
-        @update:year="selectedYear = $event" @update:month="selectedMonthValue = $event"
-        @record-selected="handleRecordSelected" @date-selected="handleDateSelected" />
-    </section>
-
-    <!-- Registered Services -->
-    <section>
-      <ServiceList
-ref="serviceListRef" :show-add-button="false" :title="$t('home.stats.services')" :description="serviceListDescription"
-        :records="selectedRecords" />
-    </section>
-
-    <!-- Docs Generator-->
-    <section>
-      <UCard>
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div class="space-y-1">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('home.documents.title') }}</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              {{ $t('home.documents.selected_month') }}: <strong>{{ selectedMonthLabel }}</strong> — {{
-                $t('home.documents.services_count', { count: selectedRecords.length }) }}
-            </p>
-            <p class="text-xs text-gray-400">
-              {{ $t('home.documents.diets_types', {
-                full: selectionTotals.fullDietCount, half:
-                  selectionTotals.halfDietCount
-              }) }}
-            </p>
-            <p class="text-xs text-gray-400">
-              {{ $t('home.documents.kilometers') }}: <strong>{{ selectionTotals.kilometers?.toLocaleString(locale) ?? 0
-              }}
-                km</strong>
-            </p>
-            <p v-if="!hasTemplates" class="text-xs text-red-500 dark:text-red-400">
-              {{ $t('home.documents.missing_templates') }}
-            </p>
+    <!-- MAIN HIGHLIGHT CARD: Spent vs Budget -->
+    <div
+      class="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-8 shadow-sm">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <!-- Spent Info -->
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              {{ $t('dashboard.spent_this_month') }} ({{ monthName }})
+            </span>
+            <UBadge
+              v-if="isCurrentMonthView"
+              label="En curso"
+              color="primary"
+              variant="subtle"
+              size="xs"
+            />
           </div>
-          <div class="grid grid-cols-2 sm:flex sm:items-center gap-3 w-full sm:w-auto">
-            <USelect
-v-model="selectedMonthValue" :items="months" option-attribute="label" value-attribute="value"
-              class="w-full sm:min-w-[140px]" />
-            <USelect v-model="selectedYear" :items="availableYears" class="w-full sm:w-[100px]" />
+          <div class="flex items-baseline gap-3">
+            <span class="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight">
+              {{ totalSpentMonth.toFixed(2) }} €
+            </span>
+          </div>
+
+          <!-- Remaining or Exceeded -->
+          <div class="flex items-center gap-2 text-sm pt-1">
+            <UIcon
+              :name="isBudgetExceeded ? 'i-heroicons-exclamation-triangle' : 'i-heroicons-check-circle'"
+              :class="isBudgetExceeded ? 'text-red-500' : 'text-emerald-500'"
+              class="w-5 h-5 shrink-0"
+            />
+            <span v-if="!isBudgetExceeded" class="font-medium text-gray-700 dark:text-gray-200">
+              {{ $t('dashboard.budget_remaining', { amount: budgetDifference.toFixed(2) }) }}
+            </span>
+            <span v-else class="font-medium text-red-600 dark:text-red-400">
+              {{ $t('dashboard.budget_exceeded', { amount: Math.abs(budgetDifference).toFixed(2) }) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Budget & Action Controls -->
+        <div class="lg:text-right space-y-3">
+          <div class="inline-flex items-center gap-2 p-2.5 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800">
+            <div class="text-left px-2">
+              <span class="block text-xs text-gray-400 dark:text-gray-500 font-medium">Presupuesto</span>
+              <span class="text-lg font-bold text-gray-900 dark:text-white">{{ currentBudget.toFixed(2) }} €</span>
+            </div>
             <UButton
-icon="i-heroicons-share" color="primary" :disabled="!canExportReport"
-              class="col-span-2 sm:w-auto flex justify-center" @click="exportReport">
-              {{ $t('common.export') }}
+              icon="i-heroicons-pencil-square"
+              color="neutral"
+              variant="subtle"
+              size="xs"
+              @click="openBudgetModal">
+              {{ $t('dashboard.edit_budget') }}
+            </UButton>
+          </div>
+
+          <div class="flex flex-wrap gap-2.5 lg:justify-end">
+            <UButton
+              icon="i-heroicons-plus"
+              color="primary"
+              variant="solid"
+              size="lg"
+              class="font-semibold shadow-xs"
+              @click="openNewExpense">
+              {{ $t('dashboard.new_expense') }}
             </UButton>
           </div>
         </div>
-      </UCard>
-    </section>
+      </div>
 
-    <!-- Worked Hours -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <UCard>
-        <div class="text-center space-y-1">
-          <div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-            {{ $t('home.stats.worked_hours') }} {{ selectedMonthLabel.toLowerCase() }}
-          </div>
-          <div class="text-3xl font-bold text-primary-500 mt-2">{{ formatHours(totalHoursWorked) }}</div>
+      <!-- PROGRESS BAR -->
+      <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
+        <div class="flex items-center justify-between text-xs font-semibold mb-2">
+          <span class="text-gray-500 dark:text-gray-400">
+            {{ budgetPercentage }}% {{ $t('dashboard.budget_pct', { pct: '' }) }}
+          </span>
+          <span class="text-gray-700 dark:text-gray-300">
+            {{ totalSpentMonth.toFixed(2) }} € / {{ currentBudget.toFixed(2) }} €
+          </span>
         </div>
-      </UCard>
-      <UCard>
-        <div class="text-center space-y-1">
-          <div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">{{
-            $t('home.stats.weekly_average') }}</div>
-          <div class="text-3xl font-bold text-primary-500 mt-2">{{ formatHours(averageWeeklyHours) }}</div>
-          <p class="text-xs text-gray-400">
-            {{ $t('home.stats.weekly_average_subtitle', {
-              weeks: formatWeeks(weeksInSelectedMonth), month:
-                selectedMonthLabel.toLowerCase()
-            }) }}
-          </p>
-        </div>
-      </UCard>
-      <UCard>
-        <div class="text-center space-y-1">
-          <div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">{{
-            $t('home.stats.service_average') }}</div>
-          <div class="text-3xl font-bold text-primary-500 mt-2">{{ formatHours(averageHoursPerService) }}</div>
-          <p class="text-xs text-gray-400">
-            {{ $t('home.stats.service_average_subtitle', { count: selectionTotals.serviceCount }) }}
-          </p>
-        </div>
-      </UCard>
-    </section>
 
-    <!-- Quick Stats -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <UCard>
-        <div class="text-center">
-          <div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-            {{ $t('home.stats.services') }} {{ selectedMonthLabel.toLowerCase() }}
-          </div>
-          <div class="text-3xl font-bold text-primary-500 mt-2">{{ selectionTotals.serviceCount }}</div>
-        </div>
-      </UCard>
-      <UCard>
-        <div class="text-center">
-          <div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">{{ $t('home.stats.diets') }} {{
-            selectedMonthLabel.toLowerCase() }}</div>
-          <div class="text-3xl font-bold text-primary-500 mt-2">{{ formatCurrency(selectionTotals.allowance || 0) }}
-          </div>
-        </div>
-      </UCard>
-      <UCard>
-        <div class="text-center space-y-1">
-          <div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">{{
-            $t('home.stats.configured_prices') }}</div>
-          <p class="text-base text-gray-800 dark:text-gray-200">{{ $t('home.stats.full') }}: {{
-            formatCurrency(settingsStore.fullDietPrice || 0) }}</p>
-          <p class="text-base text-gray-800 dark:text-gray-200">{{ $t('home.stats.half') }}: {{
-            formatCurrency(settingsStore.halfDietPrice || 0) }}</p>
-        </div>
-      </UCard>
-      <UCard>
-        <div class="text-center space-y-1">
-          <div class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide">{{ $t('home.stats.kilometers')
-            }}</div>
-          <div class="text-3xl font-bold text-primary-500 mt-2">{{ selectionTotals.kilometers?.toLocaleString(locale)
-            ?? 0 }} <span class="text-sm font-normal text-gray-500">km</span></div>
-          <p class="text-xs text-gray-400">
-            {{ $t('home.stats.kilometers_average', {
-              avg: averageKmPerService.toLocaleString(locale, {
-                maximumFractionDigits: 1
-              })
-            }) }}
-          </p>
-        </div>
-      </UCard>
-
-      <!-- Year in Review Card -->
-      <UCard
-v-if="new Date().getMonth() >= 10 || new Date().getMonth() <= 1"
-        class="cursor-pointer hover:ring-2 hover:ring-primary-500 transition-all group relative overflow-hidden"
-        @click="navigateTo('/wrapped')">
-        <!-- Background Decoration -->
-        <div
-          class="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-        <div class="text-center space-y-2 relative z-10">
+        <!-- Dynamic progress bar -->
+        <div class="w-full h-3.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden p-0.5">
           <div
-            class="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide flex items-center justify-center gap-1">
-            <UIcon name="i-heroicons-sparkles" class="text-yellow-500 w-4 h-4" />
-            {{ $t('home.wrapped.annual_summary') }}
-          </div>
-          <div class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary-500 transition-colors">
-            {{ $t('home.wrapped.your_year', { year: selectedYear }) }}
-          </div>
-          <p class="text-xs text-gray-400">
-            {{ $t('home.wrapped.discover') }}
+            class="h-full rounded-full transition-all duration-500"
+            :class="{
+              'bg-emerald-500': budgetPercentage < 75,
+              'bg-amber-500': budgetPercentage >= 75 && budgetPercentage < 100,
+              'bg-red-500': budgetPercentage >= 100
+            }"
+            :style="{ width: `${Math.min(budgetPercentage, 100)}%` }"
+          />
+        </div>
+      </div>
+
+      <!-- QUICK STATS ROW -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-100 dark:border-gray-800 text-center sm:text-left">
+        <div class="p-3 rounded-2xl bg-gray-50/70 dark:bg-gray-800/40">
+          <span class="block text-xs text-gray-500 dark:text-gray-400 font-medium">{{ $t('dashboard.total_tickets') }}</span>
+          <span class="text-xl font-bold text-gray-900 dark:text-white mt-0.5 block">
+            {{ monthExpenses.length }}
+          </span>
+        </div>
+        <div class="p-3 rounded-2xl bg-gray-50/70 dark:bg-gray-800/40">
+          <span class="block text-xs text-gray-500 dark:text-gray-400 font-medium">{{ $t('dashboard.avg_ticket') }}</span>
+          <span class="text-xl font-bold text-gray-900 dark:text-white mt-0.5 block">
+            {{ averageTicket.toFixed(2) }} €
+          </span>
+        </div>
+        <div class="p-3 rounded-2xl bg-gray-50/70 dark:bg-gray-800/40 col-span-2 sm:col-span-1">
+          <span class="block text-xs text-gray-500 dark:text-gray-400 font-medium">{{ $t('dashboard.daily_average') }}</span>
+          <span class="text-xl font-bold text-gray-900 dark:text-white mt-0.5 block">
+            {{ dailyAverage.toFixed(2) }} € / día
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCT CATEGORY BREAKDOWN -->
+    <div class="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-gray-900 dark:text-white">
+            {{ $t('dashboard.categories_overview') }}
+          </h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Distribución según productos desglosados de cada compra
           </p>
         </div>
-      </UCard>
-    </section>
+        <NuxtLink to="/statistics">
+          <UButton variant="ghost" color="primary" size="xs" icon="i-heroicons-chart-bar">
+            Ver estadísticas completas
+          </UButton>
+        </NuxtLink>
+      </div>
 
-    <UDropdownMenu
-      :items="serviceFloatingActions" :content="{ side: 'top', align: 'end', sideOffset: 10 }">
-      <UButton
-        icon="i-heroicons-plus" color="primary" size="xl" square
-        :aria-label="$t('components.service_list.actions')"
-        class="page-floating-action fixed right-4 z-40 rounded-full shadow-xl sm:right-6" />
-    </UDropdownMenu>
+      <div v-if="categoryStats.length === 0" class="py-6 text-center text-sm text-gray-400">
+        No hay datos de categorías para este mes.
+      </div>
 
+      <div v-else class="space-y-4">
+        <!-- Multi-colored category distribution bar -->
+        <div class="w-full h-3 rounded-full flex overflow-hidden bg-gray-100 dark:bg-gray-800">
+          <div
+            v-for="cat in categoryStats"
+            :key="cat.category"
+            :style="{ width: `${cat.percentage}%`, backgroundColor: cat.hexColor }"
+            class="h-full first:rounded-l-full last:rounded-r-full hover:opacity-90 transition-opacity"
+            :title="`${cat.label}: ${cat.amount.toFixed(2)} € (${cat.percentage.toFixed(1)}%)`"
+          />
+        </div>
+
+        <!-- Category Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
+          <div
+            v-for="cat in categoryStats"
+            :key="cat.category"
+            class="flex items-center justify-between p-3 rounded-2xl bg-gray-50/70 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span
+                class="size-8 shrink-0 rounded-xl flex items-center justify-center text-white"
+                :style="{ backgroundColor: cat.hexColor }">
+                <UIcon :name="cat.icon" class="w-4 h-4" />
+              </span>
+              <div class="min-w-0">
+                <span class="block truncate text-xs font-semibold text-gray-800 dark:text-gray-200">
+                  {{ cat.label }}
+                </span>
+                <span class="block text-[11px] text-gray-400 font-medium">
+                  {{ cat.percentage.toFixed(1) }}% · {{ cat.itemsCount }} arts.
+                </span>
+              </div>
+            </div>
+            <span class="font-bold text-sm text-gray-900 dark:text-white shrink-0">
+              {{ cat.amount.toFixed(2) }} €
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT PURCHASES WITH PRODUCT BREAKDOWN ACCORDION -->
+    <div class="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white">
+          {{ $t('dashboard.recent_purchases') }}
+        </h2>
+        <NuxtLink to="/expenses">
+          <UButton variant="ghost" color="primary" size="xs">
+            {{ $t('dashboard.view_all') }}
+          </UButton>
+        </NuxtLink>
+      </div>
+
+      <div v-if="monthExpenses.length === 0" class="py-10 text-center">
+        <UIcon name="i-heroicons-shopping-bag" class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-2" />
+        <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
+          {{ $t('dashboard.no_purchases_month') }}
+        </p>
+        <UButton
+          icon="i-heroicons-plus"
+          color="primary"
+          variant="soft"
+          size="sm"
+          class="mt-4"
+          @click="openNewExpense">
+          {{ $t('dashboard.new_expense') }}
+        </UButton>
+      </div>
+
+      <div v-else class="divide-y divide-gray-100 dark:divide-gray-800">
+        <div
+          v-for="expense in monthExpenses"
+          :key="expense.id"
+          class="py-4 first:pt-0 last:pb-0 space-y-2">
+          <!-- Main Ticket Row -->
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="size-10 rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <UIcon name="i-heroicons-shopping-bag" class="w-5 h-5" />
+              </span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <h3 class="font-bold text-sm sm:text-base text-gray-900 dark:text-white truncate">
+                    {{ expense.description }}
+                  </h3>
+                  <UBadge
+                    v-if="expense.items && expense.items.length > 0"
+                    :label="`${expense.items.length} arts.`"
+                    color="primary"
+                    variant="subtle"
+                    size="xs"
+                    class="cursor-pointer"
+                    @click="toggleExpandTicket(expense.id)"
+                  />
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                  <span>{{ formatDate(expense.timestamp) }}</span>
+                  <span v-if="expense.location?.label" class="truncate max-w-[140px]">
+                    · {{ expense.location.label }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price and Actions -->
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-base sm:text-lg font-extrabold text-gray-900 dark:text-white">
+                {{ expense.amount.toFixed(2) }} €
+              </span>
+
+              <UButton
+                v-if="expense.ticket"
+                icon="i-heroicons-document-text"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                title="Ver comprobante"
+                @click="viewTicketAttachment(expense)"
+              />
+
+              <UButton
+                v-if="expense.items && expense.items.length > 0"
+                :icon="expandedTicketIds.has(expense.id) ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                @click="toggleExpandTicket(expense.id)"
+              />
+
+              <UDropdownMenu
+                :items="[
+                  [{
+                    label: 'Editar',
+                    icon: 'i-heroicons-pencil-square',
+                    onSelect: () => openEditExpense(expense)
+                  }],
+                  [{
+                    label: 'Eliminar',
+                    icon: 'i-heroicons-trash',
+                    color: 'error',
+                    onSelect: () => deleteExpense(expense.id)
+                  }]
+                ]">
+                <UButton icon="i-heroicons-ellipsis-vertical" color="neutral" variant="ghost" size="xs" />
+              </UDropdownMenu>
+            </div>
+          </div>
+
+          <!-- Product Breakdown (Accordion) -->
+          <div
+            v-if="expense.items && expense.items.length > 0 && expandedTicketIds.has(expense.id)"
+            class="mt-2 ml-13 pl-3 border-l-2 border-primary-200 dark:border-primary-800 space-y-1.5 py-1 text-xs">
+            <div
+              v-for="item in expense.items"
+              :key="item.id"
+              class="flex items-center justify-between text-gray-600 dark:text-gray-300 py-0.5">
+              <div class="flex items-center gap-2 truncate">
+                <UBadge
+                  v-if="item.category"
+                  :label="$t(`expenses.categories.${item.category}`)"
+                  :color="CATEGORY_COLORS[item.category] || 'neutral'"
+                  variant="subtle"
+                  size="xs"
+                />
+                <span class="truncate font-medium">{{ item.name }}</span>
+                <span v-if="item.quantity && item.quantity > 1" class="text-gray-400">
+                  (x{{ item.quantity }})
+                </span>
+              </div>
+              <span class="font-semibold text-gray-800 dark:text-gray-200 shrink-0">
+                {{ item.price.toFixed(2) }} €
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM MODAL -->
+    <UModal v-model:open="isFormModalOpen" :title="editingExpense ? 'Editar compra' : 'Nueva compra'">
+      <template #body>
+        <ExpenseForm
+          :initial-data="editingExpense"
+          @saved="isFormModalOpen = false"
+        />
+      </template>
+    </UModal>
+
+    <!-- BUDGET MODAL -->
+    <UModal v-model:open="isBudgetModalOpen" :title="$t('dashboard.set_budget_title')">
+      <template #body>
+        <div class="space-y-4">
+          <p class="text-sm text-gray-600 dark:text-gray-300">
+            {{ $t('dashboard.set_budget_description') }}
+          </p>
+          <UFormField :label="$t('dashboard.budget_input_label')" name="budget">
+            <UInput
+              v-model.number="tempBudget"
+              type="number"
+              min="0"
+              step="10"
+              icon="i-heroicons-banknotes"
+              class="w-full text-lg font-bold"
+            />
+          </UFormField>
+          <div class="flex justify-end gap-2 pt-2">
+            <UButton color="neutral" variant="outline" @click="isBudgetModalOpen = false">
+              Cancelar
+            </UButton>
+            <UButton color="primary" @click="saveBudget">
+              Guardar presupuesto
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
+
+    <!-- TICKET ATTACHMENT VIEWER MODAL -->
+    <TicketViewerModal
+      v-model:open="isViewerOpen"
+      :src="viewingTicket"
+      :name="viewingTicketName"
+    />
   </div>
 </template>

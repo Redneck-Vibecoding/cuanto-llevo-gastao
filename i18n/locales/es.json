@@ -383,13 +383,14 @@
   },
   "components": {
     "header": {
-      "title": "Dietator",
+      "title": "Cuánto llevo gastao",
       "beta": "Beta",
       "home": "Inicio",
-      "expenses": "Gastos",
+      "expenses": "Compras y Tickets",
       "settings": "Configuración",
       "help": "Ayuda",
-      "theme": "Tema"
+      "theme": "Tema",
+      "statistics": "Estadísticas"
     },
     "calendar": {
       "title": "Calendario",
@@ -583,7 +584,20 @@
       "location_autocomplete_error": "No se han podido cargar las sugerencias de Google Maps.",
       "location_hint": "Se puede escribir manualmente, usar autocompletado de Google Maps o detectar la ubicación del dispositivo.",
       "detect_location": "Detectar ubicación",
-      "ticket_extract_hint_ai": "Analiza el ticket con OpenAI para detectar con mayor precisión el importe, la fecha, la descripción, la categoría y la ubicación."
+      "ticket_extract_hint_ai": "Analiza el ticket con OpenAI para detectar con mayor precisión el importe, la fecha, la descripción, la categoría y la ubicación.",
+      "establishment": "Establecimiento / Supermercado",
+      "establishment_placeholder": "Ej: Mercadona, Carrefour, Lidl, Día...",
+      "items_title": "Desglose de productos",
+      "items_hint": "Añade los productos comprados para las estadísticas por categoría",
+      "add_item": "Añadir producto",
+      "item_name": "Producto",
+      "item_name_placeholder": "Nombre del producto",
+      "item_qty": "Cant.",
+      "item_price": "Coste (€)",
+      "item_category": "Categoría",
+      "calculate_total": "Calcular total desde productos",
+      "no_items": "Sin desglose de productos todavía",
+      "items_count": "{count} productos detectados"
     },
     "expense_list": {
       "title": "Gastos registrados",
@@ -739,7 +753,16 @@
     "calendar_title": "Calendario de gastos",
     "all_categories": "Todas las categorías",
     "categories": {
-      "diet": "Dieta",
+      "alimentacion": "Alimentación",
+      "frescos": "Frescos (Fruta, Verdura, Carnes)",
+      "bebidas": "Bebidas",
+      "limpieza": "Limpieza",
+      "cuidado_personal": "Higiene y Cuidado Personal",
+      "farmacia": "Farmacia",
+      "hogar": "Hogar y Bazar",
+      "mascotas": "Mascotas",
+      "otros": "Otros",
+      "diet": "Alimentación",
       "parking": "Parking",
       "gas": "Gasolina",
       "tolls": "Peajes",
@@ -757,5 +780,41 @@
       "by_category": "Por categoría"
     },
     "list_description_range": "Gastos del {start} al {end}"
+  },
+  "dashboard": {
+    "title": "¿Cuánto llevo gastao?",
+    "subtitle": "Control inteligente de compras de supermercado",
+    "spent_this_month": "Gastado este mes",
+    "monthly_budget": "Presupuesto mensual",
+    "budget_remaining": "Te quedan {amount} €",
+    "budget_exceeded": "Superado en {amount} €",
+    "budget_pct": "{pct}% gastado",
+    "edit_budget": "Ajustar presupuesto",
+    "set_budget_title": "Presupuesto mensual",
+    "set_budget_description": "Configura tu objetivo de gasto mensual para compras y supermercado.",
+    "budget_input_label": "Presupuesto mensual (€)",
+    "new_expense": "Nueva compra",
+    "scan_ticket": "Escanear ticket",
+    "categories_overview": "Gasto por categorías este mes",
+    "recent_purchases": "Últimas compras del mes",
+    "no_purchases_month": "No hay compras registradas en este mes todavía.",
+    "view_all": "Ver todas las compras",
+    "daily_average": "Gasto medio diario",
+    "total_tickets": "Tickets este mes",
+    "avg_ticket": "Gasto medio por compra",
+    "items_breakdown": "Desglose de productos",
+    "items_count": "{count} productos"
+  },
+  "statistics": {
+    "title": "Estadísticas de compras",
+    "subtitle": "Análisis detallado de tus gastos por categoría de producto y supermercado",
+    "all_months": "Todos los meses",
+    "total_spent": "Total gastado",
+    "avg_ticket": "Ticket medio",
+    "purchases_count": "{count} compras",
+    "by_category": "Gasto por categoría de productos",
+    "by_supermarket": "Gasto por supermercado",
+    "no_data": "No hay datos de compras para este periodo.",
+    "top_products": "Productos más frecuentes"
   }
 }

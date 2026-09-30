@@ -1,30 +1,83 @@
 // Client-side OCR for receipts/tickets. Runs entirely in the browser with
 // tesseract.js (no backend, keeps the app's privacy model) and extracts the
-// fields the expense form needs: amount, date and a likely description.
-//
-// tesseract.js is heavy and downloads a language model on first use, so it is
-// imported lazily — only when the user explicitly asks to scan a ticket.
+// fields the expense form needs: supermarket/establishment, amount, date, time,
+// and product breakdown with categories.
 
 import type { ExpenseCategory } from '~/utils/expenseCategories'
 
-// Languages to load. Spanish + English cover most receipts in Spain; numbers
-// and dates are largely language-agnostic.
 const OCR_LANGS = 'spa+eng'
+
+export interface ParsedReceiptItem {
+  id?: string
+  name: string
+  quantity?: number
+  unitPrice?: number
+  price: number
+  category?: ExpenseCategory
+}
 
 export interface ParsedReceipt {
   amount?: number
-  // A date may be available even when the receipt does not print a time.
   date?: string
-  // Local datetime-local value (YYYY-MM-DDTHH:mm) ready for the form input.
   dateTime?: string
   description?: string
   location?: string
   category?: ExpenseCategory
+  items?: ParsedReceiptItem[]
+}
+
+const KNOWN_SUPERMARKETS = [
+  { name: 'Mercadona', pattern: /\bmercadona\b/i },
+  { name: 'Carrefour', pattern: /\bcarrefour\b/i },
+  { name: 'Lidl', pattern: /\blidl\b/i },
+  { name: 'Dia', pattern: /\b(supermercados?\s+dia|supermercado\s+dia|dia\s+retail|tiendas?\s+dia|^dia$)\b/i },
+  { name: 'Alcampo', pattern: /\balcampo\b/i },
+  { name: 'Consum', pattern: /\bconsum\b/i },
+  { name: 'Eroski', pattern: /\beroski\b/i },
+  { name: 'Aldi', pattern: /\baldi\b/i },
+  { name: 'Ahorramas', pattern: /\bahorramas\b/i },
+  { name: 'Bonpreu', pattern: /\b(bonpreu|esclat)\b/i },
+  { name: 'Hipercor', pattern: /\bhipercor\b/i },
+  { name: 'El Corte Inglés', pattern: /\bel corte ingl[eé]s\b/i },
+  { name: 'Condis', pattern: /\bcondis\b/i },
+  { name: 'Spar', pattern: /\bspar\b/i },
+  { name: 'Caprabo', pattern: /\bcaprabo\b/i },
+  { name: 'Costco', pattern: /\bcostco\b/i },
+  { name: 'Makro', pattern: /\bmakro\b/i },
+  { name: 'Farmacia', pattern: /\bfarmacia\b/i }
+]
+
+export const stripAccents = (value: string) =>
+  value.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
+export function inferCategoryFromItemName(name: string): ExpenseCategory {
+  const norm = stripAccents(name.toLowerCase())
+
+  if (/\b(limpieza|lejia|detergente|lavavajillas|fregasuelos|bayeta|estropajo|suavizante|fregona|limpiacristales|insecticida|antical|pastillas lavavajillas|bolsas basura)\b/.test(norm)) {
+    return 'limpieza'
+  }
+  if (/\b(farmacia|paracetamol|ibuprofeno|gasas|alcohol|jarabe|aposito|tirita|medicamento|venda|termometro|aspirina|prospecto|suero)\b/.test(norm)) {
+    return 'farmacia'
+  }
+  if (/\b(champu|gel|desodorante|dentifrico|pasta dental|cepillo|colonia|afeitado|higiene|toallitas|tampon|compresa|jabon|crema hidratante|cuidado)\b/.test(norm)) {
+    return 'cuidado_personal'
+  }
+  if (/\b(cerveza|vino|agua|refresco|coca cola|fanta|zumo|tonica|ginebra|ron|whisky|aquarius|monster|red bull|sidra|bebida|licor)\b/.test(norm)) {
+    return 'bebidas'
+  }
+  if (/\b(perro|gato|pienso|mascota|snack perro|comida gato|arena gato|canino|felino)\b/.test(norm)) {
+    return 'mascotas'
+  }
+  if (/\b(papel cocina|papel higienico|bombilla|pila|cubo|menaje|vela|papel aluminio|film|bateria|sarten|plato)\b/.test(norm)) {
+    return 'hogar'
+  }
+  if (/\b(fruta|platano|manzana|naranja|fresa|tomate|lechuga|carne|pollo|ternera|cerdo|pescado|salmon|merluza|pescaderia|carniceria|verdura|zanahoria|cebolla|patata|pepino|aguacate|solomillo|pechuga)\b/.test(norm)) {
+    return 'frescos'
+  }
+  return 'alimentacion'
 }
 
 // Recognise the combined text of one or more images, reusing a single worker.
-// Each image may be a data URL, a blob or any source tesseract.js accepts.
-// `onProgress` receives 0..1 across all images.
 export async function recognizeImages(
   images: (string | Blob)[],
   onProgress?: (progress: number) => void
@@ -54,7 +107,6 @@ export async function recognizeImages(
   }
 }
 
-// Recognise the raw text of a single image (convenience wrapper).
 export async function recognizeText(
   image: string | Blob,
   onProgress?: (progress: number) => void
@@ -62,22 +114,13 @@ export async function recognizeText(
   return recognizeImages([image], onProgress)
 }
 
-// Matches a monetary value like 12,34 / 1.234,56 / 12.34 / 1,234.56 with two
-// decimals. The decimal separator is the last '.' or ',' in the token.
 const AMOUNT_RE = /\d{1,3}(?:[.,\s]\d{3})*[.,]\d{2}(?!\d)|\d+[.,]\d{2}(?!\d)/g
 
-// Keywords (case-insensitive, accent-insensitive) that mark the line holding
-// the total to pay. Ordered roughly by how decisive they are.
 const TOTAL_KEYWORDS = [
   'total a pagar', 'importe total', 'import total', 'total importe',
-  'a pagar', 'total euro', 'total eur', 'total', 'import', 'importe', 'suma'
+  'a pagar', 'total euro', 'total eur', 'total factura', 'total', 'import', 'importe', 'suma'
 ]
 
-const stripAccents = (value: string) =>
-  value.normalize('NFD').replace(/[̀-ͯ]/g, '')
-
-// Turn a matched amount token into a number, honouring European (comma) and
-// English (dot) decimal separators plus thousands separators.
 const parseAmountToken = (token: string): number | undefined => {
   const cleaned = token.replace(/\s/g, '')
   const lastDot = cleaned.lastIndexOf('.')
@@ -104,8 +147,6 @@ const extractAmount = (lines: string[]): number | undefined => {
     }
   }
   if (candidates.length === 0) return undefined
-  // Prefer the largest value on a "total" line; otherwise the largest value
-  // overall (the grand total is almost always the biggest number on a ticket).
   const keyworded = candidates.filter(c => c.keyword)
   const pool = keyworded.length ? keyworded : candidates
   return pool.reduce((max, c) => (c.value > max ? c.value : max), 0)
@@ -115,9 +156,6 @@ const hasAmount = (line: string) => Boolean(line.match(AMOUNT_RE))
 
 const pad2 = (n: number) => String(n).padStart(2, '0')
 
-// Extract the first plausible date, returning a datetime-local string. A time
-// is included when present on the receipt, otherwise midday is used to avoid
-// any day-shift surprises around time zones.
 const parseDateParts = (year: number, month: number, day: number) => {
   if (year < 100) year += 2000
   if (month < 1 || month > 12 || day < 1 || day > 31) return undefined
@@ -125,8 +163,6 @@ const parseDateParts = (year: number, month: number, day: number) => {
 }
 
 const findNearestTime = (text: string, dateIndex: number, dateLength: number): RegExpMatchArray | null => {
-  // Prefer a time printed on the same receipt line as the date; fall back to a
-  // nearby time to handle OCR line breaks between date and hour labels.
   const lineStart = text.lastIndexOf('\n', dateIndex) + 1
   const nextBreak = text.indexOf('\n', dateIndex + dateLength)
   const lineEnd = nextBreak === -1 ? text.length : nextBreak
@@ -158,9 +194,7 @@ const findNearestTime = (text: string, dateIndex: number, dateLength: number): R
 
 const extractDateTime = (text: string): string | undefined => {
   const patterns = [
-    // yyyy-mm-dd / yyyy/mm/dd / yyyy.mm.dd
     { re: /\b(\d{4})[/.-](\d{1,2})[/.-](\d{1,2})\b/, order: 'ymd' },
-    // dd/mm/yyyy, dd-mm-yyyy, dd.mm.yyyy (year 2 or 4 digits).
     { re: /\b(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})\b/, order: 'dmy' }
   ] as const
 
@@ -183,14 +217,23 @@ const extractDateTime = (text: string): string | undefined => {
   return undefined
 }
 
-// A receipt header line is usually the merchant name: letters, not a date or an
-// amount, of a reasonable length. Pick the first such line near the top.
-const extractDescription = (lines: string[]): string | undefined => {
+// A receipt header line is usually the merchant/supermarket name.
+const extractDescription = (lines: string[], _rawText: string): string | undefined => {
+  // First check top 4 lines for known supermarket chains
+  for (const line of lines.slice(0, 4)) {
+    for (const market of KNOWN_SUPERMARKETS) {
+      if (market.pattern.test(line)) {
+        return market.name
+      }
+    }
+  }
+
+  // Fallback to top text line
   for (const line of lines.slice(0, 8)) {
     const letters = line.replace(/[^a-zA-ZÀ-ſ]/g, '')
     if (letters.length < 3) continue
-    if (/\d{1,2}[/.-]\d{1,2}/.test(line)) continue // looks like a date
-    if (hasAmount(line)) continue // looks like an amount
+    if (/\d{1,2}[/.-]\d{1,2}/.test(line)) continue
+    if (hasAmount(line)) continue
     const trimmed = line.trim()
     if (trimmed.length >= 3 && trimmed.length <= 60) return trimmed
   }
@@ -208,6 +251,10 @@ const looksLikeReceiptMetadata = (line: string) => {
     || normalized.includes('date')
     || normalized.includes('hora')
     || normalized.includes('time')
+    || normalized.includes('cif')
+    || normalized.includes('nif')
+    || normalized.includes('factura')
+    || normalized.includes('ticket')
     || TOTAL_KEYWORDS.some(keyword => normalized.includes(keyword))
 }
 
@@ -227,6 +274,71 @@ const extractLocation = (lines: string[]): string | undefined => {
   return undefined
 }
 
+const IGNORE_ITEM_KEYWORDS = [
+  'total', 'subtotal', 'iva', 'base', 'cif', 'nif', 'tarjeta', 'visa', 'mastercard',
+  'cambio', 'entregado', 'importe', 'factura', 'simplificada', 'ticket', 'fecha',
+  'hora', 'telefono', 'tel.', 'gracias', 'atendido', 'caja', 'operador', 'articulos',
+  'descuento', 'promocion', 'puntos', 'tarifa', 'su cambio', 'efectivo'
+]
+
+export function extractItemsFromReceiptLines(lines: string[]): ParsedReceiptItem[] {
+  const items: ParsedReceiptItem[] = []
+
+  let totalLineIndex = -1
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i]
+    if (!rawLine) continue
+    const norm = stripAccents(rawLine.toLowerCase())
+    if (TOTAL_KEYWORDS.some(k => norm.includes(k))) {
+      totalLineIndex = i
+      break
+    }
+  }
+
+  const candidateLines = totalLineIndex > 0 ? lines.slice(0, totalLineIndex) : lines
+
+  for (let i = 0; i < candidateLines.length; i++) {
+    const rawLine = candidateLines[i]
+    if (!rawLine) continue
+    const line = rawLine.trim()
+    if (line.length < 3) continue
+    const norm = stripAccents(line.toLowerCase())
+    if (IGNORE_ITEM_KEYWORDS.some(k => norm.includes(k))) continue
+    if (looksLikeReceiptMetadata(line)) continue
+    if (LOCATION_KEYWORDS.some(k => norm.includes(stripAccents(k)))) continue
+
+    const amounts = Array.from(line.matchAll(AMOUNT_RE))
+    if (amounts.length > 0) {
+      const lastAmountMatch = amounts[amounts.length - 1]
+      if (!lastAmountMatch || lastAmountMatch.index === undefined) continue
+      const priceStr = lastAmountMatch[0]
+      const price = parseAmountToken(priceStr)
+      if (price !== undefined && price > 0 && price < 400) {
+        const namePart = line.slice(0, lastAmountMatch.index).trim()
+        const cleanName = namePart.replace(/^[\d\s*x.-]+/, '').trim()
+        if (cleanName.length >= 2 && !/^\d+$/.test(cleanName)) {
+          let qty = 1
+          const qtyMatch = line.match(/^(\d+(?:[.,]\d+)?)\s*(?:x|\*)\s*/i)
+          if (qtyMatch && qtyMatch[1]) {
+            qty = parseFloat(qtyMatch[1].replace(',', '.')) || 1
+          }
+
+          items.push({
+            id: `item-${Date.now()}-${items.length}`,
+            name: cleanName,
+            quantity: qty,
+            price: price,
+            unitPrice: qty > 1 ? Number((price / qty).toFixed(2)) : price,
+            category: inferCategoryFromItemName(cleanName)
+          })
+        }
+      }
+    }
+  }
+
+  return items
+}
+
 // Parse OCR text into the fields the expense form can prefill.
 export function parseReceiptText(text: string): ParsedReceipt {
   const lines = text
@@ -234,10 +346,14 @@ export function parseReceiptText(text: string): ParsedReceipt {
     .map(l => l.trim())
     .filter(Boolean)
 
+  const items = extractItemsFromReceiptLines(lines)
+  const amount = extractAmount(lines)
+
   return {
-    amount: extractAmount(lines),
+    amount: amount || (items.length > 0 ? Number(items.reduce((s, it) => s + it.price, 0).toFixed(2)) : undefined),
     dateTime: extractDateTime(text),
-    description: extractDescription(lines),
-    location: extractLocation(lines)
+    description: extractDescription(lines, text),
+    location: extractLocation(lines),
+    items: items.length > 0 ? items : undefined
   }
 }

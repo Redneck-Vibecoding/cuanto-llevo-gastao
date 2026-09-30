@@ -27,11 +27,10 @@ const toast = useToast()
 const displayTitle = computed(() => props.title || t('components.expense_list.title'))
 const displayDescription = computed(() => props.description || t('components.expense_list.description'))
 
-// Category badge shown for non-diet expenses (diet is the implied default).
+// Category badge shown for expenses
 const categoryBadge = (expense: ExpenseRecord) => {
   const category = resolveExpenseCategory(expense)
-  if (category === 'diet') return null
-  return { label: t(`expenses.categories.${category}`), color: CATEGORY_COLORS[category] }
+  return { label: t(`expenses.categories.${category}`), color: CATEGORY_COLORS[category] || 'primary' }
 }
 
 const page = ref(1)
@@ -404,15 +403,22 @@ defineExpose({
           </template>
           <template #description-cell="{ row }">
             <div class="flex items-center gap-2">
-              <span class="text-sm text-gray-700 dark:text-gray-300">{{ (row.original as ExpenseRecord).description }}</span>
+              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ (row.original as ExpenseRecord).description }}</span>
               <UBadge
                 v-if="categoryBadge(row.original as ExpenseRecord)" :color="categoryBadge(row.original as ExpenseRecord)!.color"
-                variant="soft" size="xs">
+                variant="subtle" size="xs">
                 {{ categoryBadge(row.original as ExpenseRecord)!.label }}
+              </UBadge>
+              <UBadge
+                v-if="(row.original as ExpenseRecord).items?.length"
+                color="neutral"
+                variant="subtle"
+                size="xs">
+                {{ (row.original as ExpenseRecord).items!.length }} arts.
               </UBadge>
               <UIcon
                 v-if="hasTicket(row.original as ExpenseRecord)" name="i-heroicons-paper-clip"
-                class="h-4 w-4 shrink-0 text-gray-400 cursor-pointer"
+                class="h-4 w-4 shrink-0 text-emerald-500 cursor-pointer"
                 :title="$t('components.expense_list.ticket_badge')"
                 @click.stop="viewTicket(row.original as ExpenseRecord)" />
             </div>

@@ -9,6 +9,7 @@ const toast = useToast()
 const { provinces } = useLocations()
 
 const formState = reactive({
+  monthlyBudget: (settingsStore.monthlyBudget || 400) as number | string,
   halfDietPrice: (settingsStore.halfDietPrice || 0) as number | string,
   fullDietPrice: (settingsStore.fullDietPrice || 0) as number | string,
   googleMapsApiKey: settingsStore.googleMapsApiKey || '',
@@ -37,6 +38,10 @@ const saveSettings = async () => {
     toast.add({ title: t('common.error'), description: 'DNI incorrecte', color: 'error' })
     return
   }
+
+  const normalizedBudget = parseCurrency(formState.monthlyBudget)
+  formState.monthlyBudget = normalizedBudget
+  await settingsStore.updateMonthlyBudget(normalizedBudget)
 
   const normalizedHalfPrice = parseCurrency(formState.halfDietPrice)
   const normalizedFullPrice = parseCurrency(formState.fullDietPrice)
@@ -164,6 +169,35 @@ const onBackupImported = () => {
 
     <!-- Language -->
     <SettingsLanguage />
+
+    <!-- Monthly Budget -->
+    <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="size-10 rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 flex items-center justify-center">
+          <UIcon name="i-heroicons-banknotes" class="w-6 h-6" />
+        </span>
+        <div>
+          <h2 class="text-base font-bold text-gray-900 dark:text-white">Presupuesto Mensual</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Define tu objetivo o límite de gasto mensual para compras de supermercado
+          </p>
+        </div>
+      </div>
+
+      <UFormField label="Límite mensual (€)" name="monthlyBudget">
+        <UInput
+          v-model="formState.monthlyBudget"
+          type="text"
+          inputmode="decimal"
+          icon="i-heroicons-currency-euro"
+          placeholder="400.00"
+          class="w-full text-lg font-bold"
+        />
+        <template #help>
+          Este importe se utiliza en el inicio para calcular el porcentaje gastado y avisarte si te excedes.
+        </template>
+      </UFormField>
+    </div>
 
     <!-- Personal Data -->
     <SettingsPersonalData
