@@ -1,6 +1,15 @@
-import type { ExpenseRecord } from '~/stores/expenses'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const createSampleTicket = (storeName: string, total: number, dateStr: string): string => {
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const rootDir = path.resolve(__dirname, '..')
+const outputFile = path.join(rootDir, 'public', 'dev-seed.json')
+
+const isDirectExecution = process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('scripts/seed.js')
+
+const createSampleTicket = (storeName, total, dateStr) => {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="420" viewBox="0 0 320 420">
   <rect width="320" height="420" fill="#fbfbfe" stroke="#cbd5e1" stroke-width="2" rx="10"/>
   <rect x="0" y="0" width="320" height="12" fill="#059669" rx="4"/>
@@ -20,27 +29,21 @@ const createSampleTicket = (storeName: string, total: number, dateStr: string): 
   <text x="160" y="320" font-family="monospace" font-size="11" text-anchor="middle" fill="#475569">*** GRACIAS POR SU VISITA ***</text>
 </svg>`
 
-  if (typeof btoa !== 'undefined') {
-    return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
-  }
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`
 }
 
-export function generateSampleExpenses(referenceDate = new Date()): ExpenseRecord[] {
-  const year = referenceDate.getFullYear()
-  const month = referenceDate.getMonth() // 0-indexed
-  const day = referenceDate.getDate()
+function generateExpenses(refDate = new Date()) {
+  const year = refDate.getFullYear()
+  const month = refDate.getMonth()
+  const day = refDate.getDate()
 
-  // Helper to create UTC ISO timestamp for given relative day and hour
-  const makeDate = (targetYear: number, targetMonth: number, targetDay: number, hour = 11, minute = 30) => {
+  const makeDate = (targetYear, targetMonth, targetDay, hour = 11, minute = 30) => {
     const d = new Date(targetYear, targetMonth, targetDay, hour, minute)
     return d.toISOString()
   }
 
-  const list: ExpenseRecord[] = [
-    // -------------------------------------------------------------
-    // THIS CURRENT MONTH
-    // -------------------------------------------------------------
+  return [
+    // ---------------- CURRENT MONTH ----------------
     {
       id: 'mock-curr-1',
       description: 'Compra semanal Mercadona',
@@ -48,7 +51,7 @@ export function generateSampleExpenses(referenceDate = new Date()): ExpenseRecor
       category: 'alimentacion',
       timestamp: makeDate(year, month, Math.max(1, day - 1), 18, 45),
       location: { label: 'Mercadona - Gran Vía', city: 'Madrid' },
-      ticket: createSampleTicket('Mercadona', 68.45, '2026-10-02 18:45'),
+      ticket: createSampleTicket('Mercadona', 68.45, `${year}-${String(month + 1).padStart(2, '0')}-${String(Math.max(1, day - 1)).padStart(2, '0')} 18:45`),
       ticketName: 'ticket-mercadona.svg',
       ticketType: 'image/svg+xml',
       items: [
@@ -87,7 +90,7 @@ export function generateSampleExpenses(referenceDate = new Date()): ExpenseRecor
       category: 'alimentacion',
       timestamp: makeDate(year, month, Math.max(1, day - 6), 12, 30),
       location: { label: 'Lidl Supermercados' },
-      ticket: createSampleTicket('Lidl', 42.10, '2026-09-28 12:30'),
+      ticket: createSampleTicket('Lidl', 42.10, `${year}-${String(month + 1).padStart(2, '0')}-${String(Math.max(1, day - 6)).padStart(2, '0')} 12:30`),
       ticketName: 'recibo-lidl.svg',
       ticketType: 'image/svg+xml',
       items: [
@@ -122,14 +125,11 @@ export function generateSampleExpenses(referenceDate = new Date()): ExpenseRecor
       items: [
         { id: 'i-26', name: 'Pasta spaghetti 500g', price: 1.35, quantity: 1, category: 'alimentacion' },
         { id: 'i-27', name: 'Salsa pesto genovés', price: 2.65, quantity: 1, category: 'alimentacion' },
-        { id: 'i-28', name: 'Queso parmesano rallado', price: 2.80, quantity: 1, category: 'alimentacion' },
-        { id: 'i-29', name: 'Tableta chocolate negro 85%', price: 2.10, quantity: 1, category: 'alimentacion' }
+        { id: 'i-28', name: 'Queso parmesano rallado', price: 2.80, quantity: 1, category: 'alimentacion' }
       ]
     },
 
-    // -------------------------------------------------------------
-    // PREVIOUS MONTH
-    // -------------------------------------------------------------
+    // ---------------- PREVIOUS MONTH ----------------
     {
       id: 'mock-prev-1',
       description: 'Mercadona compra mensual despensa',
@@ -137,8 +137,8 @@ export function generateSampleExpenses(referenceDate = new Date()): ExpenseRecor
       category: 'alimentacion',
       timestamp: makeDate(year, month - 1, 15, 19, 0),
       location: { label: 'Mercadona - Centro' },
-      ticket: createSampleTicket('Mercadona', 94.20, '2026-09-15 19:00'),
-      ticketName: 'mercadona-septiembre.svg',
+      ticket: createSampleTicket('Mercadona', 94.20, `${year}-${String(month).padStart(2, '0')}-15 19:00`),
+      ticketName: 'mercadona-mes-anterior.svg',
       ticketType: 'image/svg+xml',
       items: [
         { id: 'i-30', name: 'Lote legumbres (lentejas, garbanzos)', price: 6.40, category: 'alimentacion' },
@@ -177,9 +177,7 @@ export function generateSampleExpenses(referenceDate = new Date()): ExpenseRecor
       ]
     },
 
-    // -------------------------------------------------------------
-    // THIS YEAR - EARLIER MONTHS (Q1 / Q2 / S1)
-    // -------------------------------------------------------------
+    // ---------------- EARLIER MONTHS THIS YEAR ----------------
     {
       id: 'mock-s1-1',
       description: 'Alcampo - Compra grande primavera',
@@ -221,15 +219,13 @@ export function generateSampleExpenses(referenceDate = new Date()): ExpenseRecor
       ]
     },
 
-    // -------------------------------------------------------------
-    // PREVIOUS YEAR (LAST YEAR)
-    // -------------------------------------------------------------
+    // ---------------- LAST YEAR ----------------
     {
       id: 'mock-lastyear-1',
       description: 'Compra especial fin de año Mercadona',
       amount: 145.80,
       category: 'alimentacion',
-      timestamp: makeDate(year - 1, 11, 29, 18, 0), // Dec last year
+      timestamp: makeDate(year - 1, 11, 29, 18, 0),
       location: { label: 'Mercadona' },
       ticket: createSampleTicket('Mercadona', 145.80, `${year - 1}-12-29 18:00`),
       ticketName: 'navidad-mercadona.svg',
@@ -246,10 +242,77 @@ export function generateSampleExpenses(referenceDate = new Date()): ExpenseRecor
       description: 'Carrefour - Compra otoño',
       amount: 63.40,
       category: 'alimentacion',
-      timestamp: makeDate(year - 1, 9, 12, 11, 30), // Oct last year
+      timestamp: makeDate(year - 1, 9, 12, 11, 30),
       location: { label: 'Carrefour' }
     }
   ]
-
-  return list
 }
+
+export { generateExpenses }
+
+function runCli() {
+  const args = process.argv.slice(2)
+  const isReset = args.includes('--reset')
+  const isClear = args.includes('--clear')
+
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log(`
+Usage: npm run seed [options]
+
+Options:
+  --reset    Replace all local expenses with the test seed data
+  --clear    Clear the seed data from the local database
+  --help     Show this help message
+
+Description:
+  Generates a rich dataset of realistic supermarket expenses spanning
+  the current month, previous month, earlier quarters and last year.
+  The dev server (localhost:3000) will automatically apply this seed to
+  your local IndexedDB when you open or reload the browser.
+`)
+    process.exit(0)
+  }
+
+  if (isClear) {
+    const payload = {
+      seededAt: new Date().toISOString(),
+      clear: true,
+      reset: false,
+      expenses: []
+    }
+    fs.writeFileSync(outputFile, JSON.stringify(payload, null, 2), 'utf-8')
+    console.log('\n🧹 Seed cleared! Reload http://localhost:3000 to clear the test data in your browser.\n')
+    process.exit(0)
+  }
+
+  const expenses = generateExpenses()
+  const payload = {
+    seededAt: new Date().toISOString(),
+    reset: isReset,
+    clear: false,
+    expenses
+  }
+
+  fs.writeFileSync(outputFile, JSON.stringify(payload, null, 2), 'utf-8')
+
+  const totalAmount = expenses.reduce((sum, e) => sum + e.amount, 0)
+
+  console.log(`
+🌱 Test seed dataset generated successfully!
+─────────────────────────────────────────────────────────────
+📦 Total expenses:   ${expenses.length}
+💰 Total amount:     ${totalAmount.toFixed(2)} €
+📅 Date coverage:    Current month, previous month, earlier quarters & last year
+📁 Output file:      public/dev-seed.json
+─────────────────────────────────────────────────────────────
+✨ Next step:
+   Open or reload http://localhost:3000 in your browser.
+   The development persistence hook will automatically load the
+   ${expenses.length} test expenses into your local IndexedDB.
+`)
+}
+
+if (isDirectExecution) {
+  runCli()
+}
+

@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { generateSampleExpenses } from '~/utils/sampleData'
+import { generateExpenses } from '../../scripts/seed.js'
 
-describe('generateSampleExpenses utility', () => {
+describe('generateExpenses seed utility', () => {
   const refDate = new Date(2026, 9, 3) // 3 Oct 2026
 
   it('generates a rich list of mock expenses', () => {
-    const expenses = generateSampleExpenses(refDate)
+    const expenses = generateExpenses(refDate)
     expect(expenses.length).toBeGreaterThanOrEqual(10)
 
     // Check that expenses have id, description, amount, timestamp
@@ -18,7 +18,7 @@ describe('generateSampleExpenses utility', () => {
   })
 
   it('covers multiple periods: current month, previous month, earlier months and last year', () => {
-    const expenses = generateSampleExpenses(refDate)
+    const expenses = generateExpenses(refDate)
 
     const thisMonthExpenses = expenses.filter(e => {
       const d = new Date(e.timestamp)
@@ -40,7 +40,7 @@ describe('generateSampleExpenses utility', () => {
   })
 
   it('includes item breakdowns and ticket attachments on some expenses', () => {
-    const expenses = generateSampleExpenses(refDate)
+    const expenses = generateExpenses(refDate)
 
     const withItems = expenses.filter(e => e.items && e.items.length > 0)
     expect(withItems.length).toBeGreaterThanOrEqual(5)

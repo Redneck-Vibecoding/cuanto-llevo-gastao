@@ -7,7 +7,6 @@ import {
   formatIsoDateOnly
 } from '~/utils/expensePeriods'
 import { shareExpenses } from '~/utils/expenseShare'
-import { generateSampleExpenses } from '~/utils/sampleData'
 
 const expenseStore = useExpenseStore()
 const { expenses } = storeToRefs(expenseStore)
@@ -101,26 +100,6 @@ const handleExport = async () => {
     })
   } finally {
     isExporting.value = false
-  }
-}
-
-const isLoadingSample = ref(false)
-const loadSampleData = async () => {
-  isLoadingSample.value = true
-  try {
-    const samples = generateSampleExpenses()
-    const existingIds = new Set(expenses.value.map(e => e.id))
-    const newSamples = samples.filter(s => !existingIds.has(s.id))
-    await expenseStore.setExpenses([...expenses.value, ...newSamples])
-    toast.add({
-      title: t('settings.maintenance.sample_data_loaded', { count: newSamples.length }),
-      color: 'success'
-    })
-  } catch (err) {
-    console.error('Error loading sample data', err)
-    toast.add({ title: t('common.error'), color: 'error' })
-  } finally {
-    isLoadingSample.value = false
   }
 }
 </script>
@@ -247,17 +226,8 @@ const loadSampleData = async () => {
             <span v-if="hasExpenses" class="text-gray-900 dark:text-white font-semibold">
               {{ $t('export_widget.expenses_count', { count: filteredExpenses.length }) }}
             </span>
-            <span v-else class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+            <span v-else class="text-amber-600 dark:text-amber-400">
               {{ $t('export_widget.no_expenses') }}
-              <UButton
-                variant="link"
-                color="primary"
-                size="xs"
-                icon="i-heroicons-sparkles"
-                :loading="isLoadingSample"
-                @click="loadSampleData">
-                {{ $t('export_widget.load_sample_data') }}
-              </UButton>
             </span>
           </div>
 

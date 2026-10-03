@@ -21,7 +21,10 @@
     "test": "cross-env TZ=Europe/Madrid vitest run",
     "test:watch": "cross-env TZ=Europe/Madrid vitest",
     "test:coverage": "cross-env TZ=Europe/Madrid vitest run --coverage",
-    "generate-icons": "npx pwa-asset-generator public/icon.svg public/ --opaque false --icon-only --favicon --mstile --type png"
+    "generate-icons": "npx pwa-asset-generator public/icon.svg public/ --opaque false --icon-only --favicon --mstile --type png",
+    "seed": "node scripts/seed.js",
+    "seed:reset": "node scripts/seed.js --reset",
+    "seed:clear": "node scripts/seed.js --clear"
   },
   "dependencies": {
     "@internationalized/date": "^3.10.1",
