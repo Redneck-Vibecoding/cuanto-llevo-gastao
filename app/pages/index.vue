@@ -5,6 +5,7 @@ import {
   resolveExpenseCategory
 } from '~/utils/expenseCategories'
 import type { ExpenseRecord } from '~/stores/expenses'
+import { generateSampleExpenses } from '~/utils/sampleData'
 
 const expenseStore = useExpenseStore()
 const settingsStore = useSettingsStore()
@@ -200,6 +201,26 @@ const formatDate = (iso: string) => {
 const monthName = computed(() => {
   return months.value.find(m => m.value === selectedMonth.value)?.label || ''
 })
+
+const isLoadingSample = ref(false)
+const loadSampleData = async () => {
+  isLoadingSample.value = true
+  try {
+    const samples = generateSampleExpenses()
+    const existingIds = new Set(expenses.value.map(e => e.id))
+    const newSamples = samples.filter(s => !existingIds.has(s.id))
+    await expenseStore.setExpenses([...expenses.value, ...newSamples])
+    toast.add({
+      title: t('settings.maintenance.sample_data_loaded', { count: newSamples.length }),
+      color: 'success'
+    })
+  } catch (err) {
+    console.error('Error loading sample data', err)
+    toast.add({ title: t('common.error'), color: 'error' })
+  } finally {
+    isLoadingSample.value = false
+  }
+}
 </script>
 
 <template>
@@ -439,15 +460,25 @@ const monthName = computed(() => {
         <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
           {{ $t('dashboard.no_purchases_month') }}
         </p>
-        <UButton
-          icon="i-heroicons-plus"
-          color="primary"
-          variant="soft"
-          size="sm"
-          class="mt-4"
-          @click="openNewExpense">
-          {{ $t('dashboard.new_expense') }}
-        </UButton>
+        <div class="flex flex-wrap items-center justify-center gap-2 mt-4">
+          <UButton
+            icon="i-heroicons-plus"
+            color="primary"
+            variant="solid"
+            size="sm"
+            @click="openNewExpense">
+            {{ $t('dashboard.new_expense') }}
+          </UButton>
+          <UButton
+            icon="i-heroicons-sparkles"
+            color="primary"
+            variant="subtle"
+            size="sm"
+            :loading="isLoadingSample"
+            @click="loadSampleData">
+            {{ $t('dashboard.load_sample_data') }}
+          </UButton>
+        </div>
       </div>
 
       <div v-else class="divide-y divide-gray-100 dark:divide-gray-800">

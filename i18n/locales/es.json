@@ -127,7 +127,12 @@
         "attachments": "Tickets",
         "browser_usage": "Uso del navegador",
         "browser_quota": "Cuota disponible"
-      }
+      },
+      "sample_data_title": "Datos de prueba para testear",
+      "sample_data_description": "Carga un conjunto de compras simuladas con varias fechas (este mes, mes anterior, semestres y año anterior) y comprobantes para probar todas las funciones de estadísticas y exportación.",
+      "load_sample_data": "Cargar datos de prueba",
+      "sample_data_loaded": "Se han cargado {count} compras de prueba con éxito",
+      "download_sample_json": "Descargar archivo JSON de prueba"
     },
     "openai": {
       "label": "Clave API de OpenAI",
@@ -545,7 +550,8 @@
     "total_tickets": "Tickets este mes",
     "avg_ticket": "Gasto medio por compra",
     "items_breakdown": "Desglose de productos",
-    "items_count": "{count} productos"
+    "items_count": "{count} productos",
+    "load_sample_data": "Cargar datos de prueba"
   },
   "statistics": {
     "title": "Estadísticas de compras",
@@ -583,6 +589,7 @@
     "total_amount": "Total: {amount} €",
     "includes_info": "Incluye informe en PDF, hoja de cálculo CSV y comprobantes adjuntos",
     "no_expenses": "No hay gastos registrados en este periodo.",
+    "load_sample_data": "Cargar datos de prueba",
     "export_btn": "Descargar ZIP (PDF + CSV)",
     "exporting": "Generando ZIP...",
     "success_toast": "Exportación ZIP completada con éxito",

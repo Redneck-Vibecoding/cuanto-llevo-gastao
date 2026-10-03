@@ -127,7 +127,12 @@
         "attachments": "Tiquets",
         "browser_usage": "Ús del navegador",
         "browser_quota": "Quota disponible"
-      }
+      },
+      "sample_data_title": "Dades de prova per testejar",
+      "sample_data_description": "Carrega un conjunt de compres simulades amb diverses dates (aquest mes, mes anterior, semestres i any anterior) i comprovants per provar totes les funcions d'estadístiques i exportació.",
+      "load_sample_data": "Carregar dades de prova",
+      "sample_data_loaded": "S'han carregat {count} compres de prova amb èxit",
+      "download_sample_json": "Descarregar fitxer JSON de prova"
     },
     "openai": {
       "label": "Clau API d’OpenAI",
@@ -543,7 +548,8 @@
     "total_tickets": "Tiquets aquest mes",
     "avg_ticket": "Mitjana per compra",
     "items_breakdown": "Desglossament de productes",
-    "items_count": "{count} productes"
+    "items_count": "{count} productes",
+    "load_sample_data": "Carregar dades de prova"
   },
   "statistics": {
     "title": "Estadístiques de compres",
@@ -581,6 +587,7 @@
     "total_amount": "Total: {amount} €",
     "includes_info": "Inclou informe en PDF, full de càlcul CSV i comprovants adjunts",
     "no_expenses": "No hi ha despeses registrades en aquest període.",
+    "load_sample_data": "Carregar dades de prova",
     "export_btn": "Descarregar ZIP (PDF + CSV)",
     "exporting": "Generant ZIP...",
     "success_toast": "Exportació ZIP completada amb èxit",

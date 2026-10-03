@@ -4,6 +4,7 @@ import {
     getAppDatabaseUsageStats,
     type AppDatabaseUsageStats
 } from '~/utils/appDatabase'
+import { generateSampleExpenses } from '~/utils/sampleData'
 
 const { t } = useI18n()
 const toast = useToast()
@@ -191,6 +192,27 @@ const handleConfirm = async () => {
     }
     confirmModal.isOpen = false
 }
+
+const isLoadingSample = ref(false)
+const loadSampleData = async () => {
+    isLoadingSample.value = true
+    try {
+        const samples = generateSampleExpenses()
+        const existingIds = new Set(expenseStore.expenses.map(e => e.id))
+        const newSamples = samples.filter(s => !existingIds.has(s.id))
+        await expenseStore.setExpenses([...expenseStore.expenses, ...newSamples])
+        await refreshStats()
+        toast.add({
+            title: t('settings.maintenance.sample_data_loaded', { count: newSamples.length }),
+            color: 'success'
+        })
+    } catch (err) {
+        console.error('Error loading sample data', err)
+        toast.add({ title: t('common.error'), color: 'error' })
+    } finally {
+        isLoadingSample.value = false
+    }
+}
 </script>
 
 <template>
@@ -363,6 +385,43 @@ block color="warning" variant="ghost" icon="i-heroicons-paper-clip"
                         :disabled="!maintenanceState.selectedYear" @click="confirmRemoveTicketsForSelection">
                         {{ $t('settings.maintenance.remove_tickets_for_selection') }}
                     </UButton>
+                </section>
+
+                <!-- SAMPLE TEST DATA SECTION -->
+                <section class="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                            <UIcon name="i-heroicons-beaker" class="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                                {{ $t('settings.maintenance.sample_data_title') }}
+                            </h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ $t('settings.maintenance.sample_data_description') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <UButton
+                            color="primary"
+                            variant="soft"
+                            icon="i-heroicons-sparkles"
+                            :loading="isLoadingSample"
+                            @click="loadSampleData">
+                            {{ $t('settings.maintenance.load_sample_data') }}
+                        </UButton>
+                        <UButton
+                            to="/datos-prueba-gastos.json"
+                            target="_blank"
+                            download="datos-prueba-gastos.json"
+                            color="neutral"
+                            variant="outline"
+                            icon="i-heroicons-arrow-down-tray">
+                            {{ $t('settings.maintenance.download_sample_json') }}
+                        </UButton>
+                    </div>
                 </section>
             </div>
 
