@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.5.0...v1.6.0) (2026-10-03)
+
+
+### Features
+
+* **export:** add export format selection, period filenames, and full category breakdown ([3b0f53b](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/3b0f53b36c75cf1859dfd939ead88ad38e2ff121))
+
 # [1.5.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.4.0...v1.5.0) (2026-10-03)
 
 
