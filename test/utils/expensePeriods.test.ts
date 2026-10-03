@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest'
 import {
   calculatePeriodDateRange,
   filterExpensesByPeriod,
-  formatPeriodDateLabel
+  formatPeriodDateLabel,
+  formatPeriodSlug,
+  getExportFilename
 } from '~/utils/expensePeriods'
 import type { ExpenseRecord } from '~/stores/expenses'
 
@@ -109,4 +111,30 @@ describe('expensePeriods utility', () => {
     const label = formatPeriodDateLabel(range, 'es-ES')
     expect(label).toContain('2026')
   })
+
+  it('formats period slug and export filename with period name', () => {
+    const monthRange = calculatePeriodDateRange('current_month', undefined, refDate)
+    const slug = formatPeriodSlug('current_month', monthRange, 'es')
+    expect(slug).toBe('marzo-2026')
+
+    const pdfName = getExportFilename('current_month', monthRange, 'pdf', 'es')
+    expect(pdfName).toBe('informe-gastos-marzo-2026.pdf')
+
+    const csvName = getExportFilename('current_month', monthRange, 'csv', 'es')
+    expect(csvName).toBe('informe-gastos-marzo-2026.csv')
+
+    const zipName = getExportFilename('current_month', monthRange, 'zip', 'es')
+    expect(zipName).toBe('informe-gastos-marzo-2026.zip')
+
+    const caName = getExportFilename('current_month', monthRange, 'pdf', 'ca')
+    expect(caName).toContain('informe-despeses-')
+    expect(caName).toContain('2026.pdf')
+
+    const yearRange = calculatePeriodDateRange('current_year', undefined, refDate)
+    expect(getExportFilename('current_year', yearRange, 'pdf', 'es')).toBe('informe-gastos-ano-2026.pdf')
+
+    const customRange = calculatePeriodDateRange('custom', { start: '2026-02-10', end: '2026-03-05' }, refDate)
+    expect(getExportFilename('custom', customRange, 'csv', 'es')).toBe('informe-gastos-2026-02-10_a_2026-03-05.csv')
+  })
 })
+

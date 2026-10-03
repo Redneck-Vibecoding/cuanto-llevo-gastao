@@ -72,4 +72,33 @@ describe('generateExpensesPdf', () => {
 
     expect(bytes.length).toBeGreaterThan(500)
   })
+
+  it('includes all application categories and handles item breakdown with fresh produce', () => {
+    const expensesWithItems: ExpenseRecord[] = [
+      {
+        id: 'exp-items-1',
+        description: 'Mercadona',
+        amount: 35.5,
+        category: 'alimentacion',
+        timestamp: '2026-03-10T11:00:00.000Z',
+        items: [
+          { id: 'item-1', name: 'Plátanos de Canarias', price: 3.5, category: 'frescos' },
+          { id: 'item-2', name: 'Filetes de ternera', price: 12.0, category: 'frescos' },
+          { id: 'item-3', name: 'Merluza fresca', price: 8.0, category: 'frescos' },
+          { id: 'item-4', name: 'Leche entera', price: 4.0, category: 'bebidas' },
+          { id: 'item-5', name: 'Detergente ropa', price: 8.0, category: 'limpieza' }
+        ]
+      }
+    ]
+
+    const bytes = generateExpensesPdf(expensesWithItems, {
+      locale: 'es-ES',
+      periodLabel: 'Marzo 2026',
+      categoryLabel: (c) => `Categoría: ${c}`
+    })
+
+    expect(bytes).toBeInstanceOf(Uint8Array)
+    expect(bytes.length).toBeGreaterThan(500)
+  })
 })
+

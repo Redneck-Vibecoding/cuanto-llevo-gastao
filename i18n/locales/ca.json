@@ -494,7 +494,7 @@
     "all_categories": "Totes les categories",
     "categories": {
       "alimentacion": "Alimentació",
-      "frescos": "Frescos (Fruita, Verdura, Carn)",
+      "frescos": "Frescos (Fruita, Verdura, Carn, Peix)",
       "bebidas": "Begudes",
       "limpieza": "Neteja",
       "cuidado_personal": "Higiene i Cura Personal",
@@ -559,9 +559,18 @@
   },
   "export_widget": {
     "title": "Exportar despeses",
-    "subtitle": "Descarrega les teves despeses en PDF i CSV comprimits en un fitxer ZIP",
-    "badge": "ZIP · PDF + CSV",
+    "subtitle": "Descarrega les teves despeses en format PDF, CSV o fitxer comprimit ZIP",
+    "badge": "PDF · CSV · ZIP",
     "period_label": "Seleccionar període",
+    "format_label": "Format d'exportació",
+    "formats": {
+      "pdf": "Només PDF",
+      "pdf_desc": "Informe formatat",
+      "csv": "Només CSV",
+      "csv_desc": "Full de càlcul Excel",
+      "zip": "Tot en ZIP",
+      "zip_desc": "PDF + CSV + Tiquets"
+    },
     "periods": {
       "current_month": "Aquest mes",
       "previous_month": "Mes anterior",
@@ -579,11 +588,19 @@
     "period_preview": "Període:",
     "expenses_count": "{count} despeses trobades",
     "total_amount": "Total: {amount} €",
+    "target_file": "Fitxer:",
     "includes_info": "Inclou informe en PDF, full de càlcul CSV i comprovants adjunts",
     "no_expenses": "No hi ha despeses registrades en aquest període.",
-    "export_btn": "Descarregar ZIP (PDF + CSV)",
-    "exporting": "Generant ZIP...",
-    "success_toast": "Exportació ZIP completada amb èxit",
-    "error_toast": "Error en generar l'exportació ZIP"
+    "export_btn_pdf": "Descarregar informe PDF",
+    "export_btn_csv": "Descarregar full de càlcul CSV",
+    "export_btn_zip": "Descarregar fitxer ZIP",
+    "exporting_pdf": "Generant informe PDF...",
+    "exporting_csv": "Generant CSV...",
+    "exporting_zip": "Generant fitxer ZIP...",
+    "success_toast_pdf": "Informe PDF descarregat amb èxit",
+    "success_toast_csv": "Fitxer CSV descarregat amb èxit",
+    "success_toast_zip": "Fitxer ZIP descarregat amb èxit",
+    "error_toast": "Error en generar l'exportació"
   }
 }
+

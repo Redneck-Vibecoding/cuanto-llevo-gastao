@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import JSZip from 'jszip'
-import { buildExpensesArchive } from '~/utils/expenseShare'
+import { buildExpensesArchive, generateExpensesCsvContent } from '~/utils/expenseShare'
 import type { ExpenseRecord } from '~/stores/expenses'
 
 const categoryLabel = (c: string) => `cat:${c}`
@@ -56,4 +56,26 @@ describe('buildExpensesArchive', () => {
 
     expect(result!.filename).toBe('cuanto-llevo-gastao-despeses-2026-03-01_2026-03-31.zip')
   })
+
+  it('uses customFilename when provided in options', async () => {
+    const result = await buildExpensesArchive(expenses, {
+      locale: 'es-ES',
+      categoryLabel,
+      customFilename: 'informe-gastos-marzo-2026.zip'
+    })
+
+    expect(result!.filename).toBe('informe-gastos-marzo-2026.zip')
+  })
 })
+
+describe('generateExpensesCsvContent', () => {
+  it('generates well-formed CSV rows including dates, descriptions and categories', () => {
+    const csv = generateExpensesCsvContent(expenses, { locale: 'es-ES', categoryLabel })
+    expect(csv).toContain('date,description,category,amount,attachment')
+    expect(csv).toContain('Dinar feina')
+    expect(csv).toContain('cat:diet')
+    expect(csv).toContain('Pàrquing')
+    expect(csv).toContain('cat:parking')
+  })
+})
+

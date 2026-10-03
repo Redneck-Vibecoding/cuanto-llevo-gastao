@@ -10,6 +10,8 @@ import { generateExpensesPdf } from '~/utils/expensePdf'
 
 export type ShareOutcome = 'shared' | 'downloaded' | 'cancelled' | 'empty'
 
+export type ExportFormat = 'zip' | 'pdf' | 'csv'
+
 export interface ShareOptions {
   locale: string
   // Human label for each category value, e.g. t('expenses.categories.<value>').
@@ -24,7 +26,12 @@ export interface ShareOptions {
   dateRangeText?: string
   // Whether to include the generated PDF (default: true).
   includePdf?: boolean
+  // Export format: 'zip' (default), 'pdf', or 'csv'
+  format?: ExportFormat
+  // Custom filename with the exported period
+  customFilename?: string
 }
+
 
 // Decode a data URL into raw bytes so it can be written into the zip as a file.
 // (Uint8Array is accepted by JSZip in every environment, unlike Blob.)
@@ -161,33 +168,96 @@ export async function buildExpensesArchive(
 
   const blob = await zip.generateAsync({ type: 'blob' })
   const filenameDateRange = options.filenameDateRange || filenameDateRangeFromExpenses(ordered)
-  const filename = `cuanto-llevo-gastao-despeses-${filenameDateRange}.zip`
+  const filename = options.customFilename || `cuanto-llevo-gastao-despeses-${filenameDateRange}.zip`
   return { blob, filename }
 }
 
-// Share (or download) the archive for the given expenses. Returns the outcome
-// so the caller can surface an appropriate toast.
-export async function shareExpenses(
+// Generate CSV string content with header and formatted records
+export function generateExpensesCsvContent(
   expenses: ExpenseRecord[],
-  options: ShareOptions
-): Promise<ShareOutcome> {
-  const archive = await buildExpensesArchive(expenses, options)
-  if (!archive) return 'empty'
+  options: Pick<ShareOptions, 'locale' | 'categoryLabel'>
+): string {
+  const ordered = sortByDate(expenses)
+  const dateFormatter = new Intl.DateTimeFormat(options.locale, { dateStyle: 'short', timeStyle: 'short' })
+  const currencyFormatter = new Intl.NumberFormat(options.locale, { style: 'currency', currency: 'EUR' })
 
-  const { blob, filename } = archive
+  const header = ['date', 'description', 'category', 'amount', 'attachment']
+  const rows = [header.map(csvField).join(',')]
+
+  ordered.forEach((expense) => {
+    const date = new Date(expense.timestamp)
+    const dateLabel = Number.isNaN(date.getTime()) ? '' : dateFormatter.format(date)
+    const category = options.categoryLabel(resolveExpenseCategory(expense))
+    rows.push([
+      dateLabel,
+      expense.description,
+      category,
+      currencyFormatter.format(expense.amount || 0),
+      expense.ticketName || ''
+    ].map(csvField).join(','))
+  })
+
+  return rows.join('\n')
+}
+
+// Share via Web Share API when supported, falling back to browser download
+export async function shareOrDownloadFile(
+  blob: Blob,
+  filename: string,
+  title?: string
+): Promise<ShareOutcome> {
   const file = new File([blob], filename, { type: blob.type })
 
   const nav = navigator as Navigator & { canShare?: (data?: ShareData) => boolean }
   if (nav.canShare && nav.canShare({ files: [file] })) {
     try {
-      await nav.share({ files: [file], title: options.title })
+      await nav.share({ files: [file], title })
       return 'shared'
     } catch (error) {
       if ((error as Error).name === 'AbortError') return 'cancelled'
-      // Any other failure falls through to a download.
+      // Fall through to download
     }
   }
 
   saveAs(blob, filename)
   return 'downloaded'
+}
+
+// Share (or download) the selected expenses in the requested format (PDF, CSV, or ZIP archive).
+export async function shareExpenses(
+  expenses: ExpenseRecord[],
+  options: ShareOptions
+): Promise<ShareOutcome> {
+  if (expenses.length === 0) return 'empty'
+
+  const format = options.format || 'zip'
+
+  if (format === 'pdf') {
+    const ordered = sortByDate(expenses)
+    const pdfBytes = generateExpensesPdf(ordered, {
+      locale: options.locale,
+      title: options.title || 'Informe de Gastos',
+      periodLabel: options.periodLabel,
+      dateRangeText: options.dateRangeText,
+      categoryLabel: options.categoryLabel
+    })
+    const blob = new Blob([pdfBytes as unknown as BlobPart], { type: 'application/pdf' })
+    const filenameDateRange = options.filenameDateRange || filenameDateRangeFromExpenses(ordered)
+    const filename = options.customFilename || `informe-gastos-${filenameDateRange}.pdf`
+    return shareOrDownloadFile(blob, filename, options.title)
+  }
+
+  if (format === 'csv') {
+    const ordered = sortByDate(expenses)
+    const csvContent = generateExpensesCsvContent(ordered, options)
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8' })
+    const filenameDateRange = options.filenameDateRange || filenameDateRangeFromExpenses(ordered)
+    const filename = options.customFilename || `informe-gastos-${filenameDateRange}.csv`
+    return shareOrDownloadFile(blob, filename, options.title)
+  }
+
+  const archive = await buildExpensesArchive(expenses, options)
+  if (!archive) return 'empty'
+
+  return shareOrDownloadFile(archive.blob, archive.filename, options.title)
 }

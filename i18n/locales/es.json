@@ -496,7 +496,7 @@
     "all_categories": "Todas las categorías",
     "categories": {
       "alimentacion": "Alimentación",
-      "frescos": "Frescos (Fruta, Verdura, Carnes)",
+      "frescos": "Frescos (Fruta, Verdura, Carnes, Pescado)",
       "bebidas": "Bebidas",
       "limpieza": "Limpieza",
       "cuidado_personal": "Higiene y Cuidado Personal",
@@ -561,9 +561,18 @@
   },
   "export_widget": {
     "title": "Exportar gastos",
-    "subtitle": "Descarga tus gastos en PDF y CSV comprimidos en un archivo ZIP",
-    "badge": "ZIP · PDF + CSV",
+    "subtitle": "Descarga tus gastos en formato PDF, CSV o archivo comprimido ZIP",
+    "badge": "PDF · CSV · ZIP",
     "period_label": "Seleccionar periodo",
+    "format_label": "Formato de exportación",
+    "formats": {
+      "pdf": "Solo PDF",
+      "pdf_desc": "Informe formateado",
+      "csv": "Solo CSV",
+      "csv_desc": "Hoja de cálculo Excel",
+      "zip": "Todo en ZIP",
+      "zip_desc": "PDF + CSV + Tickets"
+    },
     "periods": {
       "current_month": "Este mes",
       "previous_month": "Mes anterior",
@@ -581,11 +590,19 @@
     "period_preview": "Periodo:",
     "expenses_count": "{count} gastos encontrados",
     "total_amount": "Total: {amount} €",
+    "target_file": "Archivo:",
     "includes_info": "Incluye informe en PDF, hoja de cálculo CSV y comprobantes adjuntos",
     "no_expenses": "No hay gastos registrados en este periodo.",
-    "export_btn": "Descargar ZIP (PDF + CSV)",
-    "exporting": "Generando ZIP...",
-    "success_toast": "Exportación ZIP completada con éxito",
-    "error_toast": "Error al generar la exportación ZIP"
+    "export_btn_pdf": "Descargar informe PDF",
+    "export_btn_csv": "Descargar hoja de cálculo CSV",
+    "export_btn_zip": "Descargar archivo ZIP",
+    "exporting_pdf": "Generando informe PDF...",
+    "exporting_csv": "Generando CSV...",
+    "exporting_zip": "Generando archivo ZIP...",
+    "success_toast_pdf": "Informe PDF descargado con éxito",
+    "success_toast_csv": "Archivo CSV descargado con éxito",
+    "success_toast_zip": "Archivo ZIP descargado con éxito",
+    "error_toast": "Error al generar la exportación"
   }
 }
+

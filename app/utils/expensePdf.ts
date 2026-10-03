@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf'
 import type { ExpenseRecord } from '~/stores/expenses'
-import { resolveExpenseCategory } from '~/utils/expenseCategories'
+import { SUPERMARKET_CATEGORIES, resolveExpenseCategory } from '~/utils/expenseCategories'
 
 export interface GeneratePdfOptions {
   locale?: string
@@ -141,16 +141,58 @@ export function generateExpensesPdf(
   currentY += cardHeight + 8
 
   // 3. Category Breakdown Section
+  // Include all categories available in the application (SUPERMARKET_CATEGORIES)
   const categoryTotals: Record<string, { total: number, count: number }> = {}
-  sorted.forEach(expense => {
-    const cat = resolveExpenseCategory(expense)
-    if (!categoryTotals[cat]) categoryTotals[cat] = { total: 0, count: 0 }
-    categoryTotals[cat].total += (expense.amount || 0)
-    categoryTotals[cat].count += 1
+  SUPERMARKET_CATEGORIES.forEach(cat => {
+    categoryTotals[cat] = { total: 0, count: 0 }
   })
 
-  const sortedCategories = Object.entries(categoryTotals)
-    .sort(([, a], [, b]) => b.total - a.total)
+  // Normalize subcategories or OCR aliases to canonical categories
+  const normalizeCat = (c: string): string => {
+    const norm = c.toLowerCase().trim()
+    if (norm === 'fruta' || norm === 'verdura' || norm === 'carne' || norm === 'carnes' || norm === 'pescado') {
+      return 'frescos'
+    }
+    return norm
+  }
+
+  sorted.forEach(expense => {
+    if (expense.items && expense.items.length > 0) {
+      let itemsSum = 0
+      expense.items.forEach(item => {
+        const cat = normalizeCat(item.category || resolveExpenseCategory(expense))
+        if (!categoryTotals[cat]) categoryTotals[cat] = { total: 0, count: 0 }
+        categoryTotals[cat].total += (item.price || 0)
+        categoryTotals[cat].count += 1
+        itemsSum += (item.price || 0)
+      })
+      const remainder = (expense.amount || 0) - itemsSum
+      if (remainder > 0.01) {
+        const mainCat = normalizeCat(resolveExpenseCategory(expense))
+        if (!categoryTotals[mainCat]) categoryTotals[mainCat] = { total: 0, count: 0 }
+        categoryTotals[mainCat].total += remainder
+      }
+    } else {
+      const cat = normalizeCat(resolveExpenseCategory(expense))
+      if (!categoryTotals[cat]) categoryTotals[cat] = { total: 0, count: 0 }
+      categoryTotals[cat].total += (expense.amount || 0)
+      categoryTotals[cat].count += 1
+    }
+  })
+
+  // Sort categories: categories with total > 0 descending first, followed by zero-amount categories
+  const sortedCategories = Object.entries(categoryTotals).sort(([catA, a], [catB, b]) => {
+    if (b.total !== a.total) {
+      return b.total - a.total
+    }
+    if (b.count !== a.count) {
+      return b.count - a.count
+    }
+    const idxA = (SUPERMARKET_CATEGORIES as readonly string[]).indexOf(catA)
+    const idxB = (SUPERMARKET_CATEGORIES as readonly string[]).indexOf(catB)
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB
+    return catA.localeCompare(catB)
+  })
 
   if (sortedCategories.length > 0) {
     doc.setFont('helvetica', 'bold')
@@ -166,7 +208,7 @@ export function generateExpensesPdf(
     doc.setFontSize(7.5)
     doc.setTextColor(75, 85, 99)
     doc.text('Categoría', marginLeft + 3, currentY + 4.2)
-    doc.text('Compras', marginLeft + 80, currentY + 4.2)
+    doc.text('Compras', marginLeft + 85, currentY + 4.2)
     doc.text('% Total', marginLeft + 120, currentY + 4.2)
     doc.text('Importe', pageWidth - marginRight - 3, currentY + 4.2, { align: 'right' })
     currentY += 6
@@ -175,17 +217,21 @@ export function generateExpensesPdf(
       const pct = totalAmount > 0 ? (data.total / totalAmount) * 100 : 0
       if (idx % 2 === 1) {
         doc.setFillColor(249, 250, 251)
-        doc.rect(marginLeft, currentY, usableWidth, 5.5, 'F')
+        doc.rect(marginLeft, currentY, usableWidth, 5.2, 'F')
       }
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(7.5)
-      doc.setTextColor(55, 65, 81)
-      doc.text(safeText(getCatLabel(category), 35), marginLeft + 3, currentY + 3.8)
-      doc.text(`${data.count}`, marginLeft + 80, currentY + 3.8)
-      doc.text(`${pct.toFixed(1)}%`, marginLeft + 120, currentY + 3.8)
-      doc.setFont('helvetica', 'bold')
-      doc.text(formatCurrency(data.total), pageWidth - marginRight - 3, currentY + 3.8, { align: 'right' })
-      currentY += 5.5
+      if (data.total > 0) {
+        doc.setTextColor(55, 65, 81)
+      } else {
+        doc.setTextColor(156, 163, 175)
+      }
+      doc.text(safeText(getCatLabel(category), 40), marginLeft + 3, currentY + 3.6)
+      doc.text(`${data.count}`, marginLeft + 85, currentY + 3.6)
+      doc.text(`${pct.toFixed(1)}%`, marginLeft + 120, currentY + 3.6)
+      doc.setFont('helvetica', data.total > 0 ? 'bold' : 'normal')
+      doc.text(formatCurrency(data.total), pageWidth - marginRight - 3, currentY + 3.6, { align: 'right' })
+      currentY += 5.2
     })
 
     currentY += 7

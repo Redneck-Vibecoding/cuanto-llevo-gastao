@@ -202,3 +202,73 @@ export function formatPeriodDateLabel(
   }
   return ''
 }
+
+export function formatPeriodSlug(
+  period: PredefinedPeriod,
+  dateRange: PeriodDateRange,
+  locale = 'es'
+): string {
+  const isCa = locale.startsWith('ca')
+
+  if (period === 'all') {
+    return isCa ? 'historic-complet' : 'historico-completo'
+  }
+
+  if (period === 'custom') {
+    const startStr = dateRange.start ? formatIsoDateOnly(dateRange.start) : 'inici'
+    const endStr = dateRange.end ? formatIsoDateOnly(dateRange.end) : 'fi'
+    return `${startStr}_a_${endStr}`
+  }
+
+  if (period === 'current_year' || period === 'previous_year') {
+    const year = dateRange.start ? dateRange.start.getFullYear() : new Date().getFullYear()
+    return isCa ? `any-${year}` : `ano-${year}`
+  }
+
+  if (period === 'current_semester' || period === 'previous_semester') {
+    if (dateRange.start) {
+      const year = dateRange.start.getFullYear()
+      const sem = dateRange.start.getMonth() < 6 ? 1 : 2
+      return `semestre-${sem}-${year}`
+    }
+    return dateRange.filenameDateRange
+  }
+
+  if (period === 'current_quarter') {
+    if (dateRange.start) {
+      const year = dateRange.start.getFullYear()
+      const q = Math.floor(dateRange.start.getMonth() / 3) + 1
+      return `trimestre-${q}-${year}`
+    }
+    return dateRange.filenameDateRange
+  }
+
+  if (period === 'current_month' || period === 'previous_month') {
+    if (dateRange.start) {
+      const monthFormatter = new Intl.DateTimeFormat(isCa ? 'ca-ES' : 'es-ES', { month: 'long' })
+      const rawMonth = monthFormatter.format(dateRange.start)
+      const monthName = rawMonth
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+      const year = dateRange.start.getFullYear()
+      return `${monthName}-${year}`
+    }
+    return dateRange.filenameDateRange
+  }
+
+  return dateRange.filenameDateRange
+}
+
+export function getExportFilename(
+  period: PredefinedPeriod,
+  dateRange: PeriodDateRange,
+  format: 'pdf' | 'csv' | 'zip',
+  locale = 'es'
+): string {
+  const isCa = locale.startsWith('ca')
+  const basePrefix = isCa ? 'informe-despeses' : 'informe-gastos'
+  const slug = formatPeriodSlug(period, dateRange, locale)
+  return `${basePrefix}-${slug}.${format}`
+}
+

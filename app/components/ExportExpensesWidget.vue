@@ -4,9 +4,10 @@ import {
   type PredefinedPeriod,
   filterExpensesByPeriod,
   formatPeriodDateLabel,
-  formatIsoDateOnly
+  formatIsoDateOnly,
+  getExportFilename
 } from '~/utils/expensePeriods'
-import { shareExpenses } from '~/utils/expenseShare'
+import { shareExpenses, type ExportFormat } from '~/utils/expenseShare'
 
 const expenseStore = useExpenseStore()
 const { expenses } = storeToRefs(expenseStore)
@@ -14,6 +15,7 @@ const { t, locale } = useI18n()
 const toast = useToast()
 
 const selectedPeriod = ref<PredefinedPeriod>('current_month')
+const selectedFormat = ref<ExportFormat>('zip')
 
 // Pre-fill custom dates with current month start and today
 const now = new Date()
@@ -67,6 +69,26 @@ const canExport = computed(() =>
   hasExpenses.value && isCustomRangeValid.value && !isExporting.value
 )
 
+const targetFilename = computed(() =>
+  getExportFilename(selectedPeriod.value, activeDateRange.value, selectedFormat.value, locale.value)
+)
+
+const exportButtonText = computed(() => {
+  if (isExporting.value) {
+    return t(`export_widget.exporting_${selectedFormat.value}`)
+  }
+  return t(`export_widget.export_btn_${selectedFormat.value}`)
+})
+
+const exportButtonIcon = computed(() => {
+  switch (selectedFormat.value) {
+    case 'pdf': return 'i-heroicons-document-arrow-down'
+    case 'csv': return 'i-heroicons-table-cells'
+    case 'zip': return 'i-heroicons-archive-box-arrow-down'
+    default: return 'i-heroicons-arrow-down-tray'
+  }
+})
+
 const handleExport = async () => {
   if (!canExport.value) return
 
@@ -76,24 +98,29 @@ const handleExport = async () => {
       ? formattedRangeText.value
       : t(`export_widget.periods.${selectedPeriod.value}`)
 
+    const filename = targetFilename.value
+
     const outcome = await shareExpenses(filteredExpenses.value, {
       locale: locale.value,
       categoryLabel: (category: string) => t(`expenses.categories.${category}`),
       title: `${t('export_widget.title')} - ${periodName}`,
       filenameDateRange: activeDateRange.value.filenameDateRange,
       periodLabel: periodName,
-      dateRangeText: formattedRangeText.value
+      dateRangeText: formattedRangeText.value,
+      format: selectedFormat.value,
+      customFilename: filename
     })
 
     if (outcome === 'shared' || outcome === 'downloaded') {
+      const toastTitle = t(`export_widget.success_toast_${selectedFormat.value}`)
       toast.add({
-        title: t('export_widget.success_toast'),
-        description: `${filteredExpenses.value.length} ${locale.value === 'ca' ? 'despeses' : 'gastos'} · ${totalAmount.value.toFixed(2)} € (PDF + CSV)`,
+        title: toastTitle,
+        description: `${filteredExpenses.value.length} ${locale.value === 'ca' ? 'despeses' : 'gastos'} · ${totalAmount.value.toFixed(2)} € · ${filename}`,
         color: 'success'
       })
     }
   } catch (err) {
-    console.error('Error exporting expenses zip', err)
+    console.error('Error exporting expenses', err)
     toast.add({
       title: t('export_widget.error_toast'),
       color: 'error'
@@ -144,7 +171,7 @@ const handleExport = async () => {
     <div class="space-y-4">
       <!-- Period Selector Row -->
       <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-        <div :class="isCustomPeriod ? 'md:col-span-4' : 'md:col-span-7'">
+        <div :class="isCustomPeriod ? 'md:col-span-4' : 'md:col-span-12'">
           <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
             {{ $t('export_widget.period_label') }}
           </label>
@@ -184,22 +211,81 @@ const handleExport = async () => {
             />
           </div>
         </template>
+      </div>
 
-        <!-- Export CTA Button (placed in row if not custom, or full width row on custom) -->
-        <div :class="isCustomPeriod ? 'md:col-span-12' : 'md:col-span-5'">
-          <UButton
-            icon="i-heroicons-archive-box-arrow-down"
-            color="primary"
-            variant="solid"
-            size="md"
-            block
-            :loading="isExporting"
-            :disabled="!canExport"
-            class="font-semibold shadow-xs transition-all cursor-pointer disabled:cursor-not-allowed"
-            @click="handleExport">
-            {{ isExporting ? $t('export_widget.exporting') : $t('export_widget.export_btn') }}
-          </UButton>
+      <!-- Export Format Selector -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+          {{ $t('export_widget.format_label') }}
+        </label>
+        <div class="grid grid-cols-3 gap-2.5">
+          <!-- PDF Option Card -->
+          <button
+            type="button"
+            :class="[
+              selectedFormat === 'pdf'
+                ? 'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200 ring-2 ring-emerald-500/20 shadow-xs'
+                : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/60 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/40',
+              'flex flex-col items-center justify-center p-3 rounded-2xl border text-center transition-all cursor-pointer'
+            ]"
+            @click="selectedFormat = 'pdf'">
+            <div class="size-8 rounded-xl bg-red-50 dark:bg-red-950/50 text-red-500 flex items-center justify-center mb-1.5 shadow-2xs">
+              <UIcon name="i-heroicons-document-text" class="w-5 h-5" />
+            </div>
+            <span class="text-xs font-bold">{{ $t('export_widget.formats.pdf') }}</span>
+            <span class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{{ $t('export_widget.formats.pdf_desc') }}</span>
+          </button>
+
+          <!-- CSV Option Card -->
+          <button
+            type="button"
+            :class="[
+              selectedFormat === 'csv'
+                ? 'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200 ring-2 ring-emerald-500/20 shadow-xs'
+                : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/60 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/40',
+              'flex flex-col items-center justify-center p-3 rounded-2xl border text-center transition-all cursor-pointer'
+            ]"
+            @click="selectedFormat = 'csv'">
+            <div class="size-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-1.5 shadow-2xs">
+              <UIcon name="i-heroicons-table-cells" class="w-5 h-5" />
+            </div>
+            <span class="text-xs font-bold">{{ $t('export_widget.formats.csv') }}</span>
+            <span class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{{ $t('export_widget.formats.csv_desc') }}</span>
+          </button>
+
+          <!-- ZIP Option Card -->
+          <button
+            type="button"
+            :class="[
+              selectedFormat === 'zip'
+                ? 'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200 ring-2 ring-emerald-500/20 shadow-xs'
+                : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/60 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/40',
+              'flex flex-col items-center justify-center p-3 rounded-2xl border text-center transition-all cursor-pointer'
+            ]"
+            @click="selectedFormat = 'zip'">
+            <div class="size-8 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-500 flex items-center justify-center mb-1.5 shadow-2xs">
+              <UIcon name="i-heroicons-archive-box" class="w-5 h-5" />
+            </div>
+            <span class="text-xs font-bold">{{ $t('export_widget.formats.zip') }}</span>
+            <span class="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{{ $t('export_widget.formats.zip_desc') }}</span>
+          </button>
         </div>
+      </div>
+
+      <!-- Export CTA Button -->
+      <div>
+        <UButton
+          :icon="exportButtonIcon"
+          color="primary"
+          variant="solid"
+          size="lg"
+          block
+          :loading="isExporting"
+          :disabled="!canExport"
+          class="font-semibold shadow-xs transition-all cursor-pointer disabled:cursor-not-allowed"
+          @click="handleExport">
+          {{ exportButtonText }}
+        </UButton>
       </div>
 
       <!-- Validation Error for Custom Date Range -->
@@ -238,22 +324,17 @@ const handleExport = async () => {
           </div>
         </div>
 
-        <!-- Contents badge list -->
-        <div class="flex items-center gap-2 shrink-0 text-[11px] text-gray-500 dark:text-gray-400">
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 font-mono">
-            <UIcon name="i-heroicons-document-text" class="w-3.5 h-3.5 text-red-500" />
-            PDF
-          </span>
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 font-mono">
-            <UIcon name="i-heroicons-table-cells" class="w-3.5 h-3.5 text-emerald-500" />
-            CSV
-          </span>
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 font-mono">
-            <UIcon name="i-heroicons-archive-box" class="w-3.5 h-3.5 text-blue-500" />
-            ZIP
-          </span>
+        <!-- Generated Filename Preview badge -->
+        <div class="flex items-center gap-1.5 shrink-0 text-[11px] text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-lg font-mono">
+          <UIcon
+            :name="selectedFormat === 'pdf' ? 'i-heroicons-document-text' : selectedFormat === 'csv' ? 'i-heroicons-table-cells' : 'i-heroicons-archive-box'"
+            :class="selectedFormat === 'pdf' ? 'text-red-500' : selectedFormat === 'csv' ? 'text-emerald-500' : 'text-blue-500'"
+            class="w-3.5 h-3.5"
+          />
+          <span class="truncate max-w-[200px] sm:max-w-none">{{ targetFilename }}</span>
         </div>
       </div>
     </div>
   </div>
 </template>
+
