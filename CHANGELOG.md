@@ -1,3 +1,11 @@
+# [1.5.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.4.0...v1.5.0) (2026-10-03)
+
+
+### Features
+
+* **demo:** add local test data generator and UI actions ([1b2b8a9](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/1b2b8a944d09dadaaaf088de274ed365e3384a00))
+* **export:** add expenses zip export widget with PDF and CSV by period ([e276ee6](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/e276ee61d4e1b165592b38e970b0fe9571dff144))
+
 # [1.4.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.3.0...v1.4.0) (2026-09-30)
 
 
