@@ -31,6 +31,7 @@ describe('buildExpensesArchive', () => {
     const zip = await JSZip.loadAsync(buffer)
     expect(zip.file('expenses.csv')).toBeTruthy()
     expect(zip.file('expenses.json')).toBeTruthy()
+    expect(zip.file('expenses.pdf')).toBeTruthy()
 
     // One ticket file in the tickets/ folder for the expense that has one.
     const ticketFiles = Object.keys(zip.files).filter(name => name.startsWith('tickets/') && !zip.files[name]!.dir)

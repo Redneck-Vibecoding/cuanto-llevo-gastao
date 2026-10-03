@@ -558,5 +558,34 @@
     "by_supermarket": "Gasto por supermercado",
     "no_data": "No hay datos de compras para este periodo.",
     "top_products": "Productos más frecuentes"
+  },
+  "export_widget": {
+    "title": "Exportar gastos",
+    "subtitle": "Descarga tus gastos en PDF y CSV comprimidos en un archivo ZIP",
+    "badge": "ZIP · PDF + CSV",
+    "period_label": "Seleccionar periodo",
+    "periods": {
+      "current_month": "Este mes",
+      "previous_month": "Mes anterior",
+      "current_quarter": "Este trimestre",
+      "current_semester": "Este semestre",
+      "previous_semester": "Semestre anterior",
+      "current_year": "Este año",
+      "previous_year": "Año anterior",
+      "all": "Todo el historial",
+      "custom": "Periodo personalizado..."
+    },
+    "custom_from": "Desde",
+    "custom_to": "Hasta",
+    "invalid_range": "La fecha de inicio no puede ser posterior a la fecha final.",
+    "period_preview": "Periodo:",
+    "expenses_count": "{count} gastos encontrados",
+    "total_amount": "Total: {amount} €",
+    "includes_info": "Incluye informe en PDF, hoja de cálculo CSV y comprobantes adjuntos",
+    "no_expenses": "No hay gastos registrados en este periodo.",
+    "export_btn": "Descargar ZIP (PDF + CSV)",
+    "exporting": "Generando ZIP...",
+    "success_toast": "Exportación ZIP completada con éxito",
+    "error_toast": "Error al generar la exportación ZIP"
   }
 }

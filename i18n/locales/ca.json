@@ -556,5 +556,34 @@
     "by_supermarket": "Despesa per supermercat",
     "no_data": "No hi ha dades de compres per aquest període.",
     "top_products": "Productes més freqüents"
+  },
+  "export_widget": {
+    "title": "Exportar despeses",
+    "subtitle": "Descarrega les teves despeses en PDF i CSV comprimits en un fitxer ZIP",
+    "badge": "ZIP · PDF + CSV",
+    "period_label": "Seleccionar període",
+    "periods": {
+      "current_month": "Aquest mes",
+      "previous_month": "Mes anterior",
+      "current_quarter": "Aquest trimestre",
+      "current_semester": "Aquest semestre",
+      "previous_semester": "Semestre anterior",
+      "current_year": "Aquest any",
+      "previous_year": "Any anterior",
+      "all": "Tot l'historial",
+      "custom": "Període personalitzat..."
+    },
+    "custom_from": "Des de",
+    "custom_to": "Fins a",
+    "invalid_range": "La data d'inici no pot ser posterior a la data final.",
+    "period_preview": "Període:",
+    "expenses_count": "{count} despeses trobades",
+    "total_amount": "Total: {amount} €",
+    "includes_info": "Inclou informe en PDF, full de càlcul CSV i comprovants adjunts",
+    "no_expenses": "No hi ha despeses registrades en aquest període.",
+    "export_btn": "Descarregar ZIP (PDF + CSV)",
+    "exporting": "Generant ZIP...",
+    "success_toast": "Exportació ZIP completada amb èxit",
+    "error_toast": "Error en generar l'exportació ZIP"
   }
 }

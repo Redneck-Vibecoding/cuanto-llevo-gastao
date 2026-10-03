@@ -6,10 +6,11 @@ import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import type { ExpenseRecord } from '~/stores/expenses'
 import { resolveExpenseCategory } from '~/utils/expenseCategories'
+import { generateExpensesPdf } from '~/utils/expensePdf'
 
 export type ShareOutcome = 'shared' | 'downloaded' | 'cancelled' | 'empty'
 
-interface ShareOptions {
+export interface ShareOptions {
   locale: string
   // Human label for each category value, e.g. t('expenses.categories.<value>').
   categoryLabel: (category: string) => string
@@ -17,6 +18,12 @@ interface ShareOptions {
   title?: string
   // File-safe date period for the archive name, e.g. 2026-03-01_2026-03-31.
   filenameDateRange?: string
+  // Period label for report, e.g. "Marzo 2026".
+  periodLabel?: string
+  // Formatted date range text, e.g. "01/03/2026 - 31/03/2026".
+  dateRangeText?: string
+  // Whether to include the generated PDF (default: true).
+  includePdf?: boolean
 }
 
 // Decode a data URL into raw bytes so it can be written into the zip as a file.
@@ -122,6 +129,22 @@ export async function buildExpensesArchive(
 
   // BOM so spreadsheets open the CSV as UTF-8.
   zip.file('expenses.csv', '﻿' + rows.join('\n'))
+
+  // PDF report of expenses
+  if (options.includePdf !== false) {
+    try {
+      const pdfBytes = generateExpensesPdf(ordered, {
+        locale: options.locale,
+        title: options.title || 'Informe de Gastos',
+        periodLabel: options.periodLabel,
+        dateRangeText: options.dateRangeText,
+        categoryLabel: options.categoryLabel
+      })
+      zip.file('expenses.pdf', pdfBytes)
+    } catch (pdfErr) {
+      console.error('Failed to generate PDF for expenses archive', pdfErr)
+    }
+  }
 
   const total = ordered.reduce((sum, e) => sum + (e.amount || 0), 0)
   const jsonPayload = {

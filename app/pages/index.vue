@@ -418,6 +418,9 @@ const monthName = computed(() => {
       </div>
     </div>
 
+    <!-- EXPORT EXPENSES WIDGET (PDF + CSV in ZIP) -->
+    <ExportExpensesWidget />
+
     <!-- RECENT PURCHASES WITH PRODUCT BREAKDOWN ACCORDION -->
     <div class="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
       <div class="flex items-center justify-between mb-4">
