@@ -33,6 +33,7 @@ const KNOWN_SUPERMARKETS = [
   { name: 'Dia', pattern: /\b(supermercados?\s+dia|supermercado\s+dia|dia\s+retail|tiendas?\s+dia|^dia$)\b/i },
   { name: 'Alcampo', pattern: /\balcampo\b/i },
   { name: 'Consum', pattern: /\bconsum\b/i },
+  { name: 'Charter', pattern: /\bcharter\b/i },
   { name: 'Eroski', pattern: /\beroski\b/i },
   { name: 'Aldi', pattern: /\baldi\b/i },
   { name: 'Ahorramas', pattern: /\bahorramas\b/i },
@@ -184,9 +185,14 @@ export async function recognizeText(
 
 const AMOUNT_RE = /\d{1,3}(?:[.,\s]\d{3})*[.,]\d{2}(?!\d)|\d+[.,]\d{2}(?!\d)/g
 
+const FINAL_PAYMENT_KEYWORDS = [
+  'importe a abonar', 'import a abonar', 'total a abonar', 'a abonar', 'total a pagar', 'a pagar'
+]
+
 const TOTAL_KEYWORDS = [
-  'total a pagar', 'importe total', 'import total', 'total importe',
-  'a pagar', 'total euro', 'total eur', 'total factura', 'total', 'import', 'importe', 'suma'
+  ...FINAL_PAYMENT_KEYWORDS,
+  'importe total', 'import total', 'total importe',
+  'total euro', 'total eur', 'total factura', 'total compra', 'total', 'import', 'importe', 'suma'
 ]
 
 const parseAmountToken = (token: string): number | undefined => {
@@ -203,19 +209,31 @@ const parseAmountToken = (token: string): number | undefined => {
 }
 
 const extractAmount = (lines: string[]): number | undefined => {
-  const candidates: { value: number, keyword: boolean }[] = []
+  const candidates: { value: number, isFinalPayment: boolean, hasKeyword: boolean }[] = []
   for (const line of lines) {
     const normalized = stripAccents(line.toLowerCase())
-    const hasKeyword = TOTAL_KEYWORDS.some(k => normalized.includes(k))
+    const isFinalPayment = FINAL_PAYMENT_KEYWORDS.some(k => normalized.includes(k))
+    const hasKeyword = isFinalPayment || TOTAL_KEYWORDS.some(k => normalized.includes(k))
     const matches = line.match(AMOUNT_RE)
     if (!matches) continue
     for (const token of matches) {
       const value = parseAmountToken(token)
-      if (value !== undefined && value > 0) candidates.push({ value, keyword: hasKeyword })
+      if (value !== undefined && value > 0) {
+        candidates.push({ value, isFinalPayment, hasKeyword })
+      }
     }
   }
   if (candidates.length === 0) return undefined
-  const keyworded = candidates.filter(c => c.keyword)
+
+  // Receipts from Consum, Charter or stores with member discounts frequently list
+  // pre-discount totals followed by discounts and the actual "IMPORTE A ABONAR" line.
+  // Prioritize explicit final payment lines over pre-discount higher values.
+  const finalPayments = candidates.filter(c => c.isFinalPayment)
+  if (finalPayments.length > 0) {
+    return finalPayments[finalPayments.length - 1]?.value
+  }
+
+  const keyworded = candidates.filter(c => c.hasKeyword)
   const pool = keyworded.length ? keyworded : candidates
   return pool.reduce((max, c) => (c.value > max ? c.value : max), 0)
 }

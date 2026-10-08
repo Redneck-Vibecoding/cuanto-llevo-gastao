@@ -78,6 +78,40 @@ describe('parseReceiptText', () => {
     const text = ['Producto A 3,00', 'Producto B 9,90', 'Producto C 1,10'].join('\n')
     expect(parseReceiptText(text).amount).toBe(9.9)
   })
+
+  it('selects IMPORTE A ABONAR over pre-discount total in Consum and Charter receipts', () => {
+    const text = [
+      'CONSUM S. COOP.',
+      'C/ Colon 15, Valencia',
+      'Fecha: 08/10/2026 10:15',
+      'Leche entera     1,20',
+      'Aceite oliva     8,50',
+      'TOTAL COMPRA    35,40',
+      'DTO. CHEQUE-CRECE -5,00',
+      'IMPORTE A ABONAR 30,40',
+      'TARJETA          30,40'
+    ].join('\n')
+
+    const parsed = parseReceiptText(text)
+    expect(parsed.description).toBe('Consum')
+    expect(parsed.amount).toBe(30.40)
+  })
+
+  it('recognizes Charter supermarket and extracts net amount to abonar', () => {
+    const text = [
+      'CHARTER SUPERMERCADOS',
+      'Av. del Port 45, Valencia',
+      '08/10/2026 12:45',
+      'Pan barra        0,75',
+      'Queso tierno     3,25',
+      'TOTAL ARTICULOS  4,00',
+      'TOTAL A ABONAR   3,50'
+    ].join('\n')
+
+    const parsed = parseReceiptText(text)
+    expect(parsed.description).toBe('Charter')
+    expect(parsed.amount).toBe(3.50)
+  })
 })
 
 describe('inferCategoryFromItemName supermarket segmentation', () => {

@@ -35,7 +35,7 @@ const isEditing = computed(() => Boolean(props.initialData))
 const isLoading = ref(false)
 
 const COMMON_SUPERMARKETS = [
-  'Mercadona', 'Carrefour', 'Lidl', 'Dia', 'Alcampo', 'Consum', 'Eroski', 'Aldi', 'Ahorramas', 'Farmacia'
+  'Mercadona', 'Carrefour', 'Lidl', 'Dia', 'Alcampo', 'Consum', 'Charter', 'Eroski', 'Aldi', 'Ahorramas', 'Farmacia'
 ]
 
 // State with items breakdown

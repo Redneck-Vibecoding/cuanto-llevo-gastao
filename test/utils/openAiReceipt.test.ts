@@ -27,6 +27,8 @@ describe('analyzeReceiptWithOpenAi', () => {
     const request = fetchMock.mock.calls[0]?.[1]
     expect(JSON.parse(String(request?.body)).input[0].content[0].text).toContain('Category must be one of')
     expect(JSON.parse(String(request?.body)).input[0].content[0].text).toContain('never invent 00:00')
+    expect(JSON.parse(String(request?.body)).input[0].content[0].text).toContain('IMPORTE A ABONAR')
+    expect(JSON.parse(String(request?.body)).input[0].content[0].text).toContain('CONSUM, CHARTER')
   })
 
   it('returns the receipt date without inventing a missing time', async () => {
