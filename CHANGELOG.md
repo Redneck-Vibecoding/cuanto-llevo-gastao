@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.6.0...v1.7.0) (2026-10-08)
+
+
+### Features
+
+* add core expense tracking features including categories, forms, views, and internationalization ([89d83c4](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/89d83c4e108b6bcf46435532107b8ca7e74c9a5c))
+
 # [1.6.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.5.0...v1.6.0) (2026-10-03)
 
 
