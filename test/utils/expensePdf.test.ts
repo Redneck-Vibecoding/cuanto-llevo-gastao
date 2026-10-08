@@ -73,7 +73,7 @@ describe('generateExpensesPdf', () => {
     expect(bytes.length).toBeGreaterThan(500)
   })
 
-  it('includes all application categories and handles item breakdown with fresh produce', () => {
+  it('excludes zero-amount categories and handles item breakdown with fresh produce', () => {
     const expensesWithItems: ExpenseRecord[] = [
       {
         id: 'exp-items-1',

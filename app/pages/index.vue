@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import {
-  SUPERMARKET_CATEGORIES, CATEGORY_COLORS, CATEGORY_ICONS, CATEGORY_HEX_COLORS,
-  resolveExpenseCategory
+  DOMESTIC_CATEGORIES, CATEGORY_COLORS, CATEGORY_ICONS, CATEGORY_HEX_COLORS,
+  resolveExpenseCategory, calculateCategoryPercentages, type ExpenseCategory
 } from '~/utils/expenseCategories'
 import type { ExpenseRecord } from '~/stores/expenses'
 
@@ -78,7 +78,7 @@ const isBudgetExceeded = computed(() => budgetDifference.value < 0)
 const categoryStats = computed(() => {
   const totals: Record<string, { amount: number, itemsCount: number }> = {}
 
-  SUPERMARKET_CATEGORIES.forEach(cat => {
+  DOMESTIC_CATEGORIES.forEach(cat => {
     totals[cat] = { amount: 0, itemsCount: 0 }
   })
 
@@ -98,22 +98,23 @@ const categoryStats = computed(() => {
     }
   })
 
-  const total = totalSpentMonth.value || 1
+  const nonZero = Object.entries(totals)
+    .filter(([, data]) => data.amount > 0.001)
+    .sort(([, a], [, b]) => b.amount - a.amount)
+    .map(([key, data]) => [key, { total: data.amount, itemsCount: data.itemsCount }] as [string, { total: number, itemsCount: number }])
 
-  return SUPERMARKET_CATEGORIES.map(category => {
-    const data = totals[category] || { amount: 0, itemsCount: 0 }
-    const pct = totalSpentMonth.value > 0 ? (data.amount / total) * 100 : 0
-    return {
-      category,
-      label: t(`expenses.categories.${category}`),
-      amount: data.amount,
-      itemsCount: data.itemsCount,
-      percentage: pct,
-      icon: CATEGORY_ICONS[category] || 'i-heroicons-tag',
-      color: CATEGORY_COLORS[category] || 'primary',
-      hexColor: CATEGORY_HEX_COLORS[category] || '#10b981'
-    }
-  }).filter(c => c.amount > 0).sort((a, b) => b.amount - a.amount)
+  const percentages = calculateCategoryPercentages(nonZero, totalSpentMonth.value, 1)
+
+  return nonZero.map(([category, data]) => ({
+    category,
+    label: t(`expenses.categories.${category}`),
+    amount: data.total,
+    itemsCount: data.itemsCount,
+    percentage: percentages.get(category) ?? 0,
+    icon: CATEGORY_ICONS[category] || 'i-heroicons-tag',
+    color: CATEGORY_COLORS[category as ExpenseCategory] || 'primary',
+    hexColor: CATEGORY_HEX_COLORS[category] || '#10b981'
+  }))
 })
 
 // Daily average in current month

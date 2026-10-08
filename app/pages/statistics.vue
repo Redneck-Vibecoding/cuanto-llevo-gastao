@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import {
-  SUPERMARKET_CATEGORIES, CATEGORY_COLORS, CATEGORY_ICONS, CATEGORY_HEX_COLORS,
-  resolveExpenseCategory
+  DOMESTIC_CATEGORIES, CATEGORY_COLORS, CATEGORY_ICONS, CATEGORY_HEX_COLORS,
+  resolveExpenseCategory, calculateCategoryPercentages, type ExpenseCategory
 } from '~/utils/expenseCategories'
 
 const expenseStore = useExpenseStore()
@@ -62,7 +62,7 @@ const averageTicket = computed(() => {
 const categoryStats = computed(() => {
   const totals: Record<string, { amount: number, count: number }> = {}
 
-  SUPERMARKET_CATEGORIES.forEach(cat => {
+  DOMESTIC_CATEGORIES.forEach(cat => {
     totals[cat] = { amount: 0, count: 0 }
   })
 
@@ -82,22 +82,23 @@ const categoryStats = computed(() => {
     }
   })
 
-  const total = totalSpent.value || 1
+  const nonZero = Object.entries(totals)
+    .filter(([, data]) => data.amount > 0.001)
+    .sort(([, a], [, b]) => b.amount - a.amount)
+    .map(([key, data]) => [key, { total: data.amount, count: data.count }] as [string, { total: number, count: number }])
 
-  return SUPERMARKET_CATEGORIES.map(category => {
-    const data = totals[category] || { amount: 0, count: 0 }
-    const pct = totalSpent.value > 0 ? (data.amount / total) * 100 : 0
-    return {
-      category,
-      label: t(`expenses.categories.${category}`),
-      amount: data.amount,
-      count: data.count,
-      percentage: pct,
-      icon: CATEGORY_ICONS[category] || 'i-heroicons-tag',
-      color: CATEGORY_COLORS[category] || 'primary',
-      hexColor: CATEGORY_HEX_COLORS[category] || '#10b981'
-    }
-  }).filter(c => c.amount > 0).sort((a, b) => b.amount - a.amount)
+  const percentages = calculateCategoryPercentages(nonZero, totalSpent.value, 1)
+
+  return nonZero.map(([category, data]) => ({
+    category,
+    label: t(`expenses.categories.${category}`),
+    amount: data.total,
+    count: data.count,
+    percentage: percentages.get(category) ?? 0,
+    icon: CATEGORY_ICONS[category] || 'i-heroicons-tag',
+    color: CATEGORY_COLORS[category as ExpenseCategory] || 'primary',
+    hexColor: CATEGORY_HEX_COLORS[category] || '#10b981'
+  }))
 })
 
 // Supermarket / Establishment Breakdown
@@ -217,7 +218,7 @@ const monthLabel = computed(() => {
             {{ $t('statistics.by_category') }}
           </h2>
           <p class="text-xs text-gray-500 dark:text-gray-400">
-            Alimentación, frescos, limpieza, farmacia y otros
+            {{ $t('expenses.subtitle') }}
           </p>
         </div>
 

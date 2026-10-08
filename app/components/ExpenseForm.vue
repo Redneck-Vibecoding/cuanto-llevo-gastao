@@ -12,7 +12,7 @@ import { recognizeImages, parseReceiptText } from '~/utils/ocr'
 import { analyzeReceiptWithOpenAi } from '~/utils/openAiReceipt'
 import { renderPdfToImages } from '~/utils/pdf'
 import {
-  EXPENSE_CATEGORIES, SUPERMARKET_CATEGORIES, resolveExpenseCategory,
+  EXPENSE_CATEGORIES, DOMESTIC_CATEGORIES, resolveExpenseCategory,
   CATEGORY_ICONS, type ExpenseCategory
 } from '~/utils/expenseCategories'
 
@@ -54,7 +54,7 @@ const state = reactive({
 
 
 
-const categoryItems = computed(() => SUPERMARKET_CATEGORIES.map(value => ({
+const categoryItems = computed(() => DOMESTIC_CATEGORIES.map(value => ({
   value: value as ExpenseCategory,
   label: t(`expenses.categories.${value}`),
   icon: CATEGORY_ICONS[value] || 'i-heroicons-tag'

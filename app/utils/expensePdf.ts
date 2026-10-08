@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf'
 import type { ExpenseRecord } from '~/stores/expenses'
-import { SUPERMARKET_CATEGORIES, resolveExpenseCategory } from '~/utils/expenseCategories'
+import { calculateCategoryPercentages, resolveExpenseCategory } from '~/utils/expenseCategories'
 
 export interface GeneratePdfOptions {
   locale?: string
@@ -141,11 +141,8 @@ export function generateExpensesPdf(
   currentY += cardHeight + 8
 
   // 3. Category Breakdown Section
-  // Include all categories available in the application (SUPERMARKET_CATEGORIES)
+  // Categories are mutually exclusive ("Las categorias de gasto son excluyentes").
   const categoryTotals: Record<string, { total: number, count: number }> = {}
-  SUPERMARKET_CATEGORIES.forEach(cat => {
-    categoryTotals[cat] = { total: 0, count: 0 }
-  })
 
   // Normalize subcategories or OCR aliases to canonical categories
   const normalizeCat = (c: string): string => {
@@ -180,21 +177,20 @@ export function generateExpensesPdf(
     }
   })
 
-  // Sort categories: categories with total > 0 descending first, followed by zero-amount categories
-  const sortedCategories = Object.entries(categoryTotals).sort(([catA, a], [catB, b]) => {
-    if (b.total !== a.total) {
-      return b.total - a.total
-    }
-    if (b.count !== a.count) {
+  // Do not include categories that are at zero ("Las que esten a cero no las incluyas en las exportaciones")
+  const activeCategories = Object.entries(categoryTotals)
+    .filter(([, data]) => data.total > 0.001)
+    .sort(([, a], [, b]) => {
+      if (b.total !== a.total) {
+        return b.total - a.total
+      }
       return b.count - a.count
-    }
-    const idxA = (SUPERMARKET_CATEGORIES as readonly string[]).indexOf(catA)
-    const idxB = (SUPERMARKET_CATEGORIES as readonly string[]).indexOf(catB)
-    if (idxA !== -1 && idxB !== -1) return idxA - idxB
-    return catA.localeCompare(catB)
-  })
+    })
 
-  if (sortedCategories.length > 0) {
+  // Calculate percentages that strictly sum to 100.0% ("y el procentaje ha de sumar 100, lógicamente")
+  const percentages = calculateCategoryPercentages(activeCategories, totalAmount, 1)
+
+  if (activeCategories.length > 0) {
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(9.5)
     doc.setTextColor(31, 41, 55)
@@ -213,28 +209,35 @@ export function generateExpensesPdf(
     doc.text('Importe', pageWidth - marginRight - 3, currentY + 4.2, { align: 'right' })
     currentY += 6
 
-    sortedCategories.forEach(([category, data], idx) => {
-      const pct = totalAmount > 0 ? (data.total / totalAmount) * 100 : 0
+    activeCategories.forEach(([category, data], idx) => {
+      const pct = percentages.get(category) ?? 0
       if (idx % 2 === 1) {
         doc.setFillColor(249, 250, 251)
         doc.rect(marginLeft, currentY, usableWidth, 5.2, 'F')
       }
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(7.5)
-      if (data.total > 0) {
-        doc.setTextColor(55, 65, 81)
-      } else {
-        doc.setTextColor(156, 163, 175)
-      }
+      doc.setTextColor(55, 65, 81)
       doc.text(safeText(getCatLabel(category), 40), marginLeft + 3, currentY + 3.6)
       doc.text(`${data.count}`, marginLeft + 85, currentY + 3.6)
       doc.text(`${pct.toFixed(1)}%`, marginLeft + 120, currentY + 3.6)
-      doc.setFont('helvetica', data.total > 0 ? 'bold' : 'normal')
+      doc.setFont('helvetica', 'bold')
       doc.text(formatCurrency(data.total), pageWidth - marginRight - 3, currentY + 3.6, { align: 'right' })
       currentY += 5.2
     })
 
-    currentY += 7
+    // Category summary total row
+    doc.setFillColor(243, 244, 246)
+    doc.rect(marginLeft, currentY, usableWidth, 5.5, 'F')
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(7.5)
+    doc.setTextColor(31, 41, 55)
+    doc.text('TOTAL', marginLeft + 3, currentY + 3.8)
+    const totalCatCount = activeCategories.reduce((sum, [, d]) => sum + d.count, 0)
+    doc.text(`${totalCatCount}`, marginLeft + 85, currentY + 3.8)
+    doc.text('100.0%', marginLeft + 120, currentY + 3.8)
+    doc.text(formatCurrency(totalAmount), pageWidth - marginRight - 3, currentY + 3.8, { align: 'right' })
+    currentY += 5.5 + 4
   }
 
   // 4. Detailed Expenses Table

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import {
-  EXPENSE_CATEGORIES, SUPERMARKET_CATEGORIES, CATEGORY_COLORS, resolveExpenseCategory,
+  EXPENSE_CATEGORIES, DOMESTIC_CATEGORIES, CATEGORY_COLORS, resolveExpenseCategory,
   type ExpenseCategory
 } from '~/utils/expenseCategories'
 
@@ -57,7 +57,7 @@ const showAllMonths = computed(() => selectedMonthValue.value === 0)
 // shows every category; otherwise only the chosen ones are summarised.
 const categoryFilter = ref<ExpenseCategory[]>([])
 const categoryFilterItems = computed(() =>
-  SUPERMARKET_CATEGORIES.map(value => ({ value: value as ExpenseCategory, label: t(`expenses.categories.${value}`) })))
+  DOMESTIC_CATEGORIES.map(value => ({ value: value as ExpenseCategory, label: t(`expenses.categories.${value}`) })))
 
 // Range of days selected on the calendar; filters the expense list. While only
 // the start is set (end null) the list narrows to that single day.
