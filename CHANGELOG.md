@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.8.1...v1.9.0) (2026-10-08)
+
+
+### Features
+
+* **expenses:** remove location search and location column from expense list ([ac2f198](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/ac2f19883ac9857bdf6e58844649e87572879fce))
+
 ## [1.8.1](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.8.0...v1.8.1) (2026-10-08)
 
 
