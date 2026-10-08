@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.7.0...v1.8.0) (2026-10-08)
+
+
+### Features
+
+* **categories:** segment supermarket products into mutually exclusive categories ([250dfec](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/250dfec94bea8acdf07dd335dc0df438f8913326))
+
 # [1.7.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.6.0...v1.7.0) (2026-10-08)
 
 
