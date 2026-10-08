@@ -12,7 +12,7 @@ import { recognizeImages, parseReceiptText } from '~/utils/ocr'
 import { analyzeReceiptWithOpenAi } from '~/utils/openAiReceipt'
 import { renderPdfToImages } from '~/utils/pdf'
 import {
-  EXPENSE_CATEGORIES, DOMESTIC_CATEGORIES, resolveExpenseCategory,
+  EXPENSE_CATEGORIES, SUPERMARKET_CATEGORIES, DEFAULT_EXPENSE_CATEGORY, resolveExpenseCategory,
   CATEGORY_ICONS, type ExpenseCategory
 } from '~/utils/expenseCategories'
 
@@ -48,13 +48,11 @@ const state = reactive({
   ticketName: undefined as string | undefined,
   ticketType: undefined as string | undefined,
   ticketSize: undefined as number | undefined,
-  category: 'alimentacion' as ExpenseCategory | undefined,
+  category: DEFAULT_EXPENSE_CATEGORY as ExpenseCategory | undefined,
   items: [] as ExpenseItem[]
 })
 
-
-
-const categoryItems = computed(() => DOMESTIC_CATEGORIES.map(value => ({
+const categoryItems = computed(() => SUPERMARKET_CATEGORIES.map(value => ({
   value: value as ExpenseCategory,
   label: t(`expenses.categories.${value}`),
   icon: CATEGORY_ICONS[value] || 'i-heroicons-tag'
@@ -90,7 +88,7 @@ const addItem = () => {
     name: '',
     quantity: 1,
     price: 0,
-    category: 'alimentacion'
+    category: DEFAULT_EXPENSE_CATEGORY
   })
 }
 

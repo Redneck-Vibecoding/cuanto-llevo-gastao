@@ -55,51 +55,51 @@ function generateExpenses(refDate = new Date()) {
       ticketName: 'ticket-mercadona.svg',
       ticketType: 'image/svg+xml',
       items: [
-        { id: 'i-1', name: 'Leche entera fresca x6', price: 6.30, quantity: 6, category: 'bebidas' },
-        { id: 'i-2', name: 'Plátano de Canarias 1kg', price: 2.15, quantity: 1, category: 'frescos' },
-        { id: 'i-3', name: 'Pechuga de pollo fileteada', price: 7.80, quantity: 1, category: 'frescos' },
-        { id: 'i-4', name: 'Huevos camperos L docena', price: 2.95, quantity: 1, category: 'frescos' },
-        { id: 'i-5', name: 'Aceite de oliva virgen extra 1L', price: 8.50, quantity: 1, category: 'alimentacion' },
-        { id: 'i-6', name: 'Arroz redondo 1kg', price: 1.45, quantity: 1, category: 'alimentacion' },
+        { id: 'i-1', name: 'Leche entera fresca x6', price: 6.30, quantity: 6, category: 'lacteos_huevos' },
+        { id: 'i-2', name: 'Plátano de Canarias 1kg', price: 2.15, quantity: 1, category: 'frutas' },
+        { id: 'i-3', name: 'Pechuga de pollo fileteada', price: 7.80, quantity: 1, category: 'carnes' },
+        { id: 'i-4', name: 'Huevos camperos L docena', price: 2.95, quantity: 1, category: 'lacteos_huevos' },
+        { id: 'i-5', name: 'Aceite de oliva virgen extra 1L', price: 8.50, quantity: 1, category: 'aceites_condimentos' },
+        { id: 'i-6', name: 'Arroz redondo 1kg', price: 1.45, quantity: 1, category: 'arroz_pastas_legumbres' },
         { id: 'i-7', name: 'Detergente ropa líquido', price: 9.80, quantity: 1, category: 'limpieza' },
-        { id: 'i-8', name: 'Papel higiénico 12 rollos', price: 4.50, quantity: 1, category: 'cuidado_personal' },
+        { id: 'i-8', name: 'Papel higiénico 12 rollos', price: 4.50, quantity: 1, category: 'hogar' },
         { id: 'i-9', name: 'Comida húmeda gato 12 sobres', price: 8.20, quantity: 1, category: 'mascotas' },
-        { id: 'i-10', name: 'Café molido natural 250g x2', price: 6.80, quantity: 2, category: 'bebidas' }
+        { id: 'i-10', name: 'Café molido natural 250g x2', price: 6.80, quantity: 2, category: 'desayuno_dulces_cafe' }
       ]
     },
     {
       id: 'mock-curr-2',
       description: 'Frutería y verdura ecológica',
       amount: 19.30,
-      category: 'frescos',
+      category: 'verduras',
       timestamp: makeDate(year, month, Math.max(1, day - 3), 11, 15),
       location: { label: 'Frutería del Barrio' },
       items: [
-        { id: 'i-11', name: 'Manzanas Golden 1.5kg', price: 3.45, quantity: 1, category: 'frescos' },
-        { id: 'i-12', name: 'Tomate de ensalada 1kg', price: 2.80, quantity: 1, category: 'frescos' },
-        { id: 'i-13', name: 'Aguacates bolsa 500g', price: 3.90, quantity: 1, category: 'frescos' },
-        { id: 'i-14', name: 'Naranjas de zumo 3kg', price: 4.50, quantity: 1, category: 'frescos' },
-        { id: 'i-15', name: 'Espinacas frescas bolsa', price: 1.65, quantity: 1, category: 'frescos' },
-        { id: 'i-16', name: 'Zanahorias 1kg', price: 1.00, quantity: 1, category: 'frescos' }
+        { id: 'i-11', name: 'Manzanas Golden 1.5kg', price: 3.45, quantity: 1, category: 'frutas' },
+        { id: 'i-12', name: 'Tomate de ensalada 1kg', price: 2.80, quantity: 1, category: 'verduras' },
+        { id: 'i-13', name: 'Aguacates bolsa 500g', price: 3.90, quantity: 1, category: 'frutas' },
+        { id: 'i-14', name: 'Naranjas de zumo 3kg', price: 4.50, quantity: 1, category: 'frutas' },
+        { id: 'i-15', name: 'Espinacas frescas bolsa', price: 1.65, quantity: 1, category: 'verduras' },
+        { id: 'i-16', name: 'Zanahorias 1kg', price: 1.00, quantity: 1, category: 'verduras' }
       ]
     },
     {
       id: 'mock-curr-3',
       description: 'Lidl - Ofertas fin de semana',
       amount: 42.10,
-      category: 'alimentacion',
+      category: 'otros',
       timestamp: makeDate(year, month, Math.max(1, day - 6), 12, 30),
       location: { label: 'Lidl Supermercados' },
       ticket: createSampleTicket('Lidl', 42.10, `${year}-${String(month + 1).padStart(2, '0')}-${String(Math.max(1, day - 6)).padStart(2, '0')} 12:30`),
       ticketName: 'recibo-lidl.svg',
       ticketType: 'image/svg+xml',
       items: [
-        { id: 'i-17', name: 'Queso Gouda lonchas', price: 2.89, quantity: 1, category: 'alimentacion' },
-        { id: 'i-18', name: 'Yogures naturales pack 8', price: 1.95, quantity: 1, category: 'frescos' },
-        { id: 'i-19', name: 'Pan integral multicereales', price: 1.79, quantity: 1, category: 'alimentacion' },
-        { id: 'i-20', name: 'Salmón fresco 2 lomos', price: 9.90, quantity: 1, category: 'frescos' },
+        { id: 'i-17', name: 'Queso Gouda lonchas', price: 2.89, quantity: 1, category: 'quesos' },
+        { id: 'i-18', name: 'Yogures naturales pack 8', price: 1.95, quantity: 1, category: 'lacteos_huevos' },
+        { id: 'i-19', name: 'Pan integral multicereales', price: 1.79, quantity: 1, category: 'panes_tostadas' },
+        { id: 'i-20', name: 'Salmón fresco 2 lomos', price: 9.90, quantity: 1, category: 'pescados' },
         { id: 'i-21', name: 'Cerveza artesana pack 4', price: 5.60, quantity: 1, category: 'bebidas' },
-        { id: 'i-22', name: 'Bolsas de basura 30L', price: 1.85, quantity: 1, category: 'hogar' }
+        { id: 'i-22', name: 'Bolsas de basura 30L', price: 1.85, quantity: 1, category: 'limpieza' }
       ]
     },
     {
@@ -119,13 +119,13 @@ function generateExpenses(refDate = new Date()) {
       id: 'mock-curr-5',
       description: 'Carrefour Express compras urgentes',
       amount: 15.80,
-      category: 'alimentacion',
+      category: 'arroz_pastas_legumbres',
       timestamp: makeDate(year, month, Math.max(1, day - 10), 20, 15),
       location: { label: 'Carrefour Express' },
       items: [
-        { id: 'i-26', name: 'Pasta spaghetti 500g', price: 1.35, quantity: 1, category: 'alimentacion' },
-        { id: 'i-27', name: 'Salsa pesto genovés', price: 2.65, quantity: 1, category: 'alimentacion' },
-        { id: 'i-28', name: 'Queso parmesano rallado', price: 2.80, quantity: 1, category: 'alimentacion' }
+        { id: 'i-26', name: 'Pasta spaghetti 500g', price: 1.35, quantity: 1, category: 'arroz_pastas_legumbres' },
+        { id: 'i-27', name: 'Salsa pesto genovés', price: 2.65, quantity: 1, category: 'aceites_condimentos' },
+        { id: 'i-28', name: 'Queso parmesano rallado', price: 2.80, quantity: 1, category: 'quesos' }
       ]
     },
 
@@ -134,18 +134,18 @@ function generateExpenses(refDate = new Date()) {
       id: 'mock-prev-1',
       description: 'Mercadona compra mensual despensa',
       amount: 94.20,
-      category: 'alimentacion',
+      category: 'otros',
       timestamp: makeDate(year, month - 1, 15, 19, 0),
       location: { label: 'Mercadona - Centro' },
       ticket: createSampleTicket('Mercadona', 94.20, `${year}-${String(month).padStart(2, '0')}-15 19:00`),
       ticketName: 'mercadona-mes-anterior.svg',
       ticketType: 'image/svg+xml',
       items: [
-        { id: 'i-30', name: 'Lote legumbres (lentejas, garbanzos)', price: 6.40, category: 'alimentacion' },
-        { id: 'i-31', name: 'Pack conservas atún claro x6', price: 7.90, category: 'alimentacion' },
+        { id: 'i-30', name: 'Lote legumbres (lentejas, garbanzos)', price: 6.40, category: 'arroz_pastas_legumbres' },
+        { id: 'i-31', name: 'Pack conservas atún claro x6', price: 7.90, category: 'conservas' },
         { id: 'i-32', name: 'Lavavajillas pastillas x40', price: 8.50, category: 'limpieza' },
         { id: 'i-33', name: 'Pienso para perro 10kg', price: 22.00, category: 'mascotas' },
-        { id: 'i-34', name: 'Carne picada mixta 1kg', price: 8.90, category: 'frescos' },
+        { id: 'i-34', name: 'Carne picada mixta 1kg', price: 8.90, category: 'carnes' },
         { id: 'i-35', name: 'Agua mineral garrafa 5L x3', price: 4.20, category: 'bebidas' }
       ]
     },
@@ -167,13 +167,13 @@ function generateExpenses(refDate = new Date()) {
       id: 'mock-prev-3',
       description: 'Consum - Pescadería y charcutería',
       amount: 52.60,
-      category: 'frescos',
+      category: 'pescados',
       timestamp: makeDate(year, month - 1, 28, 13, 10),
       location: { label: 'Consum Cooperativa' },
       items: [
-        { id: 'i-40', name: 'Dorada fresca pieza grande', price: 12.80, category: 'frescos' },
-        { id: 'i-41', name: 'Jamón ibérico cebo 150g', price: 9.90, category: 'frescos' },
-        { id: 'i-42', name: 'Queso curado oveja cuña', price: 7.50, category: 'frescos' }
+        { id: 'i-40', name: 'Dorada fresca pieza grande', price: 12.80, category: 'pescados' },
+        { id: 'i-41', name: 'Jamón ibérico cebo 150g', price: 9.90, category: 'charcuteria' },
+        { id: 'i-42', name: 'Queso curado oveja cuña', price: 7.50, category: 'quesos' }
       ]
     },
 
@@ -182,13 +182,13 @@ function generateExpenses(refDate = new Date()) {
       id: 'mock-s1-1',
       description: 'Alcampo - Compra grande primavera',
       amount: 112.40,
-      category: 'alimentacion',
+      category: 'otros',
       timestamp: makeDate(year, 4, 18, 17, 30), // May
       location: { label: 'Alcampo Hipermercado' },
       items: [
-        { id: 'i-43', name: 'Pack aceite girasol 5L', price: 12.50, category: 'alimentacion' },
+        { id: 'i-43', name: 'Pack aceite girasol 5L', price: 12.50, category: 'aceites_condimentos' },
         { id: 'i-44', name: 'Lote bebidas refrescantes', price: 14.80, category: 'bebidas' },
-        { id: 'i-45', name: 'Surtido helados verano', price: 8.90, category: 'alimentacion' },
+        { id: 'i-45', name: 'Surtido helados verano', price: 8.90, category: 'helados' },
         { id: 'i-46', name: 'Arena aglomerante gato 15kg', price: 14.20, category: 'mascotas' }
       ]
     },
@@ -196,26 +196,26 @@ function generateExpenses(refDate = new Date()) {
       id: 'mock-s1-2',
       description: 'Bonpreu - Productos de proximidad',
       amount: 47.90,
-      category: 'frescos',
+      category: 'quesos',
       timestamp: makeDate(year, 2, 14, 12, 0), // March (Q1, S1)
       location: { label: 'Bonpreu Supermercats' },
       items: [
-        { id: 'i-47', name: 'Formatge artesà Garrotxa', price: 8.90, category: 'frescos' },
-        { id: 'i-48', name: 'Fruita de temporada', price: 6.50, category: 'frescos' },
-        { id: 'i-49', name: 'Embotit tradicional català', price: 7.20, category: 'frescos' }
+        { id: 'i-47', name: 'Formatge artesà Garrotxa', price: 8.90, category: 'quesos' },
+        { id: 'i-48', name: 'Fruita de temporada', price: 6.50, category: 'frutas' },
+        { id: 'i-49', name: 'Embotit tradicional català', price: 7.20, category: 'charcuteria' }
       ]
     },
     {
       id: 'mock-s1-3',
       description: 'Aldi - Repostería y frutos secos',
       amount: 28.30,
-      category: 'alimentacion',
+      category: 'aperitivos_frutos_secos',
       timestamp: makeDate(year, 1, 25, 16, 20), // February (Q1, S1)
       location: { label: 'Aldi' },
       items: [
-        { id: 'i-50', name: 'Nueces peladas bolsa 500g', price: 5.90, category: 'alimentacion' },
-        { id: 'i-51', name: 'Almendras tostadas 300g', price: 4.20, category: 'alimentacion' },
-        { id: 'i-52', name: 'Harina de trigo fuerza x2', price: 2.40, category: 'alimentacion' }
+        { id: 'i-50', name: 'Nueces peladas bolsa 500g', price: 5.90, category: 'aperitivos_frutos_secos' },
+        { id: 'i-51', name: 'Almendras tostadas 300g', price: 4.20, category: 'aperitivos_frutos_secos' },
+        { id: 'i-52', name: 'Harina de trigo fuerza x2', price: 2.40, category: 'desayuno_dulces_cafe' }
       ]
     },
 
@@ -224,24 +224,24 @@ function generateExpenses(refDate = new Date()) {
       id: 'mock-lastyear-1',
       description: 'Compra especial fin de año Mercadona',
       amount: 145.80,
-      category: 'alimentacion',
+      category: 'otros',
       timestamp: makeDate(year - 1, 11, 29, 18, 0),
       location: { label: 'Mercadona' },
       ticket: createSampleTicket('Mercadona', 145.80, `${year - 1}-12-29 18:00`),
       ticketName: 'navidad-mercadona.svg',
       ticketType: 'image/svg+xml',
       items: [
-        { id: 'i-53', name: 'Langostinos cocidos 1kg', price: 16.50, category: 'frescos' },
+        { id: 'i-53', name: 'Langostinos cocidos 1kg', price: 16.50, category: 'pescados' },
         { id: 'i-54', name: 'Cava brut nature reserva x2', price: 14.00, category: 'bebidas' },
-        { id: 'i-55', name: 'Turrones surtidos artesanos', price: 18.20, category: 'alimentacion' },
-        { id: 'i-56', name: 'Solomillo ibérico pieza', price: 22.90, category: 'frescos' }
+        { id: 'i-55', name: 'Turrones surtidos artesanos', price: 18.20, category: 'desayuno_dulces_cafe' },
+        { id: 'i-56', name: 'Solomillo ibérico pieza', price: 22.90, category: 'carnes' }
       ]
     },
     {
       id: 'mock-lastyear-2',
       description: 'Carrefour - Compra otoño',
       amount: 63.40,
-      category: 'alimentacion',
+      category: 'otros',
       timestamp: makeDate(year - 1, 9, 12, 11, 30),
       location: { label: 'Carrefour' }
     }

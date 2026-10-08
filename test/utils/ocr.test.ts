@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { parseReceiptText } from '~/utils/ocr'
+import { parseReceiptText, inferCategoryFromItemName } from '~/utils/ocr'
 
 describe('parseReceiptText', () => {
   it('extracts the total amount, date and merchant from a Spanish receipt', () => {
@@ -77,5 +77,54 @@ describe('parseReceiptText', () => {
   it('falls back to the largest value when no total keyword is present', () => {
     const text = ['Producto A 3,00', 'Producto B 9,90', 'Producto C 1,10'].join('\n')
     expect(parseReceiptText(text).amount).toBe(9.9)
+  })
+})
+
+describe('inferCategoryFromItemName supermarket segmentation', () => {
+  it('correctly classifies items into mutually exclusive supermarket categories', () => {
+    // Frescos distinctions
+    expect(inferCategoryFromItemName('Pechuga de pollo 500g')).toBe('carnes')
+    expect(inferCategoryFromItemName('Filetes de ternera')).toBe('carnes')
+    expect(inferCategoryFromItemName('Salmon fresco lomos')).toBe('pescados')
+    expect(inferCategoryFromItemName('Merluza fresca')).toBe('pescados')
+    expect(inferCategoryFromItemName('Jamon serrano lonchas')).toBe('charcuteria')
+    expect(inferCategoryFromItemName('Chorizo iberico bellota')).toBe('charcuteria')
+    expect(inferCategoryFromItemName('Salchichas frankfurt')).toBe('charcuteria')
+    expect(inferCategoryFromItemName('Tomate ensalada 1kg')).toBe('verduras')
+    expect(inferCategoryFromItemName('Lechuga iceberg')).toBe('verduras')
+    expect(inferCategoryFromItemName('Platanos de Canarias')).toBe('frutas')
+    expect(inferCategoryFromItemName('Manzanas golden')).toBe('frutas')
+    expect(inferCategoryFromItemName('Queso curado oveja')).toBe('quesos')
+    expect(inferCategoryFromItemName('Mozzarella fresca')).toBe('quesos')
+
+    // Dairy & bakery & breakfast
+    expect(inferCategoryFromItemName('Leche entera 1L')).toBe('lacteos_huevos')
+    expect(inferCategoryFromItemName('Docena huevos camperos')).toBe('lacteos_huevos')
+    expect(inferCategoryFromItemName('Barra de pan rustica')).toBe('panes_tostadas')
+    expect(inferCategoryFromItemName('Pan de molde integral')).toBe('panes_tostadas')
+    expect(inferCategoryFromItemName('Cafe molido natural')).toBe('desayuno_dulces_cafe')
+    expect(inferCategoryFromItemName('Galletas maria dorada')).toBe('desayuno_dulces_cafe')
+    expect(inferCategoryFromItemName('Cacao soluble colacao')).toBe('desayuno_dulces_cafe')
+
+    // Dry pantry & snacks
+    expect(inferCategoryFromItemName('Arroz redondo 1kg')).toBe('arroz_pastas_legumbres')
+    expect(inferCategoryFromItemName('Espaguetis trigo')).toBe('arroz_pastas_legumbres')
+    expect(inferCategoryFromItemName('Garbanzos cocidos tarro')).toBe('arroz_pastas_legumbres')
+    expect(inferCategoryFromItemName('Caldo pollo brik 1L')).toBe('caldos_sopas_pures')
+    expect(inferCategoryFromItemName('Pure patata copos')).toBe('caldos_sopas_pures')
+    expect(inferCategoryFromItemName('Patatas fritas onduladas')).toBe('aperitivos_frutos_secos')
+    expect(inferCategoryFromItemName('Nueces peladas 200g')).toBe('aperitivos_frutos_secos')
+
+    // Frozen vs ice cream
+    expect(inferCategoryFromItemName('Guisantes ultracongelados')).toBe('congelados')
+    expect(inferCategoryFromItemName('Pizza congelada cuatro quesos')).toBe('congelados')
+    expect(inferCategoryFromItemName('Helado tarrina vainilla')).toBe('helados')
+    expect(inferCategoryFromItemName('Polos de limon 6 uds')).toBe('helados')
+
+    // Household & personal care
+    expect(inferCategoryFromItemName('Detergente liquido lavadora')).toBe('limpieza')
+    expect(inferCategoryFromItemName('Lejia con detergente')).toBe('limpieza')
+    expect(inferCategoryFromItemName('Champu suave anticaspa')).toBe('cuidado_personal')
+    expect(inferCategoryFromItemName('Dentifrico proteccion total')).toBe('cuidado_personal')
   })
 })

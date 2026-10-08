@@ -69,7 +69,7 @@ const categoryStats = computed(() => {
   filteredExpenses.value.forEach(expense => {
     if (expense.items && expense.items.length > 0) {
       expense.items.forEach(item => {
-        const cat = item.category || 'alimentacion'
+        const cat = item.category || 'otros'
         if (!totals[cat]) totals[cat] = { amount: 0, count: 0 }
         totals[cat].amount += (item.price || 0)
         totals[cat].count += 1

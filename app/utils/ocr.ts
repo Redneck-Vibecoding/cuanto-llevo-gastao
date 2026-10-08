@@ -53,28 +53,96 @@ export const stripAccents = (value: string) =>
 export function inferCategoryFromItemName(name: string): ExpenseCategory {
   const norm = stripAccents(name.toLowerCase())
 
+  // 1. Helados (prioritised over general frozen)
+  if (/\b(helado|helados|polo|polos|cornetto|magnum|cucurucho|tarrina helad[oa]|sorbete|bombones? helados?)\b/.test(norm)) {
+    return 'helados'
+  }
+  // 2. Congelados
+  if (/\b(congelad[oa]s?|ultracongelad[oa]s?|hielo|hielos|cubitos|croqueta|croquetas|nuggets?|varitas? merluza|pizza congelada)\b/.test(norm)) {
+    return 'congelados'
+  }
+  // 3. Quesos (separated from other dairy)
+  if (/\b(queso|quesos|gouda|havarti|parmesano|parmigiano|mozzarella|manchego|brie|camembert|emmental|roquefort|cheddar|burrata|mascarpone|rallado|curado|semicurado|grana padano)\b/.test(norm)) {
+    return 'quesos'
+  }
+  // 4. Panes y tostadas
+  if (/\b(pan|panes|barra|barras|hogaza|baguette|pan molde|pan tostado|tostada|tostadas|biscote|biscotes|colines|picos|regana|reganas|masa pizza|pan hamburguesa)\b/.test(norm)) {
+    return 'panes_tostadas'
+  }
+  // 5. Desayuno, dulces y café (galletas, bollería, cacao, café, cereales)
+  if (/\b(cafe|cacao|colacao|nesquik|te|infusion|infusiones|galleta|galletas|bolleria|magdalena|magdalenas|croissant|croissants|cereales|mermelada|miel|chocolate|chocolates|bombon|bombones|azucar|sacarina|edulcorante)\b/.test(norm)) {
+    return 'desayuno_dulces_cafe'
+  }
+  // 6. Arroz, pastas y legumbres
+  if (/\b(arroz|arroces|pasta|pastas|espagueti|espaguetis|macarron|macarrones|fideo|fideos|tallarines|espirales|legumbre|legumbres|garbanzo|garbanzos|lenteja|lentejas|alubia|alubias)\b/.test(norm)) {
+    return 'arroz_pastas_legumbres'
+  }
+  // 7. Caldos, sopas y purés
+  if (/\b(caldo|caldos|sopa|sopas|pure|pures|crema verduras?|avecrem|pastilla caldo)\b/.test(norm)) {
+    return 'caldos_sopas_pures'
+  }
+  // 8. Aperitivos y frutos secos
+  if (/\b(patatas fritas|chips|snack|snacks|frutos secos|nuez|nueces|almendra|almendras|avellana|avellanas|pistacho|pistachos|pipa|pipas|cacahuete|cacahuetes|palomitas|aceituna|aceitunas|encurtidos|pepinillos)\b/.test(norm)) {
+    return 'aperitivos_frutos_secos'
+  }
+  // 9. Charcutería (cured/cooked meats, cold cuts)
+  if (/\b(jamon|jamones|paleta|lomo embuchado|chorizo|salchichon|fuet|mortadela|salchicha|salchichas|frankfurt|beicon|bacon|pechuga pavo|fiambre|pate|sobrasada|butifarra|chistorra|longaniza)\b/.test(norm)) {
+    return 'charcuteria'
+  }
+  // 10. Carnes (fresh raw meat)
+  if (/\b(carne|carniceria|pollo|pechuga|ternera|cerdo|pavo|conejo|cordero|carne picada|picada|albondiga|albondigas|hamburguesa|hamburguesas|solomillo|costilla|costillas|chuleta|chuletas|chuletillas|lomo|alitas?)\b/.test(norm)) {
+    return 'carnes'
+  }
+  // 11. Pescados y mariscos
+  if (/\b(pescado|pescaderia|merluza|salmon|dorada|lubina|bacalao|gamba|gambas|langostino|langostinos|calamar|calamares|sepia|pulpo|mejillon|mejillones|almeja|almejas|atun fresco|bonito|boqueron|boquerones|sardina|sardinas)\b/.test(norm)) {
+    return 'pescados'
+  }
+  // 12. Frutas
+  if (/\b(fruta|frutas|platano|platanos|manzana|manzanas|naranja|naranjas|fresa|fresas|freson|pera|peras|mandarina|mandarinas|limon|limones|uva|uvas|kiwi|kiwis|melon|sandia|melocoton|nectarina|cereza|cerezas|aguacate|aguacates|pina)\b/.test(norm)) {
+    return 'frutas'
+  }
+  // 13. Verduras y hortalizas
+  if (/\b(verdura|verduras|tomate|tomates|lechuga|lechugas|cebolla|cebollas|patata|patatas|zanahoria|zanahorias|pepino|pepinos|pimiento|pimientos|calabacin|calabacines|berenjena|berenjenas|brocoli|coliflor|espinaca|espinacas|acelga|acelgas|champinon|champinones|seta|setas|ensalada|ensaladas|ajo|ajos|puerro|puerros)\b/.test(norm)) {
+    return 'verduras'
+  }
+  // 14. Lácteos y huevos
+  if (/\b(leche|yogur|yogurs|yogurt|yogures|kefir|cuajada|natillas|flan|flanes|nata|mantequilla|margarina|huevo|huevos)\b/.test(norm)) {
+    return 'lacteos_huevos'
+  }
+  // 15. Aceites, salsas y condimentos
+  if (/\b(aceite|aceites|virgen extra|oliva|girasol|vinagre|vinagres|sal|especia|especias|pimienta|oregano|mayonesa|ketchup|mostaza|salsa|salsas|tomate frito|tomate triturado)\b/.test(norm)) {
+    return 'aceites_condimentos'
+  }
+  // 16. Conservas
+  if (/\b(conserva|conservas|atun lata|atun en aceite|atun natural|sardinillas|berberechos|mejillones escabeche|esparrago|esparragos|maiz dulce|alcachofas bote)\b/.test(norm)) {
+    return 'conservas'
+  }
+  // 17. Bebidas
+  if (/\b(cerveza|cervezas|vino|vinos|agua|refresco|refrescos|coca cola|fanta|zumo|zumos|tonica|ginebra|ron|whisky|aquarius|monster|red bull|sidra|bebida|licor)\b/.test(norm)) {
+    return 'bebidas'
+  }
+  // 18. Droguería y limpieza
   if (/\b(limpieza|lejia|detergente|lavavajillas|fregasuelos|bayeta|estropajo|suavizante|fregona|limpiacristales|insecticida|antical|pastillas lavavajillas|bolsas basura)\b/.test(norm)) {
     return 'limpieza'
   }
-  if (/\b(farmacia|paracetamol|ibuprofeno|gasas|alcohol|jarabe|aposito|tirita|medicamento|venda|termometro|aspirina|prospecto|suero)\b/.test(norm)) {
-    return 'farmacia'
-  }
+  // 19. Higiene y cuidado personal
   if (/\b(champu|gel|desodorante|dentifrico|pasta dental|cepillo|colonia|afeitado|higiene|toallitas|tampon|compresa|jabon|crema hidratante|cuidado)\b/.test(norm)) {
     return 'cuidado_personal'
   }
-  if (/\b(cerveza|vino|agua|refresco|coca cola|fanta|zumo|tonica|ginebra|ron|whisky|aquarius|monster|red bull|sidra|bebida|licor)\b/.test(norm)) {
-    return 'bebidas'
+  // 20. Farmacia (legacy/specific)
+  if (/\b(farmacia|paracetamol|ibuprofeno|gasas|alcohol|jarabe|aposito|tirita|medicamento|venda|termometro|aspirina|prospecto|suero)\b/.test(norm)) {
+    return 'farmacia'
   }
-  if (/\b(perro|gato|pienso|mascota|snack perro|comida gato|arena gato|canino|felino)\b/.test(norm)) {
+  // 21. Mascotas
+  if (/\b(perro|perros|gato|gatos|pienso|mascota|mascotas|snack perro|comida gato|arena gato|canino|felino)\b/.test(norm)) {
     return 'mascotas'
   }
-  if (/\b(papel cocina|papel higienico|bombilla|pila|cubo|menaje|vela|papel aluminio|film|bateria|sarten|plato)\b/.test(norm)) {
+  // 22. Hogar y bazar
+  if (/\b(papel cocina|papel higienico|bombilla|pila|pilas|cubo|menaje|vela|papel aluminio|film|bateria|sarten|plato)\b/.test(norm)) {
     return 'hogar'
   }
-  if (/\b(fruta|platano|manzana|naranja|fresa|tomate|lechuga|carne|pollo|ternera|cerdo|pescado|salmon|merluza|pescaderia|carniceria|verdura|zanahoria|cebolla|patata|pepino|aguacate|solomillo|pechuga)\b/.test(norm)) {
-    return 'frescos'
-  }
-  return 'alimentacion'
+
+  return 'otros'
 }
 
 // Recognise the combined text of one or more images, reusing a single worker.

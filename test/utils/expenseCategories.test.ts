@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  SUPERMARKET_CATEGORIES,
   DOMESTIC_CATEGORIES,
   calculateCategoryPercentages,
   categoryCountsTowardBalance,
@@ -28,31 +29,36 @@ describe('expense categories', () => {
     expect(resolveExpenseCategory({ excludeFromBalance: false })).toBe('diet')
   })
 
-  it('provides an exhaustive list of typical domestic expense categories', () => {
+  it('provides an exhaustive list of mutually exclusive supermarket categories', () => {
     const expected = [
-      'vivienda',
-      'suministros',
-      'alimentacion',
-      'transporte',
-      'telecomunicaciones',
-      'hogar',
+      'carnes',
+      'pescados',
+      'charcuteria',
+      'verduras',
+      'frutas',
+      'quesos',
+      'lacteos_huevos',
+      'panes_tostadas',
+      'desayuno_dulces_cafe',
+      'arroz_pastas_legumbres',
+      'caldos_sopas_pures',
+      'aperitivos_frutos_secos',
+      'congelados',
+      'helados',
+      'bebidas',
+      'aceites_condimentos',
+      'conservas',
       'limpieza',
-      'salud',
       'cuidado_personal',
-      'ropa_calzado',
-      'ocio_restauracion',
-      'suscripciones',
-      'educacion',
       'mascotas',
-      'seguros',
-      'impuestos',
-      'viajes',
+      'hogar',
       'otros'
     ]
+    expect(Array.from(SUPERMARKET_CATEGORIES)).toEqual(expected)
     expect(Array.from(DOMESTIC_CATEGORIES)).toEqual(expected)
     // Categories are mutually exclusive: no duplicates
-    const unique = new Set(DOMESTIC_CATEGORIES)
-    expect(unique.size).toBe(DOMESTIC_CATEGORIES.length)
+    const unique = new Set(SUPERMARKET_CATEGORIES)
+    expect(unique.size).toBe(SUPERMARKET_CATEGORIES.length)
   })
 
   describe('calculateCategoryPercentages', () => {

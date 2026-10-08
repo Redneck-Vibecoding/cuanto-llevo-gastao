@@ -48,7 +48,7 @@ const parseResponse = (value: string): ParsedReceipt => {
         ? item.unitPrice
         : (quantity > 1 ? Number((price / quantity).toFixed(2)) : price)
 
-      let itemCategory: ExpenseCategory = 'alimentacion'
+      let itemCategory: ExpenseCategory = 'otros'
       if (typeof item.category === 'string' && EXPENSE_CATEGORIES.includes(item.category as ExpenseCategory)) {
         itemCategory = item.category as ExpenseCategory
       }

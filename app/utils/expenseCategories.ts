@@ -1,35 +1,51 @@
-// Exhaustive categories of domestic / household expenses.
-// Categories are mutually exclusive (each expense belongs to exactly one category).
+// Exhaustive categories of supermarket and domestic expenses.
+// Categories are mutually exclusive (each product or expense belongs to exactly one category).
 // Keys are language-independent and stored on the record;
 // labels are translated in the UI via `expenses.categories.<key>`.
 
-export const DOMESTIC_CATEGORIES = [
+export const SUPERMARKET_CATEGORIES = [
+    'carnes',
+    'pescados',
+    'charcuteria',
+    'verduras',
+    'frutas',
+    'quesos',
+    'lacteos_huevos',
+    'panes_tostadas',
+    'desayuno_dulces_cafe',
+    'arroz_pastas_legumbres',
+    'caldos_sopas_pures',
+    'aperitivos_frutos_secos',
+    'congelados',
+    'helados',
+    'bebidas',
+    'aceites_condimentos',
+    'conservas',
+    'limpieza',
+    'cuidado_personal',
+    'mascotas',
+    'hogar',
+    'otros'
+] as const
+
+// Retain DOMESTIC_CATEGORIES as an alias for SUPERMARKET_CATEGORIES for compatibility
+export const DOMESTIC_CATEGORIES = SUPERMARKET_CATEGORIES
+
+export const LEGACY_CATEGORIES = [
     'vivienda',
     'suministros',
     'alimentacion',
     'transporte',
     'telecomunicaciones',
-    'hogar',
-    'limpieza',
     'salud',
-    'cuidado_personal',
     'ropa_calzado',
     'ocio_restauracion',
     'suscripciones',
     'educacion',
-    'mascotas',
     'seguros',
     'impuestos',
     'viajes',
-    'otros'
-] as const
-
-// Retain SUPERMARKET_CATEGORIES as an alias for DOMESTIC_CATEGORIES for compatibility
-export const SUPERMARKET_CATEGORIES = DOMESTIC_CATEGORIES
-
-export const LEGACY_CATEGORIES = [
     'frescos',
-    'bebidas',
     'farmacia',
     'diet',
     'parking',
@@ -39,15 +55,15 @@ export const LEGACY_CATEGORIES = [
 ] as const
 
 export const EXPENSE_CATEGORIES = [
-    ...DOMESTIC_CATEGORIES,
+    ...SUPERMARKET_CATEGORIES,
     ...LEGACY_CATEGORIES
 ] as const
 
 export type ExpenseCategory = typeof EXPENSE_CATEGORIES[number]
 
-export const DEFAULT_EXPENSE_CATEGORY: ExpenseCategory = 'alimentacion'
+export const DEFAULT_EXPENSE_CATEGORY: ExpenseCategory = 'otros'
 
-// All domestic and diet/supermarket expenses count toward balance; legacy non-diet items do not
+// All domestic, supermarket and diet expenses count toward balance; legacy transport/other do not
 export const categoryCountsTowardBalance = (category: ExpenseCategory): boolean => {
     if (category === 'parking' || category === 'gas' || category === 'tolls' || category === 'other') return false
     return true
@@ -63,26 +79,43 @@ export function resolveExpenseCategory(
 
 // Nuxt UI badge/colour per category, used for badges, charts and calendar dots.
 export const CATEGORY_COLORS: Record<ExpenseCategory, 'primary' | 'info' | 'warning' | 'error' | 'neutral' | 'success'> = {
+    carnes: 'error',
+    pescados: 'info',
+    charcuteria: 'warning',
+    verduras: 'success',
+    frutas: 'success',
+    quesos: 'warning',
+    lacteos_huevos: 'primary',
+    panes_tostadas: 'warning',
+    desayuno_dulces_cafe: 'primary',
+    arroz_pastas_legumbres: 'warning',
+    caldos_sopas_pures: 'warning',
+    aperitivos_frutos_secos: 'warning',
+    congelados: 'info',
+    helados: 'primary',
+    bebidas: 'info',
+    aceites_condimentos: 'success',
+    conservas: 'neutral',
+    limpieza: 'info',
+    cuidado_personal: 'primary',
+    mascotas: 'warning',
+    hogar: 'neutral',
+    otros: 'neutral',
+    // Legacy categories
     vivienda: 'primary',
     suministros: 'warning',
     alimentacion: 'success',
     transporte: 'info',
     telecomunicaciones: 'info',
-    hogar: 'neutral',
-    limpieza: 'info',
     salud: 'error',
-    cuidado_personal: 'warning',
     ropa_calzado: 'primary',
     ocio_restauracion: 'warning',
     suscripciones: 'info',
     educacion: 'success',
-    mascotas: 'warning',
     seguros: 'neutral',
     impuestos: 'error',
     viajes: 'info',
-    otros: 'neutral',
     frescos: 'success',
-    bebidas: 'info',
     farmacia: 'error',
     diet: 'primary',
     parking: 'info',
@@ -92,26 +125,43 @@ export const CATEGORY_COLORS: Record<ExpenseCategory, 'primary' | 'info' | 'warn
 }
 
 export const CATEGORY_ICONS: Record<string, string> = {
+    carnes: 'i-heroicons-fire',
+    pescados: 'i-heroicons-sparkles',
+    charcuteria: 'i-heroicons-tag',
+    verduras: 'i-heroicons-sparkles',
+    frutas: 'i-heroicons-sun',
+    quesos: 'i-heroicons-cake',
+    lacteos_huevos: 'i-heroicons-beaker',
+    panes_tostadas: 'i-heroicons-cake',
+    desayuno_dulces_cafe: 'i-heroicons-sparkles',
+    arroz_pastas_legumbres: 'i-heroicons-circle-stack',
+    caldos_sopas_pures: 'i-heroicons-fire',
+    aperitivos_frutos_secos: 'i-heroicons-sparkles',
+    congelados: 'i-heroicons-cloud',
+    helados: 'i-heroicons-sparkles',
+    bebidas: 'i-heroicons-beaker',
+    aceites_condimentos: 'i-heroicons-beaker',
+    conservas: 'i-heroicons-archive-box',
+    limpieza: 'i-heroicons-sparkles',
+    cuidado_personal: 'i-heroicons-user',
+    mascotas: 'i-heroicons-face-smile',
+    hogar: 'i-heroicons-home',
+    otros: 'i-heroicons-ellipsis-horizontal-circle',
+    // Legacy categories
     vivienda: 'i-heroicons-home',
     suministros: 'i-heroicons-bolt',
     alimentacion: 'i-heroicons-shopping-bag',
     transporte: 'i-heroicons-truck',
     telecomunicaciones: 'i-heroicons-wifi',
-    hogar: 'i-heroicons-wrench-screwdriver',
-    limpieza: 'i-heroicons-sparkles',
     salud: 'i-heroicons-heart',
-    cuidado_personal: 'i-heroicons-user',
     ropa_calzado: 'i-heroicons-tag',
     ocio_restauracion: 'i-heroicons-ticket',
     suscripciones: 'i-heroicons-tv',
     educacion: 'i-heroicons-academic-cap',
-    mascotas: 'i-heroicons-face-smile',
     seguros: 'i-heroicons-shield-check',
     impuestos: 'i-heroicons-document-text',
     viajes: 'i-heroicons-globe-alt',
-    otros: 'i-heroicons-ellipsis-horizontal-circle',
     frescos: 'i-heroicons-sparkles',
-    bebidas: 'i-heroicons-beaker',
     farmacia: 'i-heroicons-plus-circle',
     diet: 'i-heroicons-shopping-bag',
     parking: 'i-heroicons-truck',
@@ -121,26 +171,43 @@ export const CATEGORY_ICONS: Record<string, string> = {
 }
 
 export const CATEGORY_HEX_COLORS: Record<string, string> = {
+    carnes: '#ef4444',
+    pescados: '#06b6d4',
+    charcuteria: '#f97316',
+    verduras: '#10b981',
+    frutas: '#84cc16',
+    quesos: '#eab308',
+    lacteos_huevos: '#38bdf8',
+    panes_tostadas: '#d97706',
+    desayuno_dulces_cafe: '#a16207',
+    arroz_pastas_legumbres: '#f59e0b',
+    caldos_sopas_pures: '#fb923c',
+    aperitivos_frutos_secos: '#ca8a04',
+    congelados: '#0284c7',
+    helados: '#ec4899',
+    bebidas: '#0ea5e9',
+    aceites_condimentos: '#65a30d',
+    conservas: '#0d9488',
+    limpieza: '#3b82f6',
+    cuidado_personal: '#8b5cf6',
+    mascotas: '#d946ef',
+    hogar: '#64748b',
+    otros: '#9ca3af',
+    // Legacy categories
     vivienda: '#6366f1',
     suministros: '#f59e0b',
     alimentacion: '#10b981',
     transporte: '#0284c7',
     telecomunicaciones: '#06b6d4',
-    hogar: '#84cc16',
-    limpieza: '#3b82f6',
     salud: '#ef4444',
-    cuidado_personal: '#8b5cf6',
     ropa_calzado: '#ec4899',
     ocio_restauracion: '#f97316',
     suscripciones: '#a855f7',
     educacion: '#14b8a6',
-    mascotas: '#d946ef',
     seguros: '#475569',
     impuestos: '#64748b',
     viajes: '#0ea5e9',
-    otros: '#9ca3af',
     frescos: '#14b8a6',
-    bebidas: '#06b6d4',
     farmacia: '#ef4444',
     diet: '#10b981',
     parking: '#0284c7',
