@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.8.0...v1.8.1) (2026-10-08)
+
+
+### Bug Fixes
+
+* **ocr:** prioritize IMPORTE A ABONAR over pre-discount totals in Consum and Charter receipts ([5a7a1b9](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/5a7a1b940cd6eb29389c3dae7a2b0cd5a804a07c))
+
 # [1.8.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.7.0...v1.8.0) (2026-10-08)
 
 
