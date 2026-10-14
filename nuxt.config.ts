@@ -1,6 +1,33 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import fs from 'node:fs'
 
 const baseURL = process.env.NUXT_APP_BASE_URL || '/'
+
+const getReleaseInfo = () => {
+  let version = process.env.NUXT_PUBLIC_APP_VERSION || ''
+  let releaseDate = process.env.NUXT_PUBLIC_APP_RELEASE_DATE || ''
+
+  try {
+    const changelogPath = new URL('./CHANGELOG.md', import.meta.url)
+    if (fs.existsSync(changelogPath)) {
+      const changelog = fs.readFileSync(changelogPath, 'utf8')
+      const match = changelog.match(/#+\s+\[?(\d+\.\d+\.\d+)\]?.*?\((\d{4}-\d{2}-\d{2})\)/)
+      if (match) {
+        if (!version || version === '1.0.0') version = match[1] || ''
+        if (!releaseDate) releaseDate = match[2] || ''
+      }
+    }
+  } catch {
+    // fallback if changelog cannot be accessed
+  }
+
+  if (!version) version = '1.0.0'
+  if (!releaseDate) releaseDate = new Date().toISOString().slice(0, 10)
+
+  return { version, releaseDate }
+}
+
+const releaseInfo = getReleaseInfo()
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -9,7 +36,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      appVersion: process.env.NUXT_PUBLIC_APP_VERSION || '1.0.0',
+      appVersion: releaseInfo.version,
+      appReleaseDate: releaseInfo.releaseDate,
       googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID || ''
     }
   },
@@ -91,6 +119,7 @@ export default defineNuxtConfig({
         'heroicons:plus',
         'heroicons:camera',
         'heroicons:sparkles',
+        'heroicons:tag',
         'heroicons:trash',
         'heroicons:pencil-square',
         'heroicons:arrow-trending-up',

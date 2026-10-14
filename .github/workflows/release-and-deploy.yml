@@ -78,6 +78,7 @@ jobs:
       - name: Build (Nuxt generate)
         run: |
           export NUXT_PUBLIC_APP_VERSION="${{ needs.release.outputs.version || '1.0.0' }}"
+          export NUXT_PUBLIC_APP_RELEASE_DATE="$(date +'%Y-%m-%d')"
           if [ -n "${{ vars.NUXT_APP_BASE_URL }}" ]; then
             # Ensure leading and trailing slashes
             BASE_URL="${{ vars.NUXT_APP_BASE_URL }}"

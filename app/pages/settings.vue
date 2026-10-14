@@ -1,7 +1,27 @@
 <script setup lang="ts">
 const settingsStore = useSettingsStore()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
+const { public: { appVersion, appReleaseDate } } = useRuntimeConfig()
+
+const formattedReleaseDate = computed(() => {
+  if (!appReleaseDate) return ''
+  try {
+    const raw = String(appReleaseDate).trim()
+    const parts = raw.split('-').map(Number)
+    if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+      const date = new Date(parts[0], parts[1] - 1, parts[2])
+      return date.toLocaleDateString(locale.value === 'ca' ? 'ca-ES' : 'es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+    }
+    return raw
+  } catch {
+    return String(appReleaseDate)
+  }
+})
 
 const formState = reactive({
   monthlyBudget: (settingsStore.monthlyBudget || 400) as number | string,
@@ -61,12 +81,27 @@ const onBackupImported = () => {
 <template>
   <div class="max-w-2xl mx-auto space-y-6">
     <div class="border-b border-gray-200 pb-6 dark:border-gray-800">
-      <div>
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $t('settings.title') }}</h1>
-        <p class="text-gray-500 dark:text-gray-400 mt-2">
-          {{ $t('settings.description') }}
-        </p>
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <div class="flex items-center gap-3 flex-wrap">
+          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $t('settings.title') }}</h1>
+          <UBadge
+            color="primary"
+            variant="subtle"
+            size="md"
+            class="rounded-full px-2.5 py-0.5 font-medium inline-flex items-center gap-1.5 shadow-2xs border border-primary-200/60 dark:border-primary-800/50"
+          >
+            <UIcon name="i-heroicons-tag" class="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" />
+            <span class="font-semibold">v{{ appVersion }}</span>
+            <template v-if="formattedReleaseDate">
+              <span class="text-gray-300 dark:text-gray-600">·</span>
+              <span class="text-xs text-gray-600 dark:text-gray-300">{{ formattedReleaseDate }}</span>
+            </template>
+          </UBadge>
+        </div>
       </div>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">
+        {{ $t('settings.description') }}
+      </p>
     </div>
 
     <!-- Language -->
