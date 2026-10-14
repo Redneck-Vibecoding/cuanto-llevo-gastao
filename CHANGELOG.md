@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.9.1...v1.10.0) (2026-10-14)
+
+
+### Features
+
+* **settings:** display app version and release date badge in settings header ([6507340](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/65073400705d0b9ab62fd6cef562d083a5e863ef))
+
 ## [1.9.1](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.9.0...v1.9.1) (2026-10-14)
 
 
