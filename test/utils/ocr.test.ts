@@ -112,6 +112,41 @@ describe('parseReceiptText', () => {
     expect(parsed.description).toBe('Charter')
     expect(parsed.amount).toBe(3.50)
   })
+
+  it('correctly parses Consum receipt with cupones, savings and tax breakdown', () => {
+    const text = [
+      'consum',
+      'Juntos es cooperativa',
+      '184 - Mislata P.Llansol',
+      'Tlf.963597900',
+      'C:0184 01/000096 13.10.2026 14:17 440692',
+      '1 LIMON 0,44',
+      '1 MELOCOTON AMARILLO 1,35',
+      '1 PLATANO CANARIO IGP 1,58',
+      '1 MELON P.SAPO PART. 3,61',
+      '1 AGUACATE PREMADURAD 2,18',
+      'Acumula al cheque 0,33',
+      '1 PEPINO 1,27 -0,13',
+      '0,250 FIL.MUY TIERNO T.G. 7,13',
+      'Total factura: 35,27',
+      '* MIS CUPONES -0,13',
+      'IMPORTE A ABONAR 35,14',
+      'Tarj. Credito 35,14',
+      'Cambio 0,00',
+      'En esta compra te has ahorrado 0,13€',
+      'y acumulas a tu cheque mensual 0,33€',
+      'Total sin descuentos 35,27€',
+      'FACTURA SIMPLIFICADA',
+      'Base IVA Cuota Importe',
+      '14,91 10,00 1,49 16,40',
+      '18,02 4,00 0,70 18,72'
+    ].join('\n')
+
+    const parsed = parseReceiptText(text)
+    expect(parsed.description).toBe('Consum')
+    expect(parsed.amount).toBe(35.14)
+    expect(parsed.dateTime).toBe('2026-10-13T14:17')
+  })
 })
 
 describe('inferCategoryFromItemName supermarket segmentation', () => {

@@ -195,6 +195,11 @@ const TOTAL_KEYWORDS = [
   'total euro', 'total eur', 'total factura', 'total compra', 'total', 'import', 'importe', 'suma'
 ]
 
+const EXCLUDED_AMOUNT_KEYWORDS = [
+  'sin descuento', 'sin dto', 'ahorrado', 'ahorro', 'acumulas', 'cheque mensual',
+  'mis cupones', 'base', 'cuota'
+]
+
 const parseAmountToken = (token: string): number | undefined => {
   const cleaned = token.replace(/\s/g, '')
   const lastDot = cleaned.lastIndexOf('.')
@@ -213,6 +218,9 @@ const extractAmount = (lines: string[]): number | undefined => {
   for (const line of lines) {
     const normalized = stripAccents(line.toLowerCase())
     const isFinalPayment = FINAL_PAYMENT_KEYWORDS.some(k => normalized.includes(k))
+    const isExcluded = EXCLUDED_AMOUNT_KEYWORDS.some(k => normalized.includes(k))
+    if (isExcluded && !isFinalPayment) continue
+
     const hasKeyword = isFinalPayment || TOTAL_KEYWORDS.some(k => normalized.includes(k))
     const matches = line.match(AMOUNT_RE)
     if (!matches) continue
