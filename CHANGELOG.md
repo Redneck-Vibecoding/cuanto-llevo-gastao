@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.9.0...v1.9.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* **ocr:** refine final payment amount extraction rules and exclude informational savings ([5f60061](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/5f600610e1d81d847edc8c360939fdca5cb1863f))
+
 # [1.9.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.8.1...v1.9.0) (2026-10-08)
 
 
