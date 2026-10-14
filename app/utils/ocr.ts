@@ -63,7 +63,7 @@ export function inferCategoryFromItemName(name: string): ExpenseCategory {
     return 'congelados'
   }
   // 3. Quesos (separated from other dairy)
-  if (/\b(queso|quesos|gouda|havarti|parmesano|parmigiano|mozzarella|manchego|brie|camembert|emmental|roquefort|cheddar|burrata|mascarpone|rallado|curado|semicurado|grana padano)\b/.test(norm)) {
+  if (/\b(queso|quesos|gouda|havarti|parmesano|parmigiano|mozzarella|manchego|brie|camembert|emmental|roquefort|cheddar|burrata|mascarpone|rallado|curado|semicurado|grana padano|q\.\s*(?:mezcla|curado|semi|semicurado|tierno|fresco|cabra|oveja)|garcia baquero|g\.baq)\b/.test(norm)) {
     return 'quesos'
   }
   // 4. Panes y tostadas
@@ -71,7 +71,7 @@ export function inferCategoryFromItemName(name: string): ExpenseCategory {
     return 'panes_tostadas'
   }
   // 5. Desayuno, dulces y café (galletas, bollería, cacao, café, cereales)
-  if (/\b(cafe|cacao|colacao|nesquik|te|infusion|infusiones|galleta|galletas|bolleria|magdalena|magdalenas|croissant|croissants|cereales|mermelada|miel|chocolate|chocolates|bombon|bombones|azucar|sacarina|edulcorante)\b/.test(norm)) {
+  if (/\b(cafe|cacao|colacao|nesquik|te|infusion|infusiones|galleta|galletas|gall\.|choc\.|bolleria|magdalena|magdalenas|croissant|croissants|cereales|mermelada|miel|chocolate|chocolates|bombon|bombones|azucar|sacarina|edulcorante)\b/.test(norm)) {
     return 'desayuno_dulces_cafe'
   }
   // 6. Arroz, pastas y legumbres
@@ -87,28 +87,28 @@ export function inferCategoryFromItemName(name: string): ExpenseCategory {
     return 'aperitivos_frutos_secos'
   }
   // 9. Charcutería (cured/cooked meats, cold cuts)
-  if (/\b(jamon|jamones|paleta|lomo embuchado|chorizo|salchichon|fuet|mortadela|salchicha|salchichas|frankfurt|beicon|bacon|pechuga pavo|fiambre|pate|sobrasada|butifarra|chistorra|longaniza)\b/.test(norm)) {
+  if (/\b(jamon|jamones|paleta|lomo embuchado|chorizo|salchichon|fuet|mortadela|salchicha|salchichas|frankfurt|beicon|bacon|pechuga pavo|fiambre|pate|sobrasada|butifarra|chistorra|longaniza|j\.\s*(?:gran|reserv|serrano|iberico|curado|cebo))\b/.test(norm)) {
     return 'charcuteria'
   }
   // 10. Carnes (fresh raw meat)
-  if (/\b(carne|carniceria|pollo|pechuga|ternera|cerdo|pavo|conejo|cordero|carne picada|picada|albondiga|albondigas|hamburguesa|hamburguesas|solomillo|costilla|costillas|chuleta|chuletas|chuletillas|lomo|alitas?)\b/.test(norm)) {
+  if (/\b(carne|carniceria|pollo|pechuga|ternera|cerdo|pavo|conejo|cordero|carne picada|picada|albondiga|albondigas|hamburguesa|hamburguesas|solomillo|costilla|costillas|chuleta|chuletas|chuletillas|lomo|alitas?|filete|filetes|fil\.|fil\s+muy tierno)\b/.test(norm)) {
     return 'carnes'
   }
   // 11. Pescados y mariscos
   if (/\b(pescado|pescaderia|merluza|salmon|dorada|lubina|bacalao|gamba|gambas|langostino|langostinos|calamar|calamares|sepia|pulpo|mejillon|mejillones|almeja|almejas|atun fresco|bonito|boqueron|boquerones|sardina|sardinas)\b/.test(norm)) {
     return 'pescados'
   }
-  // 12. Frutas
+  // 12. Lácteos y huevos (prioritised over fruit/veg flavors like yogur fresa)
+  if (/\b(leche|yogur|yogurs|yogurt|yogures|griego|y\.\s*griego|kefir|cuajada|natillas|flan|flanes|nata|mantequilla|margarina|huevo|huevos)\b/.test(norm)) {
+    return 'lacteos_huevos'
+  }
+  // 13. Frutas
   if (/\b(fruta|frutas|platano|platanos|manzana|manzanas|naranja|naranjas|fresa|fresas|freson|pera|peras|mandarina|mandarinas|limon|limones|uva|uvas|kiwi|kiwis|melon|sandia|melocoton|nectarina|cereza|cerezas|aguacate|aguacates|pina)\b/.test(norm)) {
     return 'frutas'
   }
-  // 13. Verduras y hortalizas
+  // 14. Verduras y hortalizas
   if (/\b(verdura|verduras|tomate|tomates|lechuga|lechugas|cebolla|cebollas|patata|patatas|zanahoria|zanahorias|pepino|pepinos|pimiento|pimientos|calabacin|calabacines|berenjena|berenjenas|brocoli|coliflor|espinaca|espinacas|acelga|acelgas|champinon|champinones|seta|setas|ensalada|ensaladas|ajo|ajos|puerro|puerros)\b/.test(norm)) {
     return 'verduras'
-  }
-  // 14. Lácteos y huevos
-  if (/\b(leche|yogur|yogurs|yogurt|yogures|kefir|cuajada|natillas|flan|flanes|nata|mantequilla|margarina|huevo|huevos)\b/.test(norm)) {
-    return 'lacteos_huevos'
   }
   // 15. Aceites, salsas y condimentos
   if (/\b(aceite|aceites|virgen extra|oliva|girasol|vinagre|vinagres|sal|especia|especias|pimienta|oregano|mayonesa|ketchup|mostaza|salsa|salsas|tomate frito|tomate triturado)\b/.test(norm)) {
@@ -139,7 +139,7 @@ export function inferCategoryFromItemName(name: string): ExpenseCategory {
     return 'mascotas'
   }
   // 22. Hogar y bazar
-  if (/\b(papel cocina|papel higienico|bombilla|pila|pilas|cubo|menaje|vela|papel aluminio|film|bateria|sarten|plato)\b/.test(norm)) {
+  if (/\b(papel cocina|papel higienico|bombilla|pila|pilas|cubo|menaje|vela|papel aluminio|film|bateria|sarten|plato|bolsa\s+(?:compra|recicl|plastico|reutilizable))\b/.test(norm)) {
     return 'hogar'
   }
 
@@ -183,7 +183,7 @@ export async function recognizeText(
   return recognizeImages([image], onProgress)
 }
 
-const AMOUNT_RE = /\d{1,3}(?:[.,\s]\d{3})*[.,]\d{2}(?!\d)|\d+[.,]\d{2}(?!\d)/g
+const AMOUNT_RE = /(?<!\d[/.-])(?:\d{1,3}(?:[.,\s]\d{3})*[.,]\d{2}|\d+[.,]\d{2})(?!\d)(?![/.-]\d)/g
 
 const FINAL_PAYMENT_KEYWORDS = [
   'importe a abonar', 'import a abonar', 'total a abonar', 'a abonar', 'total a pagar', 'a pagar'
@@ -349,6 +349,11 @@ const looksLikeReceiptMetadata = (line: string) => {
     || normalized.includes('nif')
     || normalized.includes('factura')
     || normalized.includes('ticket')
+    || normalized.includes('tlf')
+    || normalized.includes('telefono')
+    || normalized.includes('socio')
+    || /\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/.test(line)
+    || /\b[0-2]?\d:[0-5]\d\b/.test(line)
     || TOTAL_KEYWORDS.some(keyword => normalized.includes(keyword))
 }
 
@@ -372,8 +377,16 @@ const IGNORE_ITEM_KEYWORDS = [
   'total', 'subtotal', 'iva', 'base', 'cif', 'nif', 'tarjeta', 'visa', 'mastercard',
   'cambio', 'entregado', 'importe', 'factura', 'simplificada', 'ticket', 'fecha',
   'hora', 'telefono', 'tel.', 'gracias', 'atendido', 'caja', 'operador', 'articulos',
-  'descuento', 'promocion', 'puntos', 'tarifa', 'su cambio', 'efectivo'
+  'descuento', 'promocion', 'puntos', 'tarifa', 'su cambio', 'efectivo',
+  'acumula', 'cheque', 'socio', 'cupon', 'cupones', 'ahorrado', 'ahorro'
 ]
+
+const DISCOUNT_SUFFIX_RE = /(?:^|\s)(?:-\s*(\d+[.,]\d{2})|(\d+[.,]\d{2})\s*-)\s*$/
+
+const isReceiptHeaderRow = (norm: string): boolean => {
+  return (norm.includes('articulo') || norm.includes('articulos'))
+    && (norm.includes('cant') || norm.includes('pvp') || norm.includes('euros') || norm.includes('precio') || norm.includes('dto'))
+}
 
 export function extractItemsFromReceiptLines(lines: string[]): ParsedReceiptItem[] {
   const items: ParsedReceiptItem[] = []
@@ -397,32 +410,83 @@ export function extractItemsFromReceiptLines(lines: string[]): ParsedReceiptItem
     const line = rawLine.trim()
     if (line.length < 3) continue
     const norm = stripAccents(line.toLowerCase())
+    if (isReceiptHeaderRow(norm)) continue
     if (IGNORE_ITEM_KEYWORDS.some(k => norm.includes(k))) continue
     if (looksLikeReceiptMetadata(line)) continue
     if (LOCATION_KEYWORDS.some(k => norm.includes(stripAccents(k)))) continue
 
-    const amounts = Array.from(line.matchAll(AMOUNT_RE))
+    // Handle discounts in the DTO column at the end of the line (e.g. "1 PEPINO 1,27 -0,13")
+    let lineForAmount = line
+    const discountMatch = line.match(DISCOUNT_SUFFIX_RE)
+    if (discountMatch && discountMatch.index !== undefined) {
+      lineForAmount = line.slice(0, discountMatch.index).trim()
+    }
+
+    const amounts = Array.from(lineForAmount.matchAll(AMOUNT_RE))
     if (amounts.length > 0) {
       const lastAmountMatch = amounts[amounts.length - 1]
       if (!lastAmountMatch || lastAmountMatch.index === undefined) continue
       const priceStr = lastAmountMatch[0]
       const price = parseAmountToken(priceStr)
-      if (price !== undefined && price > 0 && price < 400) {
-        const namePart = line.slice(0, lastAmountMatch.index).trim()
-        const cleanName = namePart.replace(/^[\d\s*x.-]+/, '').trim()
-        if (cleanName.length >= 2 && !/^\d+$/.test(cleanName)) {
-          let qty = 1
-          const qtyMatch = line.match(/^(\d+(?:[.,]\d+)?)\s*(?:x|\*)\s*/i)
-          if (qtyMatch && qtyMatch[1]) {
-            qty = parseFloat(qtyMatch[1].replace(',', '.')) || 1
+      if (price !== undefined && price > 0 && price < 1000) {
+        // Check if there is an explicit unit price (PVP) preceding EUROS (e.g. "0,250 FIL.MUY TIERNO 28,52 7,13")
+        let explicitUnitPrice: number | undefined
+        let nameEndIndex = lastAmountMatch.index
+
+        if (amounts.length >= 2) {
+          const prevAmountMatch = amounts[amounts.length - 2]
+          if (prevAmountMatch && prevAmountMatch.index !== undefined) {
+            const between = lineForAmount.slice(prevAmountMatch.index + prevAmountMatch[0].length, lastAmountMatch.index).trim()
+            if (between === '' || between === '€') {
+              const parsedPrev = parseAmountToken(prevAmountMatch[0])
+              if (parsedPrev !== undefined && parsedPrev > 0) {
+                explicitUnitPrice = parsedPrev
+                nameEndIndex = prevAmountMatch.index
+              }
+            }
           }
+        }
+
+        const namePart = lineForAmount.slice(0, nameEndIndex).trim()
+        if (namePart.length < 2) continue
+
+        let qty = 1
+        let cleanName = namePart
+
+        // Check for quantity with 'x' / '*' (e.g. "2 x 1,50 COCA COLA")
+        const qtySymbolMatch = namePart.match(/^(\d+(?:[.,]\d+)?)\s*(?:x|\*)\s*(.*)$/i)
+        if (qtySymbolMatch && qtySymbolMatch[1] && qtySymbolMatch[2]) {
+          qty = parseAmountToken(qtySymbolMatch[1]) || 1
+          cleanName = qtySymbolMatch[2].replace(/^\d+(?:[.,]\d+)?\s*/, '').trim()
+        } else {
+          // Check for Consum / Charter CANT column: leading units or decimal weight (e.g. "0,250 FIL.MUY TIERNO" or "1 LIMON")
+          const cantColumnMatch = namePart.match(/^(\d+(?:[.,]\d{1,3})?)\s+([a-zA-ZÀ-ſ].*)$/)
+          if (cantColumnMatch && cantColumnMatch[1] && cantColumnMatch[2]) {
+            const parsedCant = parseAmountToken(cantColumnMatch[1])
+            if (parsedCant !== undefined && parsedCant > 0) {
+              qty = parsedCant
+              cleanName = cantColumnMatch[2].trim()
+            }
+          } else {
+            // Fallback: strip leading digits / symbols
+            cleanName = namePart.replace(/^[\d\s*x.-]+/, '').trim()
+          }
+        }
+
+        // Clean up remaining punctuation/symbols
+        cleanName = cleanName.replace(/^[-*•\s]+|[-*•\s]+$/g, '').trim()
+
+        if (cleanName.length >= 2 && !/^\d+$/.test(cleanName)) {
+          const calculatedUnitPrice = explicitUnitPrice !== undefined
+            ? explicitUnitPrice
+            : (qty > 0 && qty !== 1 ? Number((price / qty).toFixed(2)) : price)
 
           items.push({
             id: `item-${Date.now()}-${items.length}`,
             name: cleanName,
             quantity: qty,
             price: price,
-            unitPrice: qty > 1 ? Number((price / qty).toFixed(2)) : price,
+            unitPrice: calculatedUnitPrice,
             category: inferCategoryFromItemName(cleanName)
           })
         }
