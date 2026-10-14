@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.10.0...v1.11.0) (2026-10-14)
+
+
+### Features
+
+* **ocr:** improve Consum and Charter column parsing for weights, prices, and discounts ([dff1b07](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/dff1b07cedddde6f1f270ec7c6a7f70530c47a08))
+
 # [1.10.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.9.1...v1.10.0) (2026-10-14)
 
 
