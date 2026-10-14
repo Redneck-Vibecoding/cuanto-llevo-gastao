@@ -76,7 +76,7 @@ watch(isOpen, (val) => {
     </template>
 
     <template #footer>
-      <UButton color="neutral" variant="ghost" @click="isOpen = false">{{ $t('components.qr_modal.close') }}</UButton>
+      <UButton color="neutral" variant="ghost" @click="() => { isOpen = false }">{{ $t('components.qr_modal.close') }}</UButton>
     </template>
   </UModal>
 </template>

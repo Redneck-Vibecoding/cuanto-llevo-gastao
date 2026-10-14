@@ -25,7 +25,7 @@ describe('expense QR helpers', () => {
 
     // Minified payload should not carry id or ticket data.
     expect(JSON.stringify(compressed)).not.toContain('data:image')
-    expect((compressed as Record<string, unknown>).id).toBeUndefined()
+    expect((compressed as unknown as Record<string, unknown>).id).toBeUndefined()
 
     const restored = decompressExpenseRecord(compressed)
     expect(restored).toMatchObject({

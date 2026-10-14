@@ -521,7 +521,7 @@ ref="importFileInput" type="file" class="hidden" accept="application/json"
         <!-- Local Confirmation Modal -->
         <UModal v-model:open="confirmModal.isOpen" :title="confirmModal.title" :description="confirmModal.description">
             <template #footer>
-                <UButton color="neutral" variant="ghost" @click="confirmModal.isOpen = false">{{ $t('common.cancel') }}
+                <UButton color="neutral" variant="ghost" @click="() => { confirmModal.isOpen = false }">{{ $t('common.cancel') }}
                 </UButton>
                 <UButton :color="confirmModal.confirmColor" @click="handleConfirm">{{ confirmModal.confirmLabel }}
                 </UButton>

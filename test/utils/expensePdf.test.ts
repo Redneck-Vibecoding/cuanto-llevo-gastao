@@ -33,7 +33,7 @@ describe('generateExpensesPdf', () => {
       title: 'Informe de Gastos',
       periodLabel: 'Marzo 2026',
       dateRangeText: '01/03/2026 - 31/03/2026',
-      categoryLabel: (cat) => `Cat: ${cat}`
+      categoryLabel: (cat: string) => `Cat: ${cat}`
     })
 
     expect(bytes).toBeInstanceOf(Uint8Array)
@@ -94,7 +94,7 @@ describe('generateExpensesPdf', () => {
     const bytes = generateExpensesPdf(expensesWithItems, {
       locale: 'es-ES',
       periodLabel: 'Marzo 2026',
-      categoryLabel: (c) => `Categoría: ${c}`
+      categoryLabel: (c: string) => `Categoría: ${c}`
     })
 
     expect(bytes).toBeInstanceOf(Uint8Array)

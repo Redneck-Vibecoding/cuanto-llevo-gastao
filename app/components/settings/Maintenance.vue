@@ -371,7 +371,7 @@ block color="warning" variant="ghost" icon="i-heroicons-paper-clip"
 v-model:open="confirmModal.isOpen" :title="confirmModal.title"
                 :description="confirmModal.description">
                 <template #footer>
-                    <UButton color="neutral" variant="ghost" @click="confirmModal.isOpen = false">{{ $t('common.cancel')
+                    <UButton color="neutral" variant="ghost" @click="() => { confirmModal.isOpen = false }">{{ $t('common.cancel')
                         }}
                     </UButton>
                     <UButton :color="confirmModal.confirmColor" @click="handleConfirm">{{ confirmModal.confirmLabel }}

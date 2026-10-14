@@ -24,7 +24,7 @@ const samplePayload: BackupPayload = {
       description: 'Mercadona',
       amount: 45.2,
       timestamp: '2026-01-10T08:00:00.000Z',
-      category: 'groceries'
+      category: 'alimentacion'
     }
   ],
   settings: {

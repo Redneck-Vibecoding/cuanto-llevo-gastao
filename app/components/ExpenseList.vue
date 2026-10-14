@@ -309,7 +309,7 @@ defineExpose({
           <template #trailing>
             <UButton
               v-if="searchQuery" color="neutral" variant="link" icon="i-heroicons-x-mark-20-solid"
-              :padded="false" @click="searchQuery = ''" />
+              :padded="false" @click="() => { searchQuery = '' }" />
           </template>
         </UInput>
         <UButton
@@ -433,7 +433,7 @@ defineExpose({
     <!-- Confirmation Modal -->
     <UModal v-model:open="confirmModal.isOpen" :title="confirmModal.title" :description="confirmModal.description">
       <template #footer>
-        <UButton color="neutral" variant="ghost" @click="confirmModal.isOpen = false">{{ $t('common.cancel') }}</UButton>
+        <UButton color="neutral" variant="ghost" @click="() => { confirmModal.isOpen = false }">{{ $t('common.cancel') }}</UButton>
         <UButton color="error" @click="handleConfirmDelete">{{ $t('common.delete') }}</UButton>
       </template>
     </UModal>

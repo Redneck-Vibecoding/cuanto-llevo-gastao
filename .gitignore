@@ -20,6 +20,7 @@ logs
 .DS_Store
 .fleet
 .idea
+*.tsbuildinfo
 
 # Local env files
 .env

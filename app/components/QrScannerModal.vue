@@ -100,7 +100,7 @@ v-if="error"
       </div>
     </template>
     <template #footer>
-      <UButton color="neutral" variant="ghost" @click="isOpen = false">{{ $t('common.cancel') }}</UButton>
+      <UButton color="neutral" variant="ghost" @click="() => { isOpen = false }">{{ $t('common.cancel') }}</UButton>
     </template>
   </UModal>
 </template>

@@ -586,7 +586,7 @@ const monthName = computed(() => {
             />
           </UFormField>
           <div class="flex justify-end gap-2 pt-2">
-            <UButton color="neutral" variant="outline" @click="isBudgetModalOpen = false">
+            <UButton color="neutral" variant="outline" @click="() => { isBudgetModalOpen = false }">
               Cancelar
             </UButton>
             <UButton color="primary" @click="saveBudget">

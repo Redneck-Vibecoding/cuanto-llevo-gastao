@@ -66,7 +66,7 @@ v-model="searchQuery" icon="i-heroicons-magnifying-glass"
 
       <div v-else class="text-center py-8">
         <p class="text-gray-500">{{ $t('help.index.no_results') }}</p>
-        <UButton color="neutral" variant="ghost" class="mt-2" @click="searchQuery = ''">
+        <UButton color="neutral" variant="ghost" class="mt-2" @click="() => { searchQuery = '' }">
           {{ $t('help.index.clear_filter') }}
         </UButton>
       </div>
