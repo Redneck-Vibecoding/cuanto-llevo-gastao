@@ -399,7 +399,10 @@
       "total_calculated": "Total calculat: {amount} €",
       "calculate_total": "Calcular total des dels productes",
       "no_items": "Sense desglossament de productes encara",
-      "items_count": "{count} productes detectats"
+      "items_count": "{count} productes detectats",
+      "persistent_category": "Assignació persistent de categoria",
+      "persistent_category_hint": "Recorda aquesta categoria per a aquest producte a {supermarket}",
+      "persistent_category_saved": "Categoria persistent desada per a \"{product}\""
     },
     "expense_list": {
       "title": "Despeses registrades",

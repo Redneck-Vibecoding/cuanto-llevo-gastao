@@ -401,7 +401,10 @@
       "total_calculated": "Total calculado: {amount} €",
       "calculate_total": "Calcular total desde productos",
       "no_items": "Sin desglose de productos todavía",
-      "items_count": "{count} productos detectados"
+      "items_count": "{count} productos detectados",
+      "persistent_category": "Asignación persistente de categoría",
+      "persistent_category_hint": "Recordar esta categoría para este producto en {supermarket}",
+      "persistent_category_saved": "Categoría persistente guardada para \"{product}\""
     },
     "expense_list": {
       "title": "Gastos registrados",

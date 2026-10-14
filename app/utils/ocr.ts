@@ -14,6 +14,7 @@ export interface ParsedReceiptItem {
   unitPrice?: number
   price: number
   category?: ExpenseCategory
+  persistentCategory?: boolean
 }
 
 export interface ParsedReceipt {

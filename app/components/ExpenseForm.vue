@@ -15,6 +15,12 @@ import {
   EXPENSE_CATEGORIES, SUPERMARKET_CATEGORIES, DEFAULT_EXPENSE_CATEGORY, resolveExpenseCategory,
   CATEGORY_ICONS, type ExpenseCategory
 } from '~/utils/expenseCategories'
+import {
+  getPersistentCategory,
+  setPersistentCategory,
+  removePersistentCategory,
+  applyPersistentCategoriesToItems
+} from '~/utils/persistentCategories'
 
 const props = withDefaults(defineProps<{
   initialData?: ExpenseRecord | null
@@ -88,9 +94,49 @@ const addItem = () => {
     name: '',
     quantity: 1,
     price: 0,
-    category: DEFAULT_EXPENSE_CATEGORY
+    category: DEFAULT_EXPENSE_CATEGORY,
+    persistentCategory: false
   })
 }
+
+const onPersistentCategoryToggle = async (item: ExpenseItem) => {
+  const establishment = state.description.trim()
+  if (!item.name.trim() || !item.category) return
+
+  if (item.persistentCategory) {
+    await setPersistentCategory(establishment, item.name, item.category)
+    toast.add({
+      title: t('components.expense_form.persistent_category_saved', { product: item.name }),
+      color: 'success'
+    })
+  } else {
+    await removePersistentCategory(establishment, item.name)
+  }
+}
+
+const onCategoryChange = async (item: ExpenseItem) => {
+  if (item.persistentCategory && item.name.trim() && item.category) {
+    const establishment = state.description.trim()
+    await setPersistentCategory(establishment, item.name, item.category)
+    toast.add({
+      title: t('components.expense_form.persistent_category_saved', { product: item.name }),
+      color: 'success'
+    })
+  }
+}
+
+// When supermarket description changes, apply any persistent category rules for that store
+watch(() => state.description, async (newDesc) => {
+  if (!newDesc.trim() || state.items.length === 0) return
+  for (const item of state.items) {
+    if (!item.name.trim()) continue
+    const persistent = await getPersistentCategory(newDesc, item.name)
+    if (persistent) {
+      item.category = persistent
+      item.persistentCategory = true
+    }
+  }
+})
 
 const removeItem = (index: number) => {
   state.items.splice(index, 1)
@@ -265,13 +311,17 @@ async function extractFromTicket() {
 
     // Populate detected items
     if (parsed.items && parsed.items.length > 0) {
-      state.items = parsed.items.map((it, idx) => ({
+      const establishment = state.description.trim() || parsed.description || ''
+      const mappedItems = await applyPersistentCategoriesToItems(parsed.items, establishment)
+
+      state.items = mappedItems.map((it, idx) => ({
         id: it.id || `ocr-item-${Date.now()}-${idx}`,
         name: it.name,
         quantity: it.quantity || 1,
         unitPrice: it.unitPrice,
         price: it.price,
-        category: it.category || 'alimentacion'
+        category: it.category || 'alimentacion',
+        persistentCategory: Boolean(it.persistentCategory)
       }))
       filled.push(t('components.expense_form.items_count', { count: parsed.items.length }))
 
@@ -368,6 +418,16 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     const saveResult = isEditing.value
       ? await expenseStore.updateExpense(baseRecord)
       : await expenseStore.addExpense(baseRecord)
+
+    // Persist any active persistent categories for this establishment
+    const establishment = baseRecord.description.trim()
+    for (const item of state.items) {
+      if (item.name.trim() && item.category) {
+        if (item.persistentCategory) {
+          await setPersistentCategory(establishment, item.name, item.category)
+        }
+      }
+    }
 
     toast.add({
       title: isEditing.value
@@ -556,64 +616,83 @@ const submitLabel = computed(() => isEditing.value
         <div
           v-for="(item, index) in state.items"
           :key="item.id || index"
-          class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xs">
-          <!-- Item Name -->
-          <div class="flex-1">
-            <UInput
-              v-model="item.name"
-              :placeholder="$t('components.expense_form.item_name_placeholder')"
+          class="flex flex-col gap-2 p-2.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xs">
+          <!-- Main inputs row -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <!-- Item Name -->
+            <div class="flex-1">
+              <UInput
+                v-model="item.name"
+                :placeholder="$t('components.expense_form.item_name_placeholder')"
+                size="sm"
+                class="w-full"
+              />
+            </div>
+
+            <!-- Item Category -->
+            <div class="w-full sm:w-44">
+              <USelect
+                v-model="item.category"
+                :items="categoryItems"
+                option-attribute="label"
+                value-attribute="value"
+                size="sm"
+                class="w-full"
+                @update:model-value="() => onCategoryChange(item)"
+              />
+            </div>
+
+            <!-- Quantity -->
+            <div class="w-20">
+              <UInput
+                v-model.number="item.quantity"
+                type="number"
+                step="any"
+                min="0.01"
+                :placeholder="$t('components.expense_form.item_qty')"
+                size="sm"
+                class="w-full text-center"
+              />
+            </div>
+
+            <!-- Price -->
+            <div class="w-28">
+              <UInput
+                v-model.number="item.price"
+                type="number"
+                step="0.01"
+                min="0"
+                :placeholder="$t('components.expense_form.item_price')"
+                size="sm"
+                icon="i-heroicons-currency-euro"
+                class="w-full font-medium"
+              />
+            </div>
+
+            <!-- Remove Item -->
+            <UButton
+              icon="i-heroicons-trash"
+              color="error"
+              variant="ghost"
               size="sm"
-              class="w-full"
+              @click="removeItem(index)"
             />
           </div>
 
-          <!-- Item Category -->
-          <div class="w-full sm:w-44">
-            <USelect
-              v-model="item.category"
-              :items="categoryItems"
-              option-attribute="label"
-              value-attribute="value"
-              size="sm"
-              class="w-full"
-            />
+          <!-- Persistent Category Checkbox Row -->
+          <div class="flex flex-wrap items-center justify-between gap-1 pt-1.5 px-0.5 border-t border-gray-100 dark:border-gray-700/50 text-xs">
+            <div class="flex items-center gap-1.5">
+              <UCheckbox
+                v-model="item.persistentCategory"
+                :label="$t('components.expense_form.persistent_category')"
+                size="xs"
+                @update:model-value="() => onPersistentCategoryToggle(item)"
+              />
+            </div>
+            <span v-if="state.description.trim()" class="text-[11px] text-gray-400 dark:text-gray-500 italic">
+              {{ $t('components.expense_form.persistent_category_hint', { supermarket: state.description.trim() }) }}
+            </span>
           </div>
-
-          <!-- Quantity -->
-          <div class="w-20">
-            <UInput
-              v-model.number="item.quantity"
-              type="number"
-              step="any"
-              min="0.01"
-              :placeholder="$t('components.expense_form.item_qty')"
-              size="sm"
-              class="w-full text-center"
-            />
-          </div>
-
-          <!-- Price -->
-          <div class="w-28">
-            <UInput
-              v-model.number="item.price"
-              type="number"
-              step="0.01"
-              min="0"
-              :placeholder="$t('components.expense_form.item_price')"
-              size="sm"
-              icon="i-heroicons-currency-euro"
-              class="w-full font-medium"
-            />
-          </div>
-
-          <!-- Remove Item -->
-          <UButton
-            icon="i-heroicons-trash"
-            color="error"
-            variant="ghost"
-            size="sm"
-            @click="removeItem(index)"
-          />
         </div>
 
         <div class="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700 text-sm">

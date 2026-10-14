@@ -1,4 +1,5 @@
 import type { ExpenseRecord } from '~/stores/expenses'
+import type { ExpenseCategory } from '~/utils/expenseCategories'
 
 export interface AppSettingsSnapshot {
     monthlyBudget?: number
@@ -35,7 +36,8 @@ export const APP_STATE_KEYS = {
     expenses: 'expenses',
     settings: 'settings',
     uiPreferences: 'uiPreferences',
-    migrationVersion: 'migrationVersion'
+    migrationVersion: 'migrationVersion',
+    persistentCategoryMappings: 'persistentCategoryMappings'
 } as const
 
 const LOCAL_STORAGE_KEYS = {
@@ -181,6 +183,11 @@ export const setExpenses = (expenses: ExpenseRecord[]) => setAppStateValue(APP_S
 
 export const getSettings = () => getAppStateValue<AppSettingsSnapshot>(APP_STATE_KEYS.settings)
 export const setSettings = (settings: AppSettingsSnapshot) => setAppStateValue(APP_STATE_KEYS.settings, settings)
+
+export const getPersistentCategoryMappings = <T = Record<string, Record<string, ExpenseCategory>>>() =>
+    getAppStateValue<T>(APP_STATE_KEYS.persistentCategoryMappings)
+export const setPersistentCategoryMappings = <T = Record<string, Record<string, ExpenseCategory>>>(mappings: T) =>
+    setAppStateValue(APP_STATE_KEYS.persistentCategoryMappings, mappings)
 
 export const getAppDatabaseState = async (): Promise<AppDatabaseState> => ({
     expenses: await getExpenses() ?? [],

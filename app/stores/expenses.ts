@@ -22,6 +22,7 @@ export interface ExpenseItem {
     unitPrice?: number
     price: number
     category?: ExpenseCategory
+    persistentCategory?: boolean
 }
 
 export interface ExpenseRecord {
