@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.11.0...v1.12.0) (2026-10-14)
+
+
+### Features
+
+* **expenses:** add persistent product category assignment per supermarket in receipt breakdown ([9f5f8fb](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/9f5f8fba2c686c5c9d8b440ae55680838bfe7cb7))
+
 # [1.11.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.10.0...v1.11.0) (2026-10-14)
 
 
