@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.12.0...v1.13.0) (2026-10-15)
+
+
+### Features
+
+* **settings:** add access button to share app url ([9f22244](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/9f22244f4bbc5b2ff3c8b57c157a3ec06c25eb15))
+
 # [1.12.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.11.0...v1.12.0) (2026-10-14)
 
 
