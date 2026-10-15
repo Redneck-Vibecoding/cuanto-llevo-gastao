@@ -33,6 +33,11 @@
     "title": "Configuración",
     "description": "Gestiona tus datos personales y preferencias de la aplicación.",
     "save": "Guardar configuración",
+    "share_app": "Compartir app",
+    "share_app_title": "Cuánto llevo gastao",
+    "share_app_text": "Control inteligente de compras y gastos de supermercado",
+    "share_app_success": "App compartida correctamente",
+    "share_app_copied": "Enlace de la app copiado al portapapeles",
     "language": {
       "title": "Idioma",
       "description": "Selecciona el idioma de la aplicación."

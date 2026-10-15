@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import { getAppShareUrl, shareApp } from '~/utils/shareApp'
+
 const settingsStore = useSettingsStore()
 const { t, locale } = useI18n()
 const toast = useToast()
-const { public: { appVersion, appReleaseDate } } = useRuntimeConfig()
+const runtimeConfig = useRuntimeConfig()
+const { public: { appVersion, appReleaseDate } } = runtimeConfig
+const isSharingApp = ref(false)
 
 const formattedReleaseDate = computed(() => {
   if (!appReleaseDate) return ''
@@ -76,6 +80,42 @@ const onBackupImported = () => {
   formState.monthlyBudget = settingsStore.monthlyBudget || 400
   formState.openAiApiKey = settingsStore.openAiApiKey || ''
 }
+
+const handleShareApp = async () => {
+  if (isSharingApp.value) return
+  isSharingApp.value = true
+  try {
+    const baseURL = (runtimeConfig.app?.baseURL as string) || '/'
+    const shareUrl = getAppShareUrl(baseURL)
+
+    const outcome = await shareApp({
+      title: t('settings.share_app_title'),
+      text: t('settings.share_app_text'),
+      url: shareUrl
+    })
+
+    if (outcome === 'shared') {
+      toast.add({
+        title: t('settings.share_app_success'),
+        color: 'success',
+        icon: 'i-heroicons-check-circle'
+      })
+    } else if (outcome === 'copied') {
+      toast.add({
+        title: t('settings.share_app_copied'),
+        color: 'success',
+        icon: 'i-heroicons-check-circle'
+      })
+    } else if (outcome === 'failed') {
+      toast.add({
+        title: shareUrl,
+        color: 'neutral'
+      })
+    }
+  } finally {
+    isSharingApp.value = false
+  }
+}
 </script>
 
 <template>
@@ -102,6 +142,20 @@ const onBackupImported = () => {
       <p class="text-gray-500 dark:text-gray-400 mt-2">
         {{ $t('settings.description') }}
       </p>
+      <div class="mt-4">
+        <UButton
+          id="share-app-url-btn"
+          icon="i-heroicons-share"
+          color="neutral"
+          variant="outline"
+          size="sm"
+          class="rounded-xl shadow-2xs cursor-pointer font-medium"
+          :loading="isSharingApp"
+          @click="handleShareApp"
+        >
+          {{ $t('settings.share_app') }}
+        </UButton>
+      </div>
     </div>
 
     <!-- Language -->

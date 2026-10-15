@@ -33,6 +33,11 @@
     "title": "Configuració",
     "description": "Gestiona les teves dades personals i preferències de l'aplicació.",
     "save": "Desar configuració",
+    "share_app": "Compartir app",
+    "share_app_title": "Cuánto llevo gastao",
+    "share_app_text": "Control intel·ligent de compres i despeses de supermercat",
+    "share_app_success": "App compartida correctament",
+    "share_app_copied": "Enllaç de l'app copiat al porta-retalls",
     "language": {
       "title": "Idioma",
       "description": "Selecciona l'idioma de l'aplicació."
