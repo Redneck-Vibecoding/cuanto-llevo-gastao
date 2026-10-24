@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.13.0...v1.14.0) (2026-10-24)
+
+
+### Features
+
+* **i18n:** add English and Hindi language options to settings ([f335382](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/f3353828f092de826a84b5dfd0aac241fc14cd8c))
+
 # [1.13.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.12.0...v1.13.0) (2026-10-15)
 
 
