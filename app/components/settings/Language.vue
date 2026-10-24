@@ -3,7 +3,9 @@ const { locale, setLocale, t } = useI18n()
 
 const languageOptions = [
     { label: 'ca', value: 'ca' },
-    { label: 'es', value: 'es' }
+    { label: 'es', value: 'es' },
+    { label: 'en', value: 'en' },
+    { label: 'hi', value: 'hi' }
 ]
 </script>
 
@@ -25,7 +27,7 @@ const languageOptions = [
             <div class="w-full sm:w-1/2">
                 <USelect
 :model-value="locale" :items="languageOptions" option-attribute="label" value-attribute="value"
-                    @update:model-value="(val) => setLocale(val as 'ca' | 'es')" />
+                    @update:model-value="(val) => setLocale(val as 'ca' | 'es' | 'en' | 'hi')" />
             </div>
         </div>
     </UCard>

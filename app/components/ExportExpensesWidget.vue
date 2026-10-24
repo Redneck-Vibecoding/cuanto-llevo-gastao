@@ -113,9 +113,10 @@ const handleExport = async () => {
 
     if (outcome === 'shared' || outcome === 'downloaded') {
       const toastTitle = t(`export_widget.success_toast_${selectedFormat.value}`)
+      const expenseWord = locale.value === 'ca' ? 'despeses' : locale.value === 'en' ? 'expenses' : locale.value === 'hi' ? 'खर्च' : 'gastos'
       toast.add({
         title: toastTitle,
-        description: `${filteredExpenses.value.length} ${locale.value === 'ca' ? 'despeses' : 'gastos'} · ${totalAmount.value.toFixed(2)} € · ${filename}`,
+        description: `${filteredExpenses.value.length} ${expenseWord} · ${totalAmount.value.toFixed(2)} € · ${filename}`,
         color: 'success'
       })
     }

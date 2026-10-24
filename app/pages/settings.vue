@@ -15,7 +15,13 @@ const formattedReleaseDate = computed(() => {
     const parts = raw.split('-').map(Number)
     if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
       const date = new Date(parts[0], parts[1] - 1, parts[2])
-      return date.toLocaleDateString(locale.value === 'ca' ? 'ca-ES' : 'es-ES', {
+      const localeMap: Record<string, string> = {
+        ca: 'ca-ES',
+        es: 'es-ES',
+        en: 'en-US',
+        hi: 'hi-IN'
+      }
+      return date.toLocaleDateString(localeMap[locale.value] || locale.value || 'es-ES', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'

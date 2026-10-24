@@ -54,7 +54,7 @@
 - **PWA & Offline**: `@vite-pwa/nuxt` / Workbox / IndexedDB
 - **Estado**: Pinia con sincronización persistente
 - **Reconocimiento de Tickets**: Tesseract.js (OCR local) + OpenAI Vision (opcional)
-- **Idiomas**: Soporte en Español (`es`) por defecto y Català (`ca`)
+- **Idiomas**: Soporte en Español (`es`) por defecto, Català (`ca`), Inglés (`en`) e Hindi (`hi`)
 
 ---
 

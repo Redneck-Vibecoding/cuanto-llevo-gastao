@@ -1,0 +1,643 @@
+{
+  "common": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "nationalId": "National ID",
+    "email": "Email address",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Settings saved",
+    "export": "Export",
+    "import": "Import",
+    "disconnect": "Disconnect",
+    "all": "All",
+    "current_month": "Current month",
+    "all_months": "All months"
+  },
+  "errors": {
+    "share_not_allowed": "Sharing not allowed, downloading...",
+    "share_not_supported": "Your device does not support sharing this file, downloading...",
+    "export_failed": "Could not export",
+    "no_data": "No data to export",
+    "select_month_export": "Select a month to export"
+  },
+  "success": {},
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your personal data and application preferences.",
+    "save": "Save settings",
+    "share_app": "Share app",
+    "share_app_title": "Cuánto llevo gastao",
+    "share_app_text": "Smart tracking for grocery shopping and expenses",
+    "share_app_success": "App shared successfully",
+    "share_app_copied": "App link copied to clipboard",
+    "language": {
+      "title": "Language",
+      "description": "Select the application language."
+    },
+    "budget": {
+      "title": "Budget",
+      "description": "Configure your monthly budget.",
+      "label": "Monthly budget",
+      "help": "This amount will be used to calculate spending percentages on the home page."
+    },
+    "backup": {
+      "title": "Backups",
+      "description": "Export and import your data so you don't lose anything.",
+      "export_config": "Export Configuration",
+      "import_config": "Import Backup",
+      "export_data": "Export Data",
+      "select_year": "Select year",
+      "select_month": "Select month",
+      "encrypt": "Encrypt with password",
+      "password": "Password",
+      "export_btn": "Download Backup",
+      "share_btn": "Share Backup",
+      "import_placeholder": "Select a .json file...",
+      "export_config_btn": "Export Config",
+      "export_config_description": "Saves budget, API keys, and application options.",
+      "export_data_description": "Saves purchases record, breakdowns, and receipts.",
+      "export_data_btn": "Export Data",
+      "import_config_description": "Restores configuration or data from a previous `.json` file.",
+      "select_file": "Select file",
+      "change_file": "Change file",
+      "search_file": "Browse file...",
+      "process_import": "Process Import",
+      "encrypt_help": "Protects the file with a password.",
+      "password_help": "Used to protect the exported file.",
+      "imported": "Backup imported",
+      "updated_data_config": "Data and configuration updated",
+      "updated_data": "Data updated",
+      "updated_config": "Configuration updated",
+      "enter_password": "Enter password to import",
+      "select_file_warning": "Select a backup file",
+      "malformed": "Malformed or empty backup",
+      "import_config_title": "Import Configuration",
+      "import_config_confirm": "This will overwrite current configuration. Do you want to continue?",
+      "import_data_title": "Import Data",
+      "overwrite_month": "You are about to overwrite data for the month of {month}. Do you want to continue?",
+      "overwrite_year": "You are about to overwrite data for the year {year}. Other years will remain intact. Do you want to continue?",
+      "overwrite_all": "You are about to overwrite ALL registered purchases. This action cannot be undone. Do you want to continue?",
+      "confirm_import": "Confirm and Import",
+      "import_error": "Error importing (incorrect password?)"
+    },
+    "maintenance": {
+      "title": "Maintenance",
+      "description": "Advanced data management options.",
+      "storage_usage": "Approximate storage usage",
+      "local_data": "Local data saved in IndexedDB",
+      "total_expenses": "{count} total expenses",
+      "delete_data": "Delete Data",
+      "year": "Year",
+      "select_year": "Select a year",
+      "month_optional": "Month (Optional)",
+      "entire_year": "Entire year",
+      "select_year_to_delete": "Select a year to delete",
+      "delete_month_data": "Delete data from {month}",
+      "delete_year_data": "Delete entire year {year}",
+      "confirm_delete_title": "Delete data?",
+      "confirm_delete_month": "This will delete all purchases and receipts for the month of {month}. This action is irreversible.",
+      "confirm_delete_year": "This will delete all purchases and receipts for the year {year}. This action is irreversible.",
+      "data_deleted": "Data deleted",
+      "tickets_title": "Attached receipts",
+      "tickets_description": "Images and PDFs saved in IndexedDB along with other local data.",
+      "tickets_count": "{count} receipts",
+      "remove_tickets": "Delete receipts",
+      "remove_tickets_for_selection": "Delete only receipts for the selected period",
+      "tickets_removed": "Receipts deleted",
+      "confirm_remove_tickets_title": "Delete receipts?",
+      "confirm_remove_tickets_all_desc": "All receipt attachments will be deleted to free space in IndexedDB. Expenses and their lightweight data will be kept. This action cannot be undone.",
+      "confirm_remove_tickets_selection_desc": "Attached receipts for the selected period will be deleted to free space in IndexedDB. Expenses and their lightweight data will be kept. This action cannot be undone.",
+      "legacy_title": "Old data in localStorage",
+      "legacy_description": "Migration to IndexedDB has already completed. You can delete this old copy to free browser storage.",
+      "legacy_keys": "{count} legacy keys",
+      "clear_legacy": "Delete old copy",
+      "confirm_clear_legacy_title": "Delete old copy?",
+      "confirm_clear_legacy_description": "Legacy keys will be removed from localStorage. Current IndexedDB data will remain intact.",
+      "legacy_cleared": "Old copy deleted",
+      "storage_strategy": {
+        "storage_limit_title": "Persistence in IndexedDB",
+        "storage_limit_description": "Cuánto llevo gastao saves purchases, expenses, configuration, caches, and receipts in a single IndexedDB database.",
+        "active": "Active",
+        "active_title": "Local data in IndexedDB",
+        "active_description": "Receipts live in a separate table within the same database to avoid rewriting large files every time an expense changes. Backups hydrate them when exporting data.",
+        "app_state": "Main data",
+        "attachments": "Receipts",
+        "browser_usage": "Browser usage",
+        "browser_quota": "Available quota"
+      }
+    },
+    "openai": {
+      "label": "OpenAI API Key",
+      "description": "Enables enhanced AI receipt analysis.",
+      "privacy": "Scanned receipts will be sent to OpenAI for analysis. The key is stored only on this device."
+    }
+  },
+  "home": {
+    "title": "Home",
+    "welcome": {
+      "title": "Welcome to",
+      "description": "Manage your supermarket purchases and expenses completely locally. Cuánto llevo gastao stores no data on any server and works completely offline."
+    },
+    "alerts": {
+      "price_missing": {
+        "title": "Add allowance price",
+        "description": "Configure price to calculate totals and generate documents correctly."
+      }
+    },
+    "documents": {
+      "title": "Generate documents",
+      "selected_month": "Selected month",
+      "services_count": "{count} services",
+      "diets_types": "Allowances: {full} full · {half} half",
+      "kilometers": "Kilometers",
+      "missing_templates": "A monthly or service template must be uploaded from Settings."
+    },
+    "stats": {
+      "worked_hours": "Hours worked",
+      "weekly_average": "Weekly average",
+      "weekly_average_subtitle": "Average of {weeks} weeks in {month}",
+      "service_average": "Average per service",
+      "service_average_subtitle": "Average based on {count} services",
+      "services": "Services",
+      "diets": "Allowances",
+      "configured_prices": "Configured prices",
+      "full": "Full",
+      "half": "Half",
+      "kilometers": "Kilometers",
+      "kilometers_average": "Average: {avg} km/service"
+    },
+    "wrapped": {
+      "annual_summary": "Annual Summary",
+      "your_year": "Your {year}",
+      "discover": "Discover your statistics"
+    },
+    "lunches": "Lunches: {count}",
+    "dinners": "Dinners: {count}",
+    "events_of_day": "📅 Events of the day",
+    "all_day": "All day",
+    "registered_services": "Registered services"
+  },
+  "months": {
+    "0": "All",
+    "1": "January",
+    "2": "February",
+    "3": "March",
+    "4": "April",
+    "5": "May",
+    "6": "June",
+    "7": "July",
+    "8": "August",
+    "9": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
+  },
+  "weekdays": {
+    "1": "Monday",
+    "2": "Tuesday",
+    "3": "Wednesday",
+    "4": "Thursday",
+    "5": "Friday",
+    "6": "Saturday",
+    "7": "Sunday"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "local_first": {
+      "title": "1. No Servers (Local-First)",
+      "p1": "Cuánto llevo gastao is designed with a <strong>Local-First</strong> philosophy. This means we have no central servers, cloud databases, or systems to collect, store, or process your data.",
+      "p2": "All information entered into the application is stored <strong>exclusively on your device</strong> (computer, tablet, or mobile) using browser technologies (IndexedDB)."
+    },
+    "responsibility": {
+      "title": "2. User Responsibility and Security",
+      "p1": "Since we do not have access to your data, <strong>we cannot recover it</strong> in case of loss, device theft, or accidental browser deletion.",
+      "p2": "Therefore, it is your sole responsibility to:",
+      "li1": "Maintain the physical and logical security of your device.",
+      "li2": "Perform regular <strong>backups</strong> (Settings > Export Config/Data).",
+      "li3": "Use the <strong>encryption</strong> option when exporting backups to protect sensitive data if sharing the file."
+    },
+    "stored_data": {
+      "title": "3. Stored Data",
+      "p1": "The application locally stores the following information necessary for its operation:",
+      "li1": "Configuration data and preferences.",
+      "li2": "Purchases record, item breakdowns, and scanned receipts.",
+      "li3": "Configuration preferences (theme, budget).",
+      "li4": "Access tokens or user-configured keys (if applicable).",
+      "li5": "Optional keys (OpenAI Vision API)."
+    },
+    "third_party": {
+      "title": "4. Third-Party Services",
+      "p1": "Although Cuánto llevo gastao has no servers of its own, the application may connect directly from your browser to third-party services if you enable these features:",
+      "google_calendar": {
+        "title": "Google Calendar API",
+        "description": "Only used if you connect your calendar to read events. The connection is made directly between your browser and Google."
+      },
+      "google_maps": {
+        "title": "Google Maps API",
+        "description": "If you configure your API key, it will be used to calculate distances or locations."
+      }
+    },
+    "deletion": {
+      "title": "5. Data Deletion",
+      "p1": "You have full control over your data. You can delete all information stored by Cuánto llevo gastao at any time simply by:",
+      "li1": "Using the \"Delete all data\" option in the maintenance section of Settings.",
+      "li2": "Or by clearing website data (cookies and local storage) in your browser settings."
+    },
+    "contact": {
+      "title": "6. Contact",
+      "p1": "If you have questions about this policy or the technical operation of the application, you can open an issue or discussion on the official <a href=\"https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao\" target=\"_blank\" class=\"text-primary-500 hover:underline\">GitHub</a> repository."
+    }
+  },
+  "terms": {
+    "title": "General Terms of Service",
+    "nature": {
+      "title": "1. Nature of Service",
+      "p1": "<strong>Cuánto llevo gastao</strong> is a free and open-source software project (<a href=\"https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao\" target=\"_blank\" class=\"text-primary-500 hover:underline\">GitHub</a>) developed and distributed entirely free of charge and non-profit.",
+      "p2": "The purpose of this software is to provide a helpful tool for smart tracking of supermarket purchases and expenses, but does not constitute a professional or commercial service."
+    },
+    "beta": {
+      "title": "2. Development Status (Beta)",
+      "p1": "This application is currently in <strong>BETA</strong> and is considered a \"proof of concept\". This means the software is still under active development, may contain bugs, incomplete features, or undergo significant changes without prior notice."
+    },
+    "disclaimer": {
+      "title": "3. Disclaimer of Warranties and Liability",
+      "p1": "The software is provided \"AS IS\" (<strong>\"AS IS\"</strong>), without warranty of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement.",
+      "p2": "In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.",
+      "warning": "<strong>Important:</strong> The user is solely responsible for the accuracy of entered data and for performing periodic backups. Cuánto llevo gastao saves no data on its servers and is not responsible for any loss of data stored locally on the user's device."
+    },
+    "privacy": {
+      "title": "4. Privacy and Data",
+      "p1": "Cuánto llevo gastao operates under a <strong>Local-First</strong> philosophy. All data you enter (purchases, receipts, budget, personal details) is stored exclusively in your browser (IndexedDB).",
+      "p2": "No information is sent to third-party servers, with the exception of:",
+      "li1": "The OpenAI API if you choose to use smart receipt extraction with AI (direct communication between your browser and OpenAI).",
+      "li2": "The Google Maps API if you configure your key for supermarket location autocomplete."
+    },
+    "license": {
+      "title": "5. License",
+      "p1": "This project is licensed under the terms of the MIT license. You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, provided that the copyright notice and original permission notice are included."
+    }
+  },
+  "components": {
+    "header": {
+      "title": "Cuánto llevo gastao",
+      "beta": "Beta",
+      "home": "Home",
+      "expenses": "Purchases and Receipts",
+      "settings": "Settings",
+      "help": "Help",
+      "theme": "Theme",
+      "statistics": "Statistics"
+    },
+    "qr_modal": {
+      "title": "QR Code",
+      "description": "Scan this code from another device to import the purchase.",
+      "generating": "Generating QR...",
+      "error": "Could not generate QR code",
+      "close": "Close",
+      "share_title": "Share purchase"
+    },
+    "qr_scanner": {
+      "title": "Scan QR",
+      "description": "Frame the QR code inside the box to import the purchase.",
+      "loading": "Starting camera...",
+      "errors": {
+        "permission": "Camera permission is required.",
+        "not_found": "No camera found on this device.",
+        "ssl": "This page is not served over HTTPS (security required).",
+        "in_use": "Camera is already in use.",
+        "overconstrained": "Installed cameras are not suitable.",
+        "stream": "Browser does not support camera access.",
+        "unknown": "Camera error: {error}"
+      }
+    },
+    "pwa": {
+      "update_available": "Update available",
+      "new_version": "New version {version} available!",
+      "update_now": "Update now",
+      "dismiss": "Dismiss",
+      "install": "Install App",
+      "install_description": "Install the app for quick access and offline use."
+    },
+    "selectors": {
+      "search_municipality": "Search municipality...",
+      "select_municipality": "Select municipality",
+      "search_province": "Search province...",
+      "select_province": "Select province"
+    },
+    "expense_form": {
+      "description": "Description",
+      "description_placeholder": "E.g.: Groceries, toll, fuel...",
+      "date": "Date and time",
+      "amount": "Amount (€)",
+      "category": "Category",
+      "category_placeholder": "Select a category",
+      "category_hint": "Only Diet expenses deduct from balance; the rest are tracked separately.",
+      "ticket": "Receipt (optional)",
+      "ticket_hint": "Attach a photo or document of the receipt",
+      "ticket_step_title": "Start with the receipt",
+      "ticket_step_description": "Upload the receipt and extract data with AI before reviewing the form.",
+      "ticket_upload": "Upload file",
+      "ticket_camera": "Take photo",
+      "ticket_remove": "Remove receipt",
+      "ticket_view": "View receipt",
+      "ticket_edit": "Crop",
+      "ticket_crop_title": "Crop receipt",
+      "ticket_crop_hint": "Adjust frame of receipt before saving",
+      "ticket_crop_confirm": "Apply",
+      "ticket_grayscale": "Grayscale",
+      "ticket_download": "Download",
+      "save": "Save purchase",
+      "update": "Update purchase",
+      "validation": {
+        "description_required": "Description is required",
+        "date_required": "Date is required",
+        "amount_required": "Amount is required",
+        "amount_positive": "Amount must be greater than 0",
+        "category_required": "Category is required"
+      },
+      "alerts": {
+        "saved": "Purchase saved successfully",
+        "updated": "Purchase updated successfully",
+        "save_error": "Error saving purchase",
+        "ticket_too_large": "Receipt is too large (maximum {size} MB)",
+        "ticket_invalid": "Invalid file format",
+        "ticket_error": "Could not load receipt",
+        "ocr_success": "Data extracted from receipt",
+        "ocr_empty": "No data detected on receipt",
+        "ocr_error": "Could not read receipt",
+        "location_detected": "Location detected",
+        "location_error": "Could not detect location",
+        "ticket_removed_for_space": "The purchase was saved, but the attached receipt was removed because the browser lacked enough space in IndexedDB. You can free IndexedDB space in Settings."
+      },
+      "ticket_extract": "Extract data",
+      "ticket_extract_progress": "Extracting… {progress}%",
+      "ticket_extract_hint": "Reads receipt and automatically fills empty fields (amount, date, and description).",
+      "ocr_action": "Extract receipt data",
+      "ocr_progress": "Reading receipt… {progress}%",
+      "ocr_hint": "Automatically detects supermarket, date, amount, and item breakdown",
+      "location": "Location (optional)",
+      "location_placeholder": "Search for a place, address, or area...",
+      "location_searching": "Searching locations…",
+      "location_autocomplete_error": "Could not load Google Maps suggestions.",
+      "location_hint": "Can be entered manually, autocomplete via Google Maps, or detected via device location.",
+      "detect_location": "Detect location",
+      "ticket_extract_hint_ai": "Analyzes receipt with OpenAI for more accurate amount, date, description, category, and location detection.",
+      "establishment": "Store / Supermarket",
+      "establishment_placeholder": "E.g.: Mercadona, Carrefour, Lidl, Walmart...",
+      "items_title": "Items breakdown",
+      "items_hint": "Add purchased items for category statistics",
+      "add_item": "Add item",
+      "item_name": "Item",
+      "item_name_placeholder": "Item name",
+      "item_qty": "Qty",
+      "item_price": "Price (€)",
+      "item_category": "Category",
+      "items_sum": "Sum of items",
+      "use_as_total": "Use as total",
+      "items_total": "Total items",
+      "total_calculated": "Calculated total: {amount} €",
+      "calculate_total": "Calculate total from items",
+      "no_items": "No item breakdown yet",
+      "items_count": "{count} items detected",
+      "persistent_category": "Persistent category assignment",
+      "persistent_category_hint": "Remember this category for this item at {supermarket}",
+      "persistent_category_saved": "Persistent category saved for \"{product}\""
+    },
+    "expense_list": {
+      "title": "Recorded expenses",
+      "records_count": "{count} records",
+      "description": "View, edit, or delete existing expenses.",
+      "search_placeholder": "Search by description...",
+      "add": "Add expense",
+      "empty": "No recorded expenses yet.",
+      "per_page": "{count} per page",
+      "all": "All",
+      "actions": "Actions",
+      "date": "Date and time",
+      "description_col": "Description",
+      "amount": "Amount",
+      "edit": "Edit",
+      "delete": "Delete",
+      "view_ticket": "View receipt",
+      "ticket_badge": "Receipt attached",
+      "import": "Import",
+      "import_qr": "Import expense via QR",
+      "share_qr": "Share QR",
+      "qr_title": "Share expense",
+      "modals": {
+        "edit_title": "Edit purchase",
+        "edit_desc": "Update details for the selected purchase",
+        "new_title": "New purchase",
+        "new_desc": "Fill in purchase or receipt details",
+        "delete_title": "Delete purchase",
+        "delete_desc": "Are you sure you want to delete this purchase? This action cannot be undone.",
+        "deleted": "Purchase deleted",
+        "import_success": "Purchase imported successfully",
+        "import_error_title": "Import error",
+        "import_error": "The QR code does not contain a valid purchase."
+      },
+      "selected_count": "{count} selected",
+      "share_selected": "Share selection",
+      "clear_selection": "Clear selection",
+      "select_all": "Select all",
+      "select_row": "Select expense",
+      "share_selected_title": "{count} expenses",
+      "share_success": "Expenses shared successfully",
+      "share_error": "Could not share expenses",
+      "location": "Location",
+      "location_filter_placeholder": "Filter by city, province, or area..."
+    }
+  },
+  "help": {
+    "index": {
+      "title": "Help & Documentation",
+      "description": "Application information and reference guide.",
+      "topics_title": "Help Topics",
+      "search_placeholder": "Filter topics...",
+      "no_results": "No topics found matching your search.",
+      "clear_filter": "Clear filter",
+      "legal_section": "Legal",
+      "terms_desc": "Legal information, warranties, and terms of use.",
+      "privacy_desc": "How we manage (and do not store) your data."
+    },
+    "topics": {
+      "about": {
+        "title": "About Cuánto llevo gastao",
+        "description": "Local philosophy, privacy, and how your data works."
+      },
+      "pwa": {
+        "title": "Installation (PWA)",
+        "description": "How to install the application on your mobile or computer."
+      },
+      "maps": {
+        "title": "Google Maps API",
+        "description": "Supermarket autocomplete and geolocation."
+      },
+      "backups": {
+        "title": "Backups",
+        "description": "How to export, import, and protect your data."
+      }
+    }
+  },
+  "layout": {
+    "footer": {
+      "rights": "All rights reserved.",
+      "terms": "General Terms",
+      "privacy": "Privacy Policy"
+    }
+  },
+  "expenses": {
+    "title": "Expenses",
+    "subtitle": "Manage your expenses and view your net balance.",
+    "list_title": "Expenses",
+    "list_description": "Expenses for {month}",
+    "list_description_day": "Expenses for {day}",
+    "calendar_title": "Expense calendar",
+    "all_categories": "All categories",
+    "categories": {
+      "carnes": "Meat",
+      "pescados": "Fish and Seafood",
+      "charcuteria": "Deli & Cold Cuts",
+      "verduras": "Vegetables",
+      "frutas": "Fruits",
+      "quesos": "Cheeses",
+      "lacteos_huevos": "Dairy and Eggs",
+      "panes_tostadas": "Bread and Toast",
+      "desayuno_dulces_cafe": "Breakfast, Sweets & Coffee",
+      "arroz_pastas_legumbres": "Rice, Pasta & Legumes",
+      "caldos_sopas_pures": "Broths, Soups & Purees",
+      "aperitivos_frutos_secos": "Snacks & Nuts",
+      "congelados": "Frozen Food",
+      "helados": "Ice Cream",
+      "bebidas": "Beverages",
+      "aceites_condimentos": "Oils, Sauces & Condiments",
+      "conservas": "Canned Goods",
+      "limpieza": "Cleaning & Household",
+      "cuidado_personal": "Personal Care & Hygiene",
+      "mascotas": "Pets",
+      "hogar": "Home & Bazaar",
+      "otros": "Other",
+      "vivienda": "Housing (Rent / Mortgage)",
+      "suministros": "Utilities (Electricity, Water, Gas)",
+      "alimentacion": "Supermarket & Groceries",
+      "transporte": "Transportation & Vehicle",
+      "telecomunicaciones": "Internet, Phone & TV",
+      "salud": "Health & Pharmacy",
+      "ropa_calzado": "Clothing & Footwear",
+      "ocio_restauracion": "Leisure & Dining Out",
+      "suscripciones": "Subscriptions & Streaming",
+      "educacion": "Education & Training",
+      "seguros": "Insurance & Finance",
+      "impuestos": "Taxes & Fees",
+      "viajes": "Travel & Vacations",
+      "frescos": "Fresh Produce (Fruit, Veg, Meat, Fish)",
+      "farmacia": "Pharmacy",
+      "diet": "Food & Diet",
+      "parking": "Parking",
+      "gas": "Gas / Fuel",
+      "tolls": "Tolls",
+      "other": "Other"
+    },
+    "stats": {
+      "count": "{count} purchases",
+      "diet_total": "Total spent",
+      "other_total": "Number of purchases",
+      "other_total_subtitle": "In the selected period",
+      "daily_average": "Average spend",
+      "daily_average_subtitle": "Average per receipt/purchase",
+      "net_balance": "Days with purchases",
+      "net_balance_subtitle": "{days} days with recorded purchases",
+      "by_category": "By category"
+    },
+    "list_description_range": "Expenses from {start} to {end}"
+  },
+  "dashboard": {
+    "title": "¿Cuánto llevo gastao?",
+    "subtitle": "Smart grocery shopping expense tracking",
+    "spent_this_month": "Spent this month",
+    "monthly_budget": "Monthly budget",
+    "budget_remaining": "{amount} € remaining",
+    "budget_exceeded": "{amount} € over budget",
+    "budget_pct": "{pct}% spent",
+    "edit_budget": "Adjust budget",
+    "set_budget_title": "Monthly budget",
+    "set_budget_description": "Set your monthly spending goal for grocery shopping.",
+    "budget_input_label": "Monthly budget (€)",
+    "new_expense": "New purchase",
+    "scan_ticket": "Scan receipt",
+    "categories_overview": "Spending by category this month",
+    "recent_purchases": "Recent purchases this month",
+    "no_purchases_month": "No purchases recorded for this month yet.",
+    "view_all": "View all purchases",
+    "daily_average": "Daily average spend",
+    "total_tickets": "Receipts this month",
+    "avg_ticket": "Average per purchase",
+    "items_breakdown": "Items breakdown",
+    "items_count": "{count} items"
+  },
+  "statistics": {
+    "title": "Purchase statistics",
+    "subtitle": "Detailed analysis of your spending by product category and supermarket",
+    "all_months": "All months",
+    "total_spent": "Total spent",
+    "avg_ticket": "Average receipt",
+    "purchases_count": "{count} purchases",
+    "by_category": "Spending by product category",
+    "by_supermarket": "Spending by supermarket",
+    "no_data": "No purchase data for this period.",
+    "top_products": "Most frequent products"
+  },
+  "export_widget": {
+    "title": "Export expenses",
+    "subtitle": "Download your expenses as PDF, CSV, or a compressed ZIP archive",
+    "badge": "PDF · CSV · ZIP",
+    "period_label": "Select period",
+    "format_label": "Export format",
+    "formats": {
+      "pdf": "PDF only",
+      "pdf_desc": "Formatted report",
+      "csv": "CSV only",
+      "csv_desc": "Excel spreadsheet",
+      "zip": "All in ZIP",
+      "zip_desc": "PDF + CSV + Receipts"
+    },
+    "periods": {
+      "current_month": "This month",
+      "previous_month": "Previous month",
+      "current_quarter": "This quarter",
+      "current_semester": "This semester",
+      "previous_semester": "Previous semester",
+      "current_year": "This year",
+      "previous_year": "Previous year",
+      "all": "All history",
+      "custom": "Custom period..."
+    },
+    "custom_from": "From",
+    "custom_to": "To",
+    "invalid_range": "Start date cannot be after end date.",
+    "period_preview": "Period:",
+    "expenses_count": "{count} expenses found",
+    "total_amount": "Total: {amount} €",
+    "target_file": "File:",
+    "includes_info": "Includes PDF report, CSV spreadsheet, and attached receipts",
+    "no_expenses": "No expenses recorded in this period.",
+    "export_btn_pdf": "Download PDF report",
+    "export_btn_csv": "Download CSV spreadsheet",
+    "export_btn_zip": "Download ZIP archive",
+    "exporting_pdf": "Generating PDF report...",
+    "exporting_csv": "Generating CSV...",
+    "exporting_zip": "Generating ZIP archive...",
+    "success_toast_pdf": "PDF report downloaded successfully",
+    "success_toast_csv": "CSV file downloaded successfully",
+    "success_toast_zip": "ZIP archive downloaded successfully",
+    "error_toast": "Error generating export"
+  }
+}

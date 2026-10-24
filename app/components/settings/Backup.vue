@@ -267,7 +267,7 @@ const processImport = async (payload: ImportPayload) => {
     if (settings) {
         await settingsStore.loadSettings(settings)
         if (settings.locale) {
-            setLocale(settings.locale as 'ca' | 'es')
+            setLocale(settings.locale as 'ca' | 'es' | 'en' | 'hi')
         }
     }
 
