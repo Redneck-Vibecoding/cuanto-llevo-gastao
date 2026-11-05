@@ -1,3 +1,10 @@
+## [1.14.1](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.14.0...v1.14.1) (2026-11-05)
+
+
+### Bug Fixes
+
+* **export:** remove frescos grouping and keep meat produce and fish categories independent ([b156e75](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/commit/b156e75530804fa80206eb1002cb4484e2a9ed08))
+
 # [1.14.0](https://github.com/Redneck-Vibecoding/cuanto-llevo-gastao/compare/v1.13.0...v1.14.0) (2026-10-24)
 
 
