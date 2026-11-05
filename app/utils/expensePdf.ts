@@ -147,9 +147,10 @@ export function generateExpensesPdf(
   // Normalize subcategories or OCR aliases to canonical categories
   const normalizeCat = (c: string): string => {
     const norm = c.toLowerCase().trim()
-    if (norm === 'fruta' || norm === 'verdura' || norm === 'carne' || norm === 'carnes' || norm === 'pescado') {
-      return 'frescos'
-    }
+    if (norm === 'carne') return 'carnes'
+    if (norm === 'pescado') return 'pescados'
+    if (norm === 'fruta') return 'frutas'
+    if (norm === 'verdura') return 'verduras'
     return norm
   }
 
@@ -297,7 +298,7 @@ export function generateExpensesPdf(
 
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(107, 114, 128)
-    const cat = resolveExpenseCategory(expense)
+    const cat = normalizeCat(resolveExpenseCategory(expense))
     doc.text(safeText(getCatLabel(cat), 25), marginLeft + 115, currentY + 4.3)
 
     doc.setFont('helvetica', 'bold')

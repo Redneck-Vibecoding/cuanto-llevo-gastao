@@ -27,9 +27,13 @@
 - **Recorte y Optimización**: Permite recortar el comprobante, aplicar escala de grises y guardarlo comprimido en el dispositivo.
 
 ### 📈 4. Apartado Estadístico por Categorías de Productos
-- Análisis exhaustivo por categorías esenciales:
-  - **Alimentación** (conservas, lácteos, despensa, etc.)
-  - **Frescos** (fruta, verdura, carne, pescado)
+- Análisis exhaustivo por categorías esenciales e independientes de supermercado:
+  - **Carnes**
+  - **Pescados y Mariscos**
+  - **Charcutería**
+  - **Verduras y Hortalizas**
+  - **Frutas**
+  - **Lácteos y Huevos**
   - **Bebidas** (agua, refrescos, zumos, etc.)
   - **Limpieza** (detergentes, lejía, lavavajillas, etc.)
   - **Higiene y Cuidado Personal** (gel, champú, desodorante, etc.)
